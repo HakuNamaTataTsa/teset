@@ -638,7 +638,7 @@
     }
 
     async function callBlipModel(imageUrl, apiKey) {
-      const res = await fetch('https://api-inference.huggingface.co/models/nlpconnect/vit-gpt2-image-captioning', {
+      const res = await fetch('https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
