@@ -121,11 +121,6 @@
     .btn-restore{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.2)}.btn-restore:hover{background:#60a5fa;color:#fff}
     .btn-update{background:var(--accent);color:#0a0a0f;border:none}.btn-update:hover{box-shadow:0 2px 10px rgba(255,221,87,.25)}
 
-    .btn-ai{background:rgba(139,92,246,.12);color:#a78bfa;border-color:rgba(139,92,246,.2)}
-    .btn-ai:hover{background:#a78bfa;color:#fff}
-    .ai-log-item{padding:.35rem .5rem;border-bottom:1px solid var(--border);font-size:.7rem;display:flex;gap:.5rem;align-items:center}
-    .ai-log-item span{color:var(--muted);font-family:var(--fd);flex-shrink:0}
-
     .pagination{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:1rem 0 .25rem}
     .pg-btn{padding:.5rem 1rem;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);color:var(--muted);font-family:var(--fb);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.35rem;min-height:36px}
     .pg-btn:hover:not(:disabled){color:var(--fg);border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
@@ -208,6 +203,47 @@
       .item-info .ii-link a{max-width:90px}
       .btn-sm{padding:.22rem .4rem;font-size:.58rem}
     }
+
+    /* ═══════════════════════════════════════════════════ */
+    /* TAMBAHAN: AI Kategorisasi Styles                    */
+    /* ═══════════════════════════════════════════════════ */
+    .ai-cat-badge{display:inline-flex;align-items:center;gap:.2rem;font-size:.6rem;font-weight:600;padding:.1rem .45rem;border-radius:50px;white-space:nowrap}
+    .ai-cat-badge.categorized{background:rgba(34,211,153,.12);color:#22d399;border:1px solid rgba(34,211,153,.2)}
+    .ai-cat-badge.uncategorized{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border)}
+    .ai-cat-badge.failed{background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.18)}
+    .ai-cat-badge.identified{background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.18)}
+    .btn-ai{background:rgba(34,211,153,.1);color:#22d399;border-color:rgba(34,211,153,.2)}
+    .btn-ai:hover{background:#22d399;color:#0a0a0f}
+    .btn-ai:disabled{opacity:.4;cursor:not-allowed;background:rgba(34,211,153,.05);color:#22d399}
+    .btn-ai-clear{background:rgba(255,255,255,.03);color:var(--muted);border-color:var(--border)}
+    .btn-ai-clear:hover{color:var(--fg);border-color:rgba(255,255,255,.12)}
+    .ai-action-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap}
+    .ai-toggle{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--muted);cursor:pointer;user-select:none}
+    .ai-toggle input{display:none}
+    .ai-toggle .toggle-track{width:34px;height:18px;border-radius:50px;background:var(--border);position:relative;transition:background .25s}
+    .ai-toggle .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted);transition:all .25s}
+    .ai-toggle input:checked+.toggle-track{background:rgba(34,211,153,.35)}
+    .ai-toggle input:checked+.toggle-track::after{left:18px;background:#22d399}
+    .ai-progress{width:100%;height:4px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:1rem;display:none}
+    .ai-progress.show{display:block}
+    .ai-progress .bar{height:100%;background:linear-gradient(90deg,#22d399,#60a5fa);border-radius:4px;transition:width .4s ease;width:0}
+    .ai-log{max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--rs);background:rgba(0,0,0,.2)}
+    .ai-log-entry{padding:.65rem .85rem;border-bottom:1px solid var(--border);font-size:.72rem;animation:fadeUp .3s ease}
+    .ai-log-entry:last-child{border-bottom:none}
+    .ai-log-entry .log-head{display:flex;align-items:center;gap:.4rem;margin-bottom:.2rem;flex-wrap:wrap}
+    .ai-log-entry .log-time{font-family:var(--fd);font-size:.62rem;color:var(--muted);font-weight:500}
+    .ai-log-entry .log-status{font-size:.6rem;font-weight:700}
+    .ai-log-entry .log-status.ok{color:#22d399}
+    .ai-log-entry .log-status.fail{color:#f87171}
+    .ai-log-entry .log-caption{font-size:.68rem;color:var(--fg-dim);font-style:italic;margin-top:.15rem;padding:.3rem .5rem;background:rgba(255,255,255,.02);border-radius:6px;border-left:2px solid var(--border);word-break:break-word}
+    .ai-log-entry .log-error{font-size:.65rem;color:#f87171;margin-top:.15rem}
+    .ai-log-entry .log-stock{color:var(--accent);font-weight:600;font-size:.7rem}
+    .ai-log-entry .log-category{color:#22d399;font-weight:600;font-size:.7rem}
+    .ai-log-empty{text-align:center;padding:2rem;color:var(--muted);font-size:.78rem}
+    .ai-log-empty i{font-size:1.4rem;display:block;margin-bottom:.4rem;opacity:.3}
+    .ai-item-info .ai-cat-row{display:flex;align-items:center;gap:.3rem;margin-top:.15rem}
+    @keyframes aiSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .ai-spinning i{animation:aiSpin 1s linear infinite}
   </style>
 </head>
 <body>
@@ -239,6 +275,8 @@
       <button class="tab-btn active" onclick="switchTab('stock')"><i class="fas fa-car"></i> Stock Mobil</button>
       <button class="tab-btn" onclick="switchTab('limited')"><i class="fas fa-star"></i> Secret Car</button>
       <button class="tab-btn" onclick="switchTab('sosmed')"><i class="fas fa-share-nodes"></i> Sosmed</button>
+      <!-- ═══ TAMBAHAN: Tab AI Kategori ═══ -->
+      <button class="tab-btn tab-ai-btn" onclick="switchAI()"><i class="fas fa-robot"></i> AI Kategori</button>
     </div>
 
     <div class="tab-panel active" id="tabStock">
@@ -267,20 +305,6 @@
       <hr class="divider">
       <div class="sec-title" style="color:var(--muted)"><i class="fas fa-trash"></i> Dihapus <span class="count" id="cntDel" style="background:rgba(255,255,255,.05);color:var(--muted)">0</span></div>
       <div id="listDel"></div>
-
-      <!-- AI Section -->
-      <div id="aiApiKeySection" class="form-card" style="margin-top:1.5rem">
-        <h4><i class="fas fa-robot"></i> AI Kategorisasi</h4>
-        <div class="fr">
-          <label>Hugging Face API Key</label>
-          <input type="password" id="hfApiKey" placeholder="hf_xxxxxxxxxxxx">
-          <div class="hint">Dapatkan di <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--accent)">huggingface.co/settings/tokens</a> (read token).</div>
-        </div>
-        <button class="btn-primary" onclick="saveApiKey()"><i class="fas fa-save"></i> Simpan</button>
-        <div class="form-msg" id="apiKeyMsg"></div>
-      </div>
-      <div class="sec-title" style="margin-top:1rem"><i class="fas fa-history"></i> AI Activity Log</div>
-      <div id="aiLogList" style="max-height:300px;overflow-y:auto;margin-bottom:1rem"></div>
     </div>
 
     <div class="tab-panel" id="tabLimited">
@@ -312,10 +336,33 @@
       <div class="filter-row" id="sosmedFilter"></div>
       <div id="sosmedList"></div>
     </div>
+
+    <!-- ═══ TAMBAHAN: Panel AI Kategori ═══ -->
+    <div class="tab-panel" id="tabAI">
+      <div class="stats" id="aiStats"></div>
+      <div class="ai-action-bar">
+        <label class="ai-toggle" title="Otomatis analisa stock baru saat ditambahkan">
+          <input type="checkbox" id="aiAutoToggle" checked>
+          <span class="toggle-track"></span>
+          <span>Auto-analisa stock baru</span>
+        </label>
+        <div style="flex:1"></div>
+        <button class="btn-primary btn-sm" id="aiAnalyzeAllBtn" onclick="window.aiAnalyzeAll()" style="font-size:.72rem;padding:.45rem .9rem"><i class="fas fa-wand-magic-sparkles"></i> Analisa Semua yang Belum</button>
+      </div>
+      <div class="ai-progress" id="aiProgress"><div class="bar" id="aiProgressBar"></div></div>
+      <div class="sec-title"><i class="fas fa-car-side" style="color:#22d399"></i> Daftar Stock <span class="count" id="aiCntTotal" style="background:rgba(34,211,153,.12);color:#22d399">0</span></div>
+      <div id="aiStockList"></div>
+      <hr class="divider">
+      <div class="sec-title"><i class="fas fa-clipboard-list" style="color:#60a5fa"></i> Log Aktivitas AI <span class="count" id="aiCntLog" style="background:rgba(96,165,250,.12);color:#60a5fa">0</span></div>
+      <div id="aiLogList" class="ai-log"></div>
+    </div>
   </div>
 
   <div class="toast-wrap" id="toasts"></div>
 
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- SCRIPT: Login, UI, Toast, Thumbnail, Sosmed Render Functions -->
+  <!-- ═══════════════════════════════════════════════════ -->
   <script>
     var PASS='bajingan011';
     var sosmedFilter='all';
@@ -457,7 +504,7 @@
       var code=window.getIgCode(url);if(!code){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Link Instagram tidak valid.';return}
       if(POSTS.some(function(p){return window.getIgCode(p.url)===code})){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Post ini sudah ada.';return}
       var btn=document.getElementById('addBtn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-      try{await addDoc(collection(db,"carStock"),{url:url,price:price,desc:desc,addedAt:Date.now(),status:"available",soldAt:null,editedPrice:""});msg.className='form-msg ok show';msg.innerHTML='<i class="fas fa-check-circle"></i> Stock berhasil ditambahkan!';document.getElementById('addUrl').value='';document.getElementById('addPrice').value='';document.getElementById('addDesc').value='';currentPage=1;setTimeout(function(){msg.style.display='none'},3000)}
+      try{await addDoc(collection(db,"carStock"),{url:url,price:price,desc:desc,addedAt:Date.now(),status:"available",soldAt:null,editedPrice:"",aiCategory:""});msg.className='form-msg ok show';msg.innerHTML='<i class="fas fa-check-circle"></i> Stock berhasil ditambahkan!';document.getElementById('addUrl').value='';document.getElementById('addPrice').value='';document.getElementById('addDesc').value='';currentPage=1;setTimeout(function(){msg.style.display='none'},3000)}
       catch(err){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Gagal: '+err.message}
       finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-plus"></i> Tambah Stock'}
     };
@@ -502,30 +549,43 @@
       delList.forEach(function(c){var code=window.getIgCode(c.url);hd+='<div class="item" style="opacity:.45"><div class="item-thumb sc-b">'+window.getThumbHtml(code)+'</div><div class="item-info deleted"><div class="ii-price">'+escL(c.name)+'</div><div class="ii-desc">'+escL(c.url)+'</div><div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(c.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(c.url))+'</a></div></div><div class="item-actions"><button class="btn-sm btn-restore" data-id="'+c.id+'"><i class="fas fa-rotate-left"></i> Pulihkan</button></div></div>'});
       var ld=document.getElementById('scListDel');ld.innerHTML=hd;ld.querySelectorAll('.btn-restore').forEach(function(btn){btn.addEventListener('click',function(){restoreSecretCar(btn.getAttribute('data-id'))})});
     }
-    window.addSecretCar=async function(){
-      var name=document.getElementById('scAddName').value.trim(),url=document.getElementById('scAddUrl').value.trim(),msg=document.getElementById('scAddMsg');
-      msg.className='form-msg';msg.style.display='none';
-      if(!name){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Nama mobil wajib diisi.';return}
-      if(!url){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Link Instagram wajib diisi.';return}
-      var code=window.getIgCode(url);if(!code){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Link Instagram tidak valid.';return}
-      if(CARS.some(function(c){return window.getIgCode(c.url)===code&&c.status!=='deleted'})){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Post ini sudah ada di daftar Secret Car.';return}
-      var btn=document.getElementById('scAddBtn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-      try{await addDoc(collection(db,"secretCars"),{name:name,url:url,addedAt:Date.now(),status:"available"});msg.className='form-msg ok show';msg.innerHTML='<i class="fas fa-check-circle"></i> Secret car berhasil ditambahkan!';document.getElementById('scAddName').value='';document.getElementById('scAddUrl').value='';scPage=1;setTimeout(function(){msg.style.display='none'},3000)}
-      catch(err){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Gagal: '+err.message}
-      finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-plus"></i> Tambah Secret Car'}
-    };
     function startSecretEdit(docId){scEditIdx=docId;var car=CARS.find(function(c){return c.id===docId});if(!car)return;document.getElementById('scEditCard').style.display='';document.getElementById('scEditUrl').value=car.url;document.getElementById('scEditOld').value=car.name;document.getElementById('scEditNew').value='';document.getElementById('scEditNew').placeholder=car.name;setTimeout(function(){document.getElementById('scEditNew').focus()},100);document.getElementById('scEditCard').scrollIntoView({behavior:'smooth',block:'center'})}
-    window.saveSecretName=async function(){var v=document.getElementById('scEditNew').value.trim();if(!v){document.getElementById('scEditNew').style.borderColor='#f87171';setTimeout(function(){document.getElementById('scEditNew').style.borderColor=''},1500);return}if(!scEditIdx)return;try{await updateDoc(doc(db,"secretCars",scEditIdx),{name:v});scEditIdx=null;document.getElementById('scEditCard').style.display='none';toast('Nama secret car berhasil diubah','ok')}catch(err){toast('Gagal mengubah nama','err')}};
+    window.saveSecretName=async function(){var v=document.getElementById('scEditNew').value.trim();if(!v){document.getElementById('scEditNew').style.borderColor='#f87171';setTimeout(function(){document.getElementById('scEditNew').style.borderColor=''},1500);return}if(!scEditIdx)return;try{await updateDoc(doc(db,"secretCars",scEditIdx),{name:v});scEditIdx=null;document.getElementById('scEditCard').style.display='none';toast('Nama berhasil diubah','ok')}catch(err){toast('Gagal mengubah nama','err')}};
     window.cancelSecretEdit=function(){scEditIdx=null;document.getElementById('scEditCard').style.display='none';document.getElementById('scEditNew').style.borderColor=''};
     async function deleteSecretCar(docId){try{await updateDoc(doc(db,"secretCars",docId),{status:'deleted'});toast('Secret car dihapus','err')}catch(err){toast('Gagal: '+err.message,'err')}}
     async function restoreSecretCar(docId){try{await updateDoc(doc(db,"secretCars",docId),{status:'available'});toast('Secret car dipulihkan','ok')}catch(err){toast('Gagal: '+err.message,'err')}}
     var scResizeTimer;window.addEventListener('resize',function(){clearTimeout(scResizeTimer);scResizeTimer=setTimeout(function(){scPage=1;renderSecretCars()},300)});
-    onSnapshot(query(collection(db,"secretCars"),orderBy("addedAt","desc")),(snap)=>{CARS=[];snap.forEach((d)=>CARS.push({id:d.id,...d.data()}));renderSecretCars()},(err)=>{console.error("Secret cars listener error:",err)});
+    onSnapshot(query(collection(db,"secretCars"),orderBy("addedAt","desc")),(snap)=>{
+      CARS=[];snap.forEach((d)=>CARS.push({id:d.id,...d.data()}));
+      renderSecretCars();
+    },(err)=>{console.error("Secret cars listener error:",err)});
   </script>
 
-  <!-- ═════════════════════════════════════════════════════════════════ -->
-  <!-- MODULE 3: Firebase — Sosmed Orders (REALTIME) — "orders" collection -->
-  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- ═════════════════════════════════════════════════════════════════════ -->
+  <!-- TAMBAHAN: AI Tab Switching Helper (tanpa mengubah kode lama)    -->
+  <!-- ═════════════════════════════════════════════════════════════════════ -->
+  <script>
+    /* Handle tab AI: tampilkan panel AI, sembunyikan panel lain */
+    window.switchAI = function() {
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active') });
+      document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active') });
+      document.querySelector('.tab-ai-btn').classList.add('active');
+      document.getElementById('tabAI').classList.add('active');
+      /* Trigger render jika AI module sudah siap */
+      if (window.aiRenderAll) window.aiRenderAll();
+    };
+    /* Pastikan panel AI tertutup saat tab lain diklik (existing switchTab tidak tahu tab AI) */
+    document.querySelectorAll('.tab-btn:not(.tab-ai-btn)').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var aiPanel = document.getElementById('tabAI');
+        if (aiPanel) aiPanel.classList.remove('active');
+      });
+    });
+  </script>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- TAMBAHAN: MODULE AI — Kategorisasi Mobil via HuggingFace BLIP                   -->
+  <!-- ═════════════════════════════════════════════════════════════════════════════════ -->
   <script type="module">
     import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import{getFirestore,collection,query,orderBy,onSnapshot,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
@@ -533,258 +593,312 @@
     const app=initializeApp({apiKey:"AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",authDomain:"akinowedding-73271.firebaseapp.com",projectId:"akinowedding-73271",storageBucket:"akinowedding-73271.appspot.com",messagingSenderId:"307666594440",appId:"1:307666594440:web:e7d3496744464f4c6d0d3d"});
     const db=getFirestore(app);
 
-    var ORDERS_COL = "orders";
+    /* ═══ Konfigurasi ═══ */
+    const HF_TOKEN='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';
+    const HF_URL='https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large';
+    const LOG_KEY='aiCatLogs';
+    const MAX_LOGS=80;
+    const BATCH_DELAY=3500;
 
-    onSnapshot(
-      query(collection(db, ORDERS_COL), orderBy("createdAt", "desc")),
-      (snap) => {
-        var orders = [];
-        snap.forEach((d) => { orders.push({ id: d.id, ...d.data() }); });
-        if (window.renderSosmedOrders) window.renderSosmedOrders(orders);
-      },
-      (err) => {
-        console.error("Sosmed listener error:", err);
-        if (window.renderSosmedOrders) window.renderSosmedOrders([]);
-        document.getElementById('sosmedList').innerHTML =
-          '<div class="empty" style="color:#f87171"><i class="fas fa-exclamation-triangle"></i>Gagal memuat pesanan.<br><small style="opacity:.6">Collection: <b>'+ORDERS_COL+'</b><br>Error: '+err.message+'</small></div>';
-      }
-    );
+    /* ═══ State ═══ */
+    var STOCKS=[];
+    var analyzing=false;
+    var analyzingSet=new Set();
 
-    window.updateOrderStatus = async function(btnEl) {
-      var parent = btnEl.parentElement;
-      var selectEl = parent.querySelector('select[data-docid]');
-      if (!selectEl) return;
-
-      var docId = selectEl.getAttribute('data-docid');
-      var newStatus = selectEl.value;
-      if (!docId) { toast('Document ID tidak ditemukan', 'err'); return; }
-
-      var origText = btnEl.innerHTML;
-      btnEl.disabled = true;
-      btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
-
-      try {
-        await updateDoc(doc(db, ORDERS_COL, docId), { status: newStatus });
-        if (window.onOrderUpdated) window.onOrderUpdated();
-      } catch (err) {
-        console.error("Update error:", err);
-        if (window.onOrderUpdateError) window.onOrderUpdateError(err.message || err);
-        btnEl.disabled = false;
-        btnEl.innerHTML = origText;
-      }
-    };
-  </script>
-
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!-- MODULE AI: Auto Kategorisasi (Token sudah tertanam) -->
-  <!-- ═══════════════════════════════════════════════════ -->
-  <script type="module">
-    import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",
-      authDomain: "akinowedding-73271.firebaseapp.com",
-      projectId: "akinowedding-73271",
-      storageBucket: "akinowedding-73271.appspot.com",
-      messagingSenderId: "307666594440",
-      appId: "1:307666594440:web:e7d3496744464f4c6d0d3d"
-    };
-
-    let app;
-    try {
-      app = getApp();
-    } catch {
-      app = initializeApp(firebaseConfig);
+    /* ═══ Keyword Matching ═══ */
+    function matchCategory(caption){
+      if(!caption)return'Tidak Teridentifikasi';
+      var c=caption.toLowerCase();
+      /* Motor duluan */
+      if(/motorcycle|motorbike|moped|scooter|^motor\s|bmw motor/.test(c))return'Motor';
+      /* Truk / Besar */
+      if(/truck|truk|bus\b|excavator|bulldozer|crane|forklift|dump truck|semitrailer/.test(c))return'Truk / Kendaraan Besar';
+      /* Sports Car — paling spesifik duluan */
+      if(/sports\s?car|supra|gt-?r|gtr|mx-?5|mx5|\b86\b|brz|mustang|camaro|corvette|\b911\b|cayman|f-?type|vantage|amg\s?gt|nsx|rx-?7|rx7|skyline|300zx|370z|z4|boxster|evora|exige|elise|4c|mc20|huracan|urus|gt\b|roadster|spyder|spider|gr86|gr supra|fairlady|silvia/.test(c))return'Sports Car';
+      /* Off-Road */
+      if(/jeep|wrangler|land\s?cruiser|cruiser\b|patrol|g-?wagon|gwagon|defender|g\s?class|gclass|fj\s?cruiser|bronco|jimny|4x4|off-?road|rock crawler|buggy/.test(c))return'Off-Road / 4x4';
+      /* SUV */
+      if(/suv|crossover|fortuner|rush|x-?trail|terios|rav4|cx-?5|outlander|sportage|seltos|creta|almaz|tucson|pajero|cr-?v|crv|hr-?v|hrv|brv|everest|wuling|cherokee|captiva|trailblazer|escalade|navigator|highlander|pilot|4runner|pathfinder|murano|rogue|tahoe|suburban|yukon|cayenne|macan|gle|glc|x5|x3|q5|q7|\brx\b|\bnx\b|\blx\b|\bgx\b|discovery|evoque|sport|toughest|terra|liberty/.test(c))return'SUV';
+      /* MPV */
+      if(/mpv|minivan|avanza|xenia|innova|veloz|xpander|sigra|calya|ertiga|mobilio|livina|serena|alphard|vellfire|staria|carnival|confero|cortez|freed|sienta|odyssey|sienna|carens|sharan|v-?class|eqv|zhige/.test(c))return'MPV';
+      /* Pickup */
+      if(/pickup|pick-?up|double\s?cabin|single\s?cabin|triton|hilux|ranger|navara|strada|d-?max|raptor|colorado|tacoma|tundra|gladiator|frontier|ridgeline|titan/.test(c))return'Pickup / Double Cabin';
+      /* Sedan */
+      if(/sedan|saloon|civic|camry|accord|vios|city\b|corolla|altis|cerato|sylphy|passat|jetta|sonata|elantra|k5|sentra|altima|maxima|model\s?3|model\s?s|ioniq|ev6|c-?class|e-?class|s-?class|3\s?series|5\s?series|7\s?series|a4|a6|a8|s60|s90|crown|mark|x|century|mirai/.test(c))return'Sedan';
+      /* Hatchback */
+      if(/hatchback|hatch\b|jazz|yaris|swift|baleno|march|mirage|agya|ayla|polo\b|fit\b|mazda\s?2|fabia|fiesta|clio|208|mini\s?cooper|\b500\b|i20|i30|cx-?30|st-?line|gr yaris/.test(c))return'Hatchback';
+      /* Van */
+      if(/\bvan\b|minibus|hiace|sprinter|ducato|transit|crafter|master|elf|canter|fuso|jumper|traveller/.test(c))return'Van / Minibus';
+      /* Klasik */
+      if(/classic|vintage|antique|retro|old\s?(car|timer)|w123|w124|e30|beetle|karmann|muscle\s?car|hot\s?rod|rat\s?rod|restomod|pontiac|chevelle|charger|challenger|gto|shelby|cobra|e-?type|countach|miura|testarossa|f40|diablo|type\s?2|comb[il]/.test(c))return'Klasik / Vintage';
+      /* Luxury brand fallback */
+      if(/ferrari|lamborghini|bugatti|mclaren|pagani|koenigsegg/.test(c))return'Sports Car';
+      if(/porsche|maserati|aston\s?martin|bentley|rolls-?royce|maybach/.test(c))return'Luxury';
+      if(/mercedes|bmw|audi|lexus|jaguar|land\s?rover|range\s?rover/.test(c))return'Luxury';
+      /* Generic */
+      if(/\bcar\b|\bvehicle\b|automobile|coupe/.test(c))return'Lainnya';
+      return'Tidak Teridentifikasi';
     }
-    const db = getFirestore(app);
 
-    // Token default (akan otomatis tersimpan jika belum ada)
-    const DEFAULT_HF_TOKEN = "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";
-
-    // Pastikan token tersimpan di localStorage
-    if (!localStorage.getItem('hfApiKey')) {
-      localStorage.setItem('hfApiKey', DEFAULT_HF_TOKEN);
-    }
-    document.getElementById('hfApiKey').value = localStorage.getItem('hfApiKey');
-
-    const CATEGORY_KEYWORDS = [
-      { category: 'Sports Car', keywords: ['sports car','sport car','coupe','gt-r','porsche','ferrari','lamborghini','mclaren','nsx','supra','rx-7','gtr','nissan gt-r','dodge challenger','ford mustang','chevrolet camaro','bmw m','mercedes amg gt','audi r8'] },
-      { category: 'SUV', keywords: ['suv','sport utility','jeep','land cruiser','range rover','fortuner','pajero','x5','x3','gle','glc','tiguan','cr-v','hr-v','cx-5'] },
-      { category: 'Sedan', keywords: ['sedan','civic','corolla','camry','accord','3 series','c class','a4','model 3','tesla model 3','altima','sentra'] },
-      { category: 'Truck', keywords: ['truck','pickup','f-150','hilux','ram','silverado','tundra','d-max'] },
-      { category: 'Hatchback', keywords: ['hatchback','yaris','jazz','golf','polo','i20','fiesta'] },
-      { category: 'Classic', keywords: ['classic','vintage','old','retro','w124','e30','mk1','mk2'] },
-      { category: 'Bus', keywords: ['bus','coach','double decker'] },
-      { category: 'Motorcycle', keywords: ['motorcycle','bike','scooter','vespa'] },
-      { category: 'Electric', keywords: ['electric','ev','tesla','byd','wuling air'] }
-    ];
-
-    function categorize(text) {
-      const lower = text.toLowerCase();
-      for (let c of CATEGORY_KEYWORDS) {
-        if (c.keywords.some(kw => lower.includes(kw))) {
-          return c.category;
+    /* ═══ Ambil gambar dari post Instagram ═══ */
+    async function getInstagramImage(postUrl){
+      /* Metode 1: noembed (oEmbed proxy, gratis, CORS-friendly) */
+      try{
+        var r1=await fetch('https://noembed.com/embed?url='+encodeURIComponent(postUrl));
+        if(r1.ok){var d1=await r1.json();if(d1.thumbnail_url)return d1.thumbnail_url}
+      }catch(e){}
+      /* Metode 2: Instagram oEmbed langsung */
+      try{
+        var r2=await fetch('https://api.instagram.com/oembed/?url='+encodeURIComponent(postUrl));
+        if(r2.ok){var d2=await r2.json();if(d2.thumbnail_url)return d2.thumbnail_url}
+      }catch(e){}
+      /* Metode 3: allorigins proxy → parse og:image */
+      try{
+        var r3=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(postUrl));
+        if(r3.ok){
+          var html=await r3.text();
+          var m1=html.match(/property="og:image"\s+content="([^"]+)"/i);
+          if(m1)return m1[1];
+          var m2=html.match(/content="([^"]+)"\s+property="og:image"/i);
+          if(m2)return m2[1];
+          var m3=html.match(/property="og:image:.url"\s+content="([^"]+)"/i);
+          if(m3)return m3[1];
         }
-      }
-      return 'Other';
+      }catch(e){}
+      return null;
     }
 
-    function getInstagramThumbnail(postUrl) {
-      const match = postUrl.match(/\/p\/([A-Za-z0-9_-]+)/);
-      if (!match) throw new Error('Kode post tidak ditemukan');
-      const code = match[1];
-      return `https://www.instagram.com/p/${code}/media/?size=l`;
-    }
-
-    async function callBlipModel(imageUrl, apiKey) {
-  const endpoint = 'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base';
-  const body = JSON.stringify({ inputs: imageUrl });
-
-  // Gunakan corsproxy.io sebagai jembatan
-  const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(endpoint);
-
-  const res = await fetch(proxyUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-      'x-requested-with': 'XMLHttpRequest'  // diperlukan oleh corsproxy.io
-    },
-    body
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Proxy error: ${res.status} ${errText}`);
-  }
-
-  const result = await res.json();
-  // Format respon: [{ generated_text: "..." }]
-  if (Array.isArray(result) && result.length > 0) {
-    return result[0].generated_text;
-  }
-  return 'Tidak ada deskripsi';
-}
-    const aiLogs = JSON.parse(localStorage.getItem('aiLogs') || '[]');
-    function addLog(entry) {
-      aiLogs.unshift({ timestamp: Date.now(), ...entry });
-      if (aiLogs.length > 50) aiLogs.length = 50;
-      localStorage.setItem('aiLogs', JSON.stringify(aiLogs));
-      renderAiLog();
-    }
-
-    function renderAiLog() {
-      const container = document.getElementById('aiLogList');
-      if (!container) return;
-      if (aiLogs.length === 0) {
-        container.innerHTML = '<div class="empty" style="font-size:.78rem"><i class="fas fa-robot"></i> Belum ada aktivitas AI</div>';
-        return;
-      }
-      container.innerHTML = aiLogs.map(log => {
-        const time = new Date(log.timestamp).toLocaleTimeString('id-ID');
-        const statusIcon = log.success ? '<i class="fas fa-check-circle" style="color:#4ade80"></i>' : '<i class="fas fa-exclamation-circle" style="color:#f87171"></i>';
-        const detail = log.category ? `→ ${log.category}` : (log.error || '');
-        return `<div class="ai-log-item"><span>${time}</span> ${statusIcon} ${log.docId} ${detail}</div>`;
-      }).join('');
-    }
-
-    async function runAiOnStock(docId) {
-      const apiKey = localStorage.getItem('hfApiKey');
-      if (!apiKey) {
-        alert('Harap simpan Hugging Face API Key terlebih dahulu.');
-        return;
-      }
-      const btn = document.querySelector(`.btn-ai[data-id="${docId}"]`);
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      }
-      try {
-        const snap = await getDoc(doc(db, "carStock", docId));
-        if (!snap.exists()) throw new Error('Dokumen tidak ditemukan');
-        const post = snap.data();
-        if (!post.url) throw new Error('URL kosong');
-
-        const imageUrl = getInstagramThumbnail(post.url);
-        const caption = await callBlipModel(imageUrl, apiKey);
-        const category = categorize(caption);
-
-        await updateDoc(doc(db, "carStock", docId), { category, aiCaption: caption });
-        addLog({ docId, success: true, category, caption });
-
-        if (btn) {
-          btn.classList.remove('btn-ai');
-          btn.classList.add('btn-sm');
-          btn.innerHTML = '<i class="fas fa-check"></i> Kategori: ' + category;
-          btn.style.background = 'rgba(74,222,128,.15)';
-          btn.style.color = '#4ade80';
-          btn.style.borderColor = 'rgba(74,222,128,.25)';
-        }
-      } catch (err) {
-        console.error(err);
-        addLog({ docId, success: false, error: err.message });
-        if (btn) {
-          btn.classList.remove('btn-ai');
-          btn.classList.add('btn-sm');
-          btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal';
-          btn.style.background = 'rgba(248,113,113,.15)';
-          btn.style.color = '#f87171';
-          btn.style.borderColor = 'rgba(248,113,113,.25)';
-        }
-      } finally {
-        if (btn) btn.disabled = false;
-      }
-    }
-
-    function attachAiButtons(container) {
-      if (!container) return;
-      const items = container.querySelectorAll('.item:not(.ai-attached)');
-      items.forEach(item => {
-        const actions = item.querySelector('.item-actions');
-        if (!actions) return;
-        const anyBtn = actions.querySelector('[data-id]');
-        if (!anyBtn) return;
-        const docId = anyBtn.getAttribute('data-id');
-        if (actions.querySelector('.btn-ai')) return;
-
-        const aiBtn = document.createElement('button');
-        aiBtn.className = 'btn-sm btn-ai';
-        aiBtn.setAttribute('data-id', docId);
-        aiBtn.innerHTML = '<i class="fas fa-robot"></i> AI';
-        aiBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          runAiOnStock(docId);
+    /* ═══ Analisa gambar dengan BLIP ═══ */
+    async function analyzeWithBLIP(imageUrl){
+      /* Coba kirim URL langsung ke HuggingFace */
+      try{
+        var r=await fetch(HF_URL,{
+          method:'POST',
+          headers:{'Authorization':'Bearer '+HF_TOKEN,'Content-Type':'application/json'},
+          body:JSON.stringify({inputs:imageUrl})
         });
-        actions.appendChild(aiBtn);
-        item.classList.add('ai-attached');
+        if(r.ok){var d=await r.json();if(d&&d[0]&&d[0].generated_text)return d[0].generated_text}
+        if(r.status===503){
+          var errD=await r.json().catch(function(){return{}});
+          var wait=(errD.estimated_time||20)*1000;
+          await new Promise(function(res){setTimeout(res,Math.min(wait,30000))});
+          return analyzeWithBLIP(imageUrl);
+        }
+        if(r.status===429){await new Promise(function(res){setTimeout(res,5000)});return analyzeWithBLIP(imageUrl)}
+      }catch(e){}
+      /* Fallback: fetch gambar lewat proxy, kirim sebagai blob */
+      try{
+        var proxyUrl='https://api.allorigins.win/raw?url='+encodeURIComponent(imageUrl);
+        var imgR=await fetch(proxyUrl);
+        if(!imgR.ok)throw new Error('proxy image fetch failed');
+        var blob=await imgR.blob();
+        var r2=await fetch(HF_URL,{
+          method:'POST',
+          headers:{'Authorization':'Bearer '+HF_TOKEN,'Content-Type':'application/octet-stream'},
+          body:blob
+        });
+        if(r2.ok){var d2=await r2.json();if(d2&&d2[0]&&d2[0].generated_text)return d2[0].generated_text}
+        if(r2.status===503){
+          var errD2=await r2.json().catch(function(){return{}});
+          var wait2=(errD2.estimated_time||20)*1000;
+          await new Promise(function(res){setTimeout(res,Math.min(wait2,30000))});
+          return analyzeWithBLIP(imageUrl);
+        }
+      }catch(e){}
+      return null;
+    }
+
+    /* ═══ Log Management (localStorage) ═══ */
+    function getLogs(){try{return JSON.parse(localStorage.getItem(LOG_KEY))||[]}catch(e){return[]}}
+    function saveLogs(logs){try{localStorage.setItem(LOG_KEY,JSON.stringify(logs.slice(0,MAX_LOGS)))}catch(e){}}
+    function addLog(entry){
+      var logs=getLogs();
+      logs.unshift({id:Date.now()+'_'+Math.random().toString(36).substr(2,5),timestamp:Date.now(),...entry});
+      saveLogs(logs);
+      renderLog();
+    }
+    function clearLogs(){localStorage.removeItem(LOG_KEY);renderLog()}
+    window.aiClearLogs=function(){clearLogs();toast('Log AI dihapus','info')};
+
+    /* ═══ Render Functions ═══ */
+    function escL(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
+    function firstLine(d){return(d||'').split('\n')[0].trim()}
+    function fmtTime(ts){var d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0')}
+
+    function renderStats(){
+      var total=STOCKS.filter(function(s){return s.status!=='deleted'&&s.status!=='sold'}).length;
+      var cat=STOCKS.filter(function(s){return s.aiCategory&&s.aiCategory!==''&&s.aiCategory!=='Tidak Teridentifikasi'&&s.status!=='deleted'&&s.status!=='sold'}).length;
+      var uncat=STOCKS.filter(function(s){return(!s.aiCategory||s.aiCategory==='')&&s.status!=='deleted'&&s.status!=='sold'}).length;
+      var fail=STOCKS.filter(function(s){return s.aiCategory==='Tidak Teridentifikasi'&&s.status!=='deleted'&&s.status!=='sold'}).length;
+      document.getElementById('aiStats').innerHTML=
+        '<div class="stat-card"><div class="sv yellow">'+total+'</div><div class="sl">Total Stock</div></div>'+
+        '<div class="stat-card"><div class="sv green">'+cat+'</div><div class="sl">Terkategorisasi</div></div>'+
+        '<div class="stat-card"><div class="sv orange">'+uncat+'</div><div class="sl">Belum</div></div>'+
+        '<div class="stat-card"><div class="sv blue">'+fail+'</div><div class="sl">Gagal Teridentifikasi</div></div>';
+    }
+
+    function renderStockList(){
+      var items=STOCKS.filter(function(s){return s.status!=='deleted'&&s.status!=='sold'});
+      document.getElementById('aiCntTotal').textContent=items.length;
+      var el=document.getElementById('aiStockList');
+      if(!items.length){el.innerHTML='<div class="empty"><i class="fas fa-robot"></i>Tidak ada stock untuk dianalisa.</div>';return}
+      var h='';
+      items.forEach(function(s){
+        var code=window.getIgCode?s.window?window.getIgCode(s.url):null:null;
+        if(!code&&window.getIgCode)code=window.getIgCode(s.url);
+        var cat=s.aiCategory||'';
+        var isAnalyzing=analyzingSet.has(s.id);
+        var badgeClass=cat?'categorized':(cat==='Tidak Teridentifikasi'?'failed':'uncategorized');
+        var badgeText=cat||'Belum dikategorisasi';
+        var badgeIcon=cat?(cat==='Tidak Teridentifikasi'?'fa-question':'fa-check'):'fa-clock';
+        h+='<div class="item">';
+        h+='<a href="'+escL(s.url)+'" target="_blank" rel="noopener noreferrer" class="item-thumb link" title="Buka di Instagram">'+(window.getThumbHtml?window.getThumbHtml(code):'')+'</a>';
+        h+='<div class="item-info ai-item-info">';
+        h+='<div class="ii-price">'+escL(s.editedPrice||s.price)+'</div>';
+        h+='<div class="ii-desc">'+escL(firstLine(s.desc))+'</div>';
+        h+='<div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(s.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl?window.shortIgUrl(s.url):s.url)+'</a></div>';
+        h+='<div class="ai-cat-row"><span class="ai-cat-badge '+badgeClass+'"><i class="fas '+badgeIcon+'" style="font-size:.5rem"></i> '+escL(badgeText)+'</span></div>';
+        h+='</div>';
+        h+='<div class="item-actions">';
+        if(isAnalyzing){
+          h+='<button class="btn-sm btn-ai ai-spinning" disabled><i class="fas fa-spinner"></i> Analisa</button>';
+        }else{
+          h+='<button class="btn-sm btn-ai" data-ai-id="'+s.id+'"><i class="fas fa-robot"></i> Analisa</button>';
+        }
+        if(cat&&cat!==''){
+          h+='<button class="btn-sm btn-ai-clear" data-ai-clear-id="'+s.id+'" title="Hapus kategori"><i class="fas fa-xmark"></i></button>';
+        }
+        h+='</div></div>';
+      });
+      el.innerHTML=h;
+      /* Event listeners */
+      el.querySelectorAll('[data-ai-id]').forEach(function(btn){
+        btn.addEventListener('click',function(){categorizeSingle(btn.getAttribute('data-ai-id'))});
+      });
+      el.querySelectorAll('[data-ai-clear-id]').forEach(function(btn){
+        btn.addEventListener('click',function(){clearCategory(btn.getAttribute('data-ai-clear-id'))});
       });
     }
 
-    const containers = ['listAvail', 'listSold', 'listDel'];
-    containers.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      attachAiButtons(el);
-      const observer = new MutationObserver(() => attachAiButtons(el));
-      observer.observe(el, { childList: true, subtree: false });
-    });
+    function renderLog(){
+      var logs=getLogs();
+      document.getElementById('aiCntLog').textContent=logs.length;
+      var el=document.getElementById('aiLogList');
+      if(!logs.length){el.innerHTML='<div class="ai-log-empty"><i class="fas fa-clipboard-list"></i>Belum ada aktivitas AI.</div>';return}
+      var h='';
+      logs.forEach(function(l){
+        h+='<div class="ai-log-entry">';
+        h+='<div class="log-head">';
+        h+='<span class="log-time">'+fmtTime(l.timestamp)+'</span>';
+        if(l.status==='success'){
+          h+='<span class="log-status ok"><i class="fas fa-check-circle"></i> Berhasil</span>';
+          h+='<span class="log-stock">'+escL(firstLine(l.desc))+'</span>';
+          h+='<span style="color:var(--muted);font-size:.65rem">→</span>';
+          h+='<span class="log-category"><i class="fas fa-tag" style="font-size:.5rem"></i> '+escL(l.category)+'</span>';
+        }else{
+          h+='<span class="log-status fail"><i class="fas fa-times-circle"></i> Gagal</span>';
+          h+='<span class="log-stock">'+escL(firstLine(l.desc))+'</span>';
+        }
+        h+='</div>';
+        if(l.caption){h+='<div class="log-caption"><i class="fas fa-quote-left" style="font-size:.55rem;opacity:.4;margin-right:.3rem"></i>'+escL(l.caption)+'</div>'}
+        if(l.error){h+='<div class="log-error"><i class="fas fa-exclamation-triangle" style="font-size:.55rem"></i> '+escL(l.error)+'</div>'}
+        h+='</div>';
+      });
+      el.innerHTML=h;
+    }
 
-    window.saveApiKey = function() {
-      const key = document.getElementById('hfApiKey').value.trim();
-      const msg = document.getElementById('apiKeyMsg');
-      if (!key) {
-        msg.className = 'form-msg err show';
-        msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> API key tidak boleh kosong.';
-        return;
+    window.aiRenderAll=function(){renderStats();renderStockList();renderLog()};
+
+    /* ═══ Progress Bar ═══ */
+    function showProgress(current,total){var el=document.getElementById('aiProgress');el.classList.add('show');document.getElementById('aiProgressBar').style.width=Math.round((current/total)*100)+'%'}
+    function hideProgress(){document.getElementById('aiProgress').classList.remove('show');document.getElementById('aiProgressBar').style.width='0%'}
+
+    /* ═══ Core: Analisa satu stock ═══ */
+    async function categorizeSingle(stockId){
+      if(analyzingSet.has(stockId))return;
+      var stock=STOCKS.find(function(s){return s.id===stockId});
+      if(!stock)return;
+      analyzingSet.add(stockId);
+      renderStockList();
+
+      try{
+        /* Step 1: Ambil gambar dari Instagram */
+        var imageUrl=await getInstagramImage(stock.url);
+        if(!imageUrl){
+          addLog({stockId:stockId,postUrl:stock.url,desc:stock.desc,caption:null,category:null,status:'failed',error:'Tidak bisa mengambil gambar dari Instagram. Post mungkin private atau link tidak valid.'});
+          await updateDoc(doc(db,"carStock",stockId),{aiCategory:'Tidak Teridentifikasi'});
+          analyzingSet.delete(stockId);renderStats();renderStockList();return;
+        }
+        /* Step 2: Analisa dengan BLIP */
+        var caption=await analyzeWithBLIP(imageUrl);
+        if(!caption){
+          addLog({stockId:stockId,postUrl:stock.url,desc:stock.desc,caption:null,category:null,status:'failed',error:'Gagal mendapatkan caption dari AI BLIP. Model mungkin sedang loading atau terjadi error jaringan.'});
+          await updateDoc(doc(db,"carStock",stockId),{aiCategory:'Tidak Teridentifikasi'});
+          analyzingSet.delete(stockId);renderStats();renderStockList();return;
+        }
+        /* Step 3: Match keyword → kategori */
+        var category=matchCategory(caption);
+        /* Step 4: Simpan ke Firebase */
+        await updateDoc(doc(db,"carStock",stockId),{aiCategory:category});
+        addLog({stockId:stockId,postUrl:stock.url,desc:stock.desc,caption:caption,category:category,status:'success',error:null});
+      }catch(err){
+        addLog({stockId:stockId,postUrl:stock.url,desc:stock.desc,caption:null,category:null,status:'failed',error:err.message||'Error tidak diketahui'});
+        try{await updateDoc(doc(db,"carStock",stockId),{aiCategory:'Tidak Teridentifikasi'})}catch(e){}
       }
-      localStorage.setItem('hfApiKey', key);
-      msg.className = 'form-msg ok show';
-      msg.innerHTML = '<i class="fas fa-check-circle"></i> API key disimpan.';
-      setTimeout(() => msg.className = 'form-msg', 3000);
+      analyzingSet.delete(stockId);
+      renderStats();renderStockList();
+    }
+
+    /* ═══ Core: Hapus kategori ═══ */
+    async function clearCategory(stockId){
+      try{
+        await updateDoc(doc(db,"carStock",stockId),{aiCategory:''});
+        toast('Kategori dihapus','info');
+      }catch(e){toast('Gagal menghapus kategori','err')}
+    }
+
+    /* ═══ Core: Analisa semua yang belum ═══ */
+    window.aiAnalyzeAll=async function(){
+      if(analyzing){toast('Sedang ada proses analisa berjalan','info');return}
+      var uncat=STOCKS.filter(function(s){return(!s.aiCategory||s.aiCategory==='')&&s.status!=='deleted'&&s.status!=='sold'});
+      if(!uncat.length){toast('Semua stock sudah terkategorisasi','ok');return}
+      analyzing=true;
+      var btn=document.getElementById('aiAnalyzeAllBtn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Menganalisa...';
+      showProgress(0,uncat.length);
+      for(var i=0;i<uncat.length;i++){
+        showProgress(i+1,uncat.length);
+        await categorizeSingle(uncat[i].id);
+        if(i<uncat.length-1)await new Promise(function(r){setTimeout(r,BATCH_DELAY)});
+      }
+      hideProgress();
+      analyzing=false;
+      btn.disabled=false;btn.innerHTML='<i class="fas fa-wand-magic-sparkles"></i> Analisa Semua yang Belum';
+      toast('Analisa batch selesai!','ok');
     };
 
-    renderAiLog();
+    /* ═══ Auto-analisa stock baru ═══ */
+    var prevIds=new Set();
+    function checkNewStock(){
+      var autoOn=document.getElementById('aiAutoToggle');
+      if(!autoOn||!autoOn.checked)return;
+      STOCKS.forEach(function(s){
+        if(!prevIds.has(s.id)&&s.status==='available'&&(!s.aiCategory||s.aiCategory==='')){
+          /* Stock baru terdeteksi, jalankan analisa setelah delay 2 detik */
+          setTimeout(function(){categorizeSingle(s.id)},2000);
+        }
+      });
+      STOCKS.forEach(function(s){prevIds.add(s.id)});
+    }
+
+    /* ═══ Firebase Listener ═══ */
+    onSnapshot(query(collection(db,"carStock"),orderBy("addedAt","desc")),(snap)=>{
+      STOCKS=[];snap.forEach((d)=>STOCKS.push({id:d.id,...d.data()}));
+      renderStats();renderStockList();
+      checkNewStock();
+    },(err)=>{console.error("AI Stock listener error:",err)});
+
+    /* Initial render */
+    renderLog();
   </script>
 </body>
 </html>
