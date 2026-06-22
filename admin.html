@@ -629,13 +629,14 @@
       return 'Other';
     }
 
-    async function getInstagramThumbnail(postUrl) {
-      const res = await fetch(`https://api.instagram.com/oembed?url=${encodeURIComponent(postUrl)}`);
-      if (!res.ok) throw new Error('Gagal mengambil data Instagram');
-      const data = await res.json();
-      return data.thumbnail_url;
-    }
-
+    function getInstagramThumbnail(postUrl) {
+  // Ambil kode post dari URL Instagram
+  const match = postUrl.match(/\/p\/([A-Za-z0-9_-]+)/);
+  if (!match) throw new Error('Kode post tidak ditemukan');
+  const code = match[1];
+  // URL langsung gambar resolusi tinggi (tidak kena CORS)
+  return `https://www.instagram.com/p/${code}/media/?size=l`;
+}
     async function callBlipModel(imageUrl, apiKey) {
       const res = await fetch('https://api-inference.huggingface.co/models/nlpconnect/vit-gpt2-image-captioning', {
         method: 'POST',
