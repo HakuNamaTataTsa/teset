@@ -640,31 +640,32 @@
     async function callBlipModel(imageUrl, apiKey) {
   const endpoint = 'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base';
   const body = JSON.stringify({ inputs: imageUrl });
-  const headers = {
-    'Authorization': `Bearer ${apiKey}`,
-    'Content-Type': 'application/json'
-  };
 
-  // Coba direct dulu
-  try {
-    const res = await fetch(endpoint, { method: 'POST', headers, body });
-    if (res.ok) return (await res.json())[0].generated_text;
-    throw new Error('Status: '+res.status);
-  } catch (e) {
-    console.warn('Direct API gagal, coba lewat proxy...');
-    // Fallback: CORS proxy (gunakan https://corsproxy.io/)
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(endpoint);
-    const res = await fetch(proxyUrl, {
-      method: 'POST',
-      headers: { ...headers, 'x-requested-with': 'XMLHttpRequest' },
-      body
-    });
-    if (!res.ok) throw new Error(`Proxy error: ${res.status}`);
-    const result = await res.json();
+  // Gunakan corsproxy.io sebagai jembatan
+  const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(endpoint);
+
+  const res = await fetch(proxyUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      'x-requested-with': 'XMLHttpRequest'  // diperlukan oleh corsproxy.io
+    },
+    body
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Proxy error: ${res.status} ${errText}`);
+  }
+
+  const result = await res.json();
+  // Format respon: [{ generated_text: "..." }]
+  if (Array.isArray(result) && result.length > 0) {
     return result[0].generated_text;
   }
+  return 'Tidak ada deskripsi';
 }
-
     const aiLogs = JSON.parse(localStorage.getItem('aiLogs') || '[]');
     function addLog(entry) {
       aiLogs.unshift({ timestamp: Date.now(), ...entry });
