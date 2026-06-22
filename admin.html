@@ -638,24 +638,32 @@
     }
 
     async function callBlipModel(imageUrl, apiKey) {
-      const res = await fetch('https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ inputs: imageUrl })
-      });
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`Hugging Face API error: ${res.status} ${errText}`);
-      }
-      const result = await res.json();
-      if (Array.isArray(result) && result.length > 0) {
-        return result[0].generated_text || result[0].caption || JSON.stringify(result[0]);
-      }
-      return result.generated_text || result.caption || JSON.stringify(result);
-    }
+  const endpoint = 'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base';
+  const body = JSON.stringify({ inputs: imageUrl });
+  const headers = {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json'
+  };
+
+  // Coba direct dulu
+  try {
+    const res = await fetch(endpoint, { method: 'POST', headers, body });
+    if (res.ok) return (await res.json())[0].generated_text;
+    throw new Error('Status: '+res.status);
+  } catch (e) {
+    console.warn('Direct API gagal, coba lewat proxy...');
+    // Fallback: CORS proxy (gunakan https://corsproxy.io/)
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(endpoint);
+    const res = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: { ...headers, 'x-requested-with': 'XMLHttpRequest' },
+      body
+    });
+    if (!res.ok) throw new Error(`Proxy error: ${res.status}`);
+    const result = await res.json();
+    return result[0].generated_text;
+  }
+}
 
     const aiLogs = JSON.parse(localStorage.getItem('aiLogs') || '[]');
     function addLog(entry) {
