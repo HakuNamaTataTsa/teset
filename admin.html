@@ -710,7 +710,7 @@
     window.saveHfToken=function(){
       var t=document.getElementById('hfTokenInput').value.trim();
       if(!t){window.toast('API Key tidak boleh kosong','err');return}
-      if(!t.startsWith('AIza')){window.toast('Format key tidak valid (harus diawali AIza...)','err');return}
+      if(!t.startsWith('A')){window.toast('Format key tidak valid (harus diawali AIza...)','err');return}
       localStorage.setItem('hf_token',t);
       window.toast('API Key tersimpan','ok');
       addLog('API Key berhasil disimpan','ok');
