@@ -121,12 +121,10 @@
     .btn-restore{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.2)}.btn-restore:hover{background:#60a5fa;color:#fff}
     .btn-update{background:var(--accent);color:#0a0a0f;border:none}.btn-update:hover{box-shadow:0 2px 10px rgba(255,221,87,.25)}
 
-    /* === TAMBAHAN AI === */
     .btn-ai{background:rgba(139,92,246,.12);color:#a78bfa;border-color:rgba(139,92,246,.2)}
     .btn-ai:hover{background:#a78bfa;color:#fff}
     .ai-log-item{padding:.35rem .5rem;border-bottom:1px solid var(--border);font-size:.7rem;display:flex;gap:.5rem;align-items:center}
     .ai-log-item span{color:var(--muted);font-family:var(--fd);flex-shrink:0}
-    /* ===================== */
 
     .pagination{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:1rem 0 .25rem}
     .pg-btn{padding:.5rem 1rem;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);color:var(--muted);font-family:var(--fb);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.35rem;min-height:36px}
@@ -270,7 +268,7 @@
       <div class="sec-title" style="color:var(--muted)"><i class="fas fa-trash"></i> Dihapus <span class="count" id="cntDel" style="background:rgba(255,255,255,.05);color:var(--muted)">0</span></div>
       <div id="listDel"></div>
 
-      <!-- ============ FITUR AI (TAMBAHAN) ============ -->
+      <!-- AI Section -->
       <div id="aiApiKeySection" class="form-card" style="margin-top:1.5rem">
         <h4><i class="fas fa-robot"></i> AI Kategorisasi</h4>
         <div class="fr">
@@ -283,7 +281,6 @@
       </div>
       <div class="sec-title" style="margin-top:1rem"><i class="fas fa-history"></i> AI Activity Log</div>
       <div id="aiLogList" style="max-height:300px;overflow-y:auto;margin-bottom:1rem"></div>
-      <!-- ========================================== -->
     </div>
 
     <div class="tab-panel" id="tabLimited">
@@ -319,9 +316,6 @@
 
   <div class="toast-wrap" id="toasts"></div>
 
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!-- SCRIPT: Login, UI, Toast, Thumbnail, Sosmed Render Functions -->
-  <!-- ═══════════════════════════════════════════════════ -->
   <script>
     var PASS='bajingan011';
     var sosmedFilter='all';
@@ -582,8 +576,7 @@
   </script>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- MODULE AI: Auto Kategorisasi dengan Hugging Face + Instagram -->
-  <!-- (TAMBAHAN FITUR AI – tidak mengubah kode asli) -->
+  <!-- MODULE AI: Auto Kategorisasi (Token sudah tertanam) -->
   <!-- ═══════════════════════════════════════════════════ -->
   <script type="module">
     import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
@@ -606,7 +599,15 @@
     }
     const db = getFirestore(app);
 
-    // Kategori dan kata kunci (lowercase)
+    // Token default (akan otomatis tersimpan jika belum ada)
+    const DEFAULT_HF_TOKEN = "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";
+
+    // Pastikan token tersimpan di localStorage
+    if (!localStorage.getItem('hfApiKey')) {
+      localStorage.setItem('hfApiKey', DEFAULT_HF_TOKEN);
+    }
+    document.getElementById('hfApiKey').value = localStorage.getItem('hfApiKey');
+
     const CATEGORY_KEYWORDS = [
       { category: 'Sports Car', keywords: ['sports car','sport car','coupe','gt-r','porsche','ferrari','lamborghini','mclaren','nsx','supra','rx-7','gtr','nissan gt-r','dodge challenger','ford mustang','chevrolet camaro','bmw m','mercedes amg gt','audi r8'] },
       { category: 'SUV', keywords: ['suv','sport utility','jeep','land cruiser','range rover','fortuner','pajero','x5','x3','gle','glc','tiguan','cr-v','hr-v','cx-5'] },
@@ -630,13 +631,12 @@
     }
 
     function getInstagramThumbnail(postUrl) {
-  // Ambil kode post dari URL Instagram
-  const match = postUrl.match(/\/p\/([A-Za-z0-9_-]+)/);
-  if (!match) throw new Error('Kode post tidak ditemukan');
-  const code = match[1];
-  // URL langsung gambar resolusi tinggi (tidak kena CORS)
-  return `https://www.instagram.com/p/${code}/media/?size=l`;
-}
+      const match = postUrl.match(/\/p\/([A-Za-z0-9_-]+)/);
+      if (!match) throw new Error('Kode post tidak ditemukan');
+      const code = match[1];
+      return `https://www.instagram.com/p/${code}/media/?size=l`;
+    }
+
     async function callBlipModel(imageUrl, apiKey) {
       const res = await fetch('https://api-inference.huggingface.co/models/nlpconnect/vit-gpt2-image-captioning', {
         method: 'POST',
@@ -657,7 +657,6 @@
       return result.generated_text || result.caption || JSON.stringify(result);
     }
 
-    // Log management
     const aiLogs = JSON.parse(localStorage.getItem('aiLogs') || '[]');
     function addLog(entry) {
       aiLogs.unshift({ timestamp: Date.now(), ...entry });
@@ -698,7 +697,7 @@
         const post = snap.data();
         if (!post.url) throw new Error('URL kosong');
 
-        const imageUrl = await getInstagramThumbnail(post.url);
+        const imageUrl = getInstagramThumbnail(post.url);
         const caption = await callBlipModel(imageUrl, apiKey);
         const category = categorize(caption);
 
@@ -753,7 +752,6 @@
       });
     }
 
-    // Amati semua container list stok
     const containers = ['listAvail', 'listSold', 'listDel'];
     containers.forEach(id => {
       const el = document.getElementById(id);
@@ -763,7 +761,6 @@
       observer.observe(el, { childList: true, subtree: false });
     });
 
-    // Simpan API Key
     window.saveApiKey = function() {
       const key = document.getElementById('hfApiKey').value.trim();
       const msg = document.getElementById('apiKeyMsg');
@@ -778,11 +775,6 @@
       setTimeout(() => msg.className = 'form-msg', 3000);
     };
 
-    // Muat API key yang tersimpan
-    const savedKey = localStorage.getItem('hfApiKey');
-    if (savedKey) document.getElementById('hfApiKey').value = savedKey;
-
-    // Render log awal
     renderAiLog();
   </script>
 </body>
