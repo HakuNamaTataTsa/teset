@@ -527,7 +527,6 @@
         btn.addEventListener('click', function(e){
           e.stopPropagation();
           const docId = btn.getAttribute('data-id');
-          // Jika sudah ada yang menunggu, batalkan dulu
           if (currentAiTarget) {
             currentAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
             currentAiTarget.btn.disabled = false;
@@ -537,7 +536,6 @@
           btn.innerHTML = '<i class="fas fa-paste"></i> Tempel gambar (Ctrl+V)';
           currentAiTarget = { docId, btn };
           
-          // Hapus target setelah 15 detik jika tidak ada paste
           const timeout = setTimeout(() => {
             if (currentAiTarget && currentAiTarget.btn === btn) {
               currentAiTarget = null;
@@ -546,7 +544,6 @@
             }
           }, 15000);
           
-          // Jika klik di luar, batalkan
           function outsideClickHandler(ev) {
             if (!btn.contains(ev.target)) {
               clearTimeout(timeout);
@@ -590,7 +587,7 @@
     
     async function classifyCarFromBase64(base64) {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
