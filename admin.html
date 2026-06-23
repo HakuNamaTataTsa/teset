@@ -466,19 +466,22 @@
 
     // ══════════════ GEMINI AI - CLASSIFICATION ══════════════
     const GEMINI_KEY = "AIzaSyA09dWuqQn2ZC-gasY1FwwneyZnhCu-BW8";
-    // Fungsi untuk mendapatkan thumbnail dari Instagram (fallback, pakai proxy)
-    async function getThumbnailFromIG(urlIG) {
-      const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(urlIG)}`;
-      const proxied = `https://corsproxy.io/?${encodeURIComponent(oembedUrl)}`;
-      const resp = await fetch(proxied);
-      if (!resp.ok) throw new Error("Gagal fetch oEmbed");
-      const data = await resp.json();
-      return data.thumbnail_url;
+    // Helper: URL ke base64
+    async function urlToBase64(url) {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`Gagal fetch gambar: ${resp.status}`);
+      const blob = await resp.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
     }
-    // Fungsi klasifikasi gambar (menerima URL gambar publik)
+    // Fungsi klasifikasi dengan fallback base64
     async function classifyCarImage(imageUrl) {
-      // Karena ini URL publik (dari Instagram CDN), tidak perlu proxy
-      const res = await fetch(
+      // Coba kirim URL langsung
+      let res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
         {
           method: "POST",
@@ -494,8 +497,35 @@
           })
         }
       );
-      const data = await res.json();
-      if (!data.candidates) throw new Error("Respons AI tidak valid");
+      let data = await res.json();
+      // Jika sukses
+      if (data.candidates) {
+        return data.candidates[0].content.parts[0].text.trim();
+      }
+      // Fallback ke base64
+      console.warn("Gemini fileUri gagal, mencoba base64. Response:", data);
+      const base64 = await urlToBase64(imageUrl);
+      res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: "Klasifikasikan mobil ini ke dalam salah satu kategori: Sedan, SUV, Truck, Sport, Hatchback, Lainnya. Jawab hanya dengan satu kata kategori (contoh: SUV)." },
+                { inlineData: { mimeType: "image/jpeg", data: base64 } }
+              ]
+            }],
+            generationConfig: { maxOutputTokens: 10 }
+          })
+        }
+      );
+      data = await res.json();
+      if (!data.candidates) {
+        console.error("Gemini base64 juga gagal. Response:", data);
+        throw new Error("Respons AI tidak valid setelah fallback");
+      }
       return data.candidates[0].content.parts[0].text.trim();
     }
 
@@ -511,7 +541,15 @@
       }
     };
 
-    // Reklasifikasi semua stok yang belum berkategori (fallback pakai oEmbed)
+    // Reklasifikasi semua stok yang belum berkategori (fallback pakai oEmbed + proxy)
+    async function getThumbnailFromIG(urlIG) {
+      const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(urlIG)}`;
+      const proxied = `https://corsproxy.io/?${encodeURIComponent(oembedUrl)}`;
+      const resp = await fetch(proxied);
+      if (!resp.ok) throw new Error("Gagal fetch oEmbed");
+      const data = await resp.json();
+      return data.thumbnail_url;
+    }
     window.reclassifyAll = async function() {
       const toClassify = POSTS.filter(p => p.status === 'available' && (!p.category || p.category === 'Lainnya'));
       if (toClassify.length === 0) {
@@ -527,7 +565,6 @@
           await updateDoc(doc(db, "carStock", post.id), { category: category });
         } catch (err) {
           console.warn(`Gagal klasifikasi stok ${post.id}:`, err);
-          // Lanjutkan ke stok berikutnya
         }
         await new Promise(r => setTimeout(r, 1500)); // jeda
       }
