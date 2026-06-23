@@ -515,42 +515,59 @@
       return result.replace(/[^a-zA-Z]/g, "").trim() || "Lainnya";
     }
 
-    // ---------- AMBIL GAMBAR DARI INSTAGRAM (tanpa library) ----------
-    async function getImageUrlFromInstagram(postUrl) {
-      // Metode 1: oEmbed (kadang masih ada thumbnail_url)
-      try {
-        const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(postUrl)}`;
-        const oembedResp = await fetch(oembedUrl);
-        if (oembedResp.ok) {
-          const data = await oembedResp.json();
-          if (data.thumbnail_url) return data.thumbnail_url;
+// ---------- AMBIL GAMBAR DARI INSTAGRAM (tanpa library, dengan proxy) ----------
+async function getImageUrlFromInstagram(postUrl) {
+  // Metode 1: oEmbed (kadang masih ada thumbnail_url)
+  try {
+    const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(postUrl)}`;
+    const oembedResp = await fetch(oembedUrl);
+    if (oembedResp.ok) {
+      const data = await oembedResp.json();
+      // Periksa apakah ada thumbnail_url (walaupun sekarang jarang)
+      if (data.thumbnail_url) return data.thumbnail_url;
+      // Jika tidak ada, coba ekstrak dari field 'html' (iframe)
+      if (data.html) {
+        const match = data.html.match(/src="([^"]+)"/);
+        if (match && match[1]) {
+          // Ambil dari iframe src, lalu cari gambar di dalamnya? Tidak praktis.
+          // Lebih baik lanjut ke metode berikutnya.
         }
-      } catch (e) { /* lanjut */ }
-
-      // Metode 2: Scrape meta property="og:image" via CORS proxy
-      try {
-        const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(postUrl)}`;
-        const proxyResp = await fetch(proxyUrl);
-        if (proxyResp.ok) {
-          const html = await proxyResp.text();
-          const match = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]+)"/i);
-          if (match && match[1]) return match[1];
-        }
-      } catch (e) { /* lanjut */ }
-
-      // Metode 3: coba langsung fetch halaman tanpa proxy (mungkin kena CORS)
-      try {
-        const direct = await fetch(postUrl);
-        if (direct.ok) {
-          const html = await direct.text();
-          const match = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]+)"/i);
-          if (match && match[1]) return match[1];
-        }
-      } catch (e) { /* lanjut */ }
-
-      throw new Error("Gagal mengambil gambar dari link Instagram. Pastikan link benar dan coba lagi.");
+      }
     }
+  } catch (e) { /* lanjut */ }
 
+  // Metode 2: Scrape meta property="og:image" via CORS proxy (lebih stabil)
+  try {
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(postUrl)}`;
+    const proxyResp = await fetch(proxyUrl);
+    if (proxyResp.ok) {
+      const html = await proxyResp.text();
+      const match = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]+)"/i);
+      if (match && match[1]) {
+        // Bersihkan URL (kadang ada karakter escape)
+        let imageUrl = match[1].replace(/&amp;/g, '&');
+        return imageUrl;
+      }
+    }
+  } catch (e) { /* lanjut */ }
+
+  // Metode 3: Coba dengan corsproxy.io sebagai cadangan
+  try {
+    const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(postUrl)}`;
+    const proxyResp = await fetch(proxyUrl);
+    if (proxyResp.ok) {
+      const html = await proxyResp.text();
+      const match = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]+)"/i);
+      if (match && match[1]) {
+        let imageUrl = match[1].replace(/&amp;/g, '&');
+        return imageUrl;
+      }
+    }
+  } catch (e) { /* lanjut */ }
+
+  // Jika semua gagal, lempar error
+  throw new Error("Gagal mengambil gambar dari link Instagram. Pastikan link benar dan coba lagi.");
+}
     async function classifyCarFromInstagram(postUrl) {
       const imageUrl = await getImageUrlFromInstagram(postUrl);
       const resp = await fetch(imageUrl);
