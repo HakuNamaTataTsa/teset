@@ -51,7 +51,7 @@
     .stat-card .sv.yellow{color:var(--accent)}.stat-card .sv.green{color:#4ade80}.stat-card .sv.red{color:#f87171}.stat-card .sv.blue{color:#60a5fa}.stat-card .sv.orange{color:#fb923c}.stat-card .sv.purple{color:#a855f7}
     .stat-card .sl{font-size:.7rem;color:var(--muted);margin-top:.25rem}
 
-    .sec-title{font-family:var(--fd);font-size:.95rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+    .sec-title{font-family:var(--fd);font-size:.95rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
     .sec-title i{color:var(--accent);font-size:.85rem}
     .sec-title .count{font-size:.68rem;padding:.15rem .5rem;border-radius:50px;background:var(--accent-dim);color:var(--accent);font-weight:600}
 
@@ -120,6 +120,7 @@
     .btn-del{background:rgba(239,68,68,.08);color:#f87171;border-color:rgba(239,68,68,.15)}.btn-del:hover{background:#ef4444;color:#fff}
     .btn-restore{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.2)}.btn-restore:hover{background:#60a5fa;color:#fff}
     .btn-update{background:var(--accent);color:#0a0a0f;border:none}.btn-update:hover{box-shadow:0 2px 10px rgba(255,221,87,.25)}
+    .btn-ai{background:rgba(168,85,247,.15);color:#a855f7;border-color:rgba(168,85,247,.25)}.btn-ai:hover{background:#a855f7;color:#fff}
 
     .pagination{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:1rem 0 .25rem}
     .pg-btn{padding:.5rem 1rem;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);color:var(--muted);font-family:var(--fb);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.35rem;min-height:36px}
@@ -253,7 +254,11 @@
         <div class="fr"><label>Harga Baru</label><input type="text" id="editNew" placeholder="Masukkan harga baru..." onkeydown="if(event.key==='Enter')savePrice()"></div>
         <div class="ea"><button class="btn-save" onclick="savePrice()"><i class="fas fa-check"></i> Simpan</button><button class="btn-cancel" onclick="cancelPrice()"><i class="fas fa-xmark"></i> Batal</button></div>
       </div>
-      <div class="sec-title"><i class="fas fa-check-circle"></i> Tersedia <span class="count" id="cntAvail">0</span></div>
+
+      <div class="sec-title">
+        <i class="fas fa-check-circle"></i> Tersedia <span class="count" id="cntAvail">0</span>
+        <button class="btn-sm btn-ai" style="margin-left:1rem" onclick="window.reclassifyAll()"><i class="fas fa-robot"></i> Klasifikasi Semua</button>
+      </div>
       <div id="listAvail"></div>
       <div id="pagAvail"></div>
       <hr class="divider">
@@ -417,10 +422,23 @@
       var start=(currentPage-1)*PER_PAGE,pageItems=avail.slice(start,start+PER_PAGE);
       var ha='';if(!avail.length)ha='<div class="empty"><i class="fas fa-car-side"></i>Tidak ada stock tersedia.</div>';
       pageItems.forEach(function(p){var price=getEP(p),hasEdit=!!p.editedPrice,code=window.getIgCode(p.url);
-        ha+='<div class="item"><a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer" class="item-thumb link" title="Buka di Instagram">'+window.getThumbHtml(code)+'</a><div class="item-info"><div class="ii-price">'+escL(price)+'</div><div class="ii-desc">'+escL(firstLine(p.desc))+'</div><div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+(hasEdit?'<div class="ii-status"><span class="edited"><i class="fas fa-pen" style="font-size:.55rem"></i> Harga di-edit</span></div>':'')+'<div class="ii-status"><span style="color:var(--accent)">'+ (p.category||'') +'</span></div></div><div class="item-actions"><button class="btn-sm btn-edit" data-id="'+p.id+'"><i class="fas fa-pen"></i> Edit</button><button class="btn-sm btn-sold" data-id="'+p.id+'"><i class="fas fa-tag"></i> Terjual</button><button class="btn-sm btn-del" data-id="'+p.id+'"><i class="fas fa-trash"></i> Hapus</button></div></div>';
+        ha+='<div class="item"><a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer" class="item-thumb link" title="Buka di Instagram">'+window.getThumbHtml(code)+'</a><div class="item-info"><div class="ii-price">'+escL(price)+'</div><div class="ii-desc">'+escL(firstLine(p.desc))+'</div><div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+(hasEdit?'<div class="ii-status"><span class="edited"><i class="fas fa-pen" style="font-size:.55rem"></i> Harga di-edit</span></div>':'')+'<div class="ii-status"><span style="color:var(--accent)">'+ (p.category||'') +'</span></div></div><div class="item-actions"><button class="btn-sm btn-edit" data-id="'+p.id+'"><i class="fas fa-pen"></i> Edit</button><button class="btn-sm btn-sold" data-id="'+p.id+'"><i class="fas fa-tag"></i> Terjual</button><button class="btn-sm btn-del" data-id="'+p.id+'"><i class="fas fa-trash"></i> Hapus</button><button class="btn-sm btn-ai" data-id="'+p.id+'" data-url="'+escL(p.url)+'"><i class="fas fa-robot"></i> AI</button></div></div>';
       });
       var la=document.getElementById('listAvail');la.innerHTML=ha;
       la.querySelectorAll('[data-id]').forEach(function(btn){var id=btn.getAttribute('data-id');if(btn.classList.contains('btn-edit'))btn.addEventListener('click',function(){startEdit(id)});else if(btn.classList.contains('btn-sold'))btn.addEventListener('click',function(){toggleSold(id,true)});else if(btn.classList.contains('btn-del'))btn.addEventListener('click',function(){deletePost(id)})});
+      // Event untuk tombol AI
+      la.querySelectorAll('.btn-ai').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var docId = btn.getAttribute('data-id');
+          var url = btn.getAttribute('data-url');
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+          window.reclassifyPost(docId, url).finally(function(){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+          });
+        });
+      });
       renderPag('pagAvail',avail.length,currentPage,PER_PAGE,'stockGoPage');
       var hs='';if(!soldList.length)hs='<div class="empty"><i class="fas fa-tag"></i>Tidak ada stock terjual.</div>';
       soldList.forEach(function(p){var price=getEP(p),rem=SOLD_HOURS*3600000-(Date.now()-toMs(p.soldAt)),timerTxt=rem>0?fmtTimer(rem):'Segera dihapus',code=window.getIgCode(p.url);
@@ -464,6 +482,34 @@
       const data = await res.json();
       return data.candidates[0].content.parts[0].text.trim();
     }
+
+    // Reklasifikasi satu stok
+    window.reclassifyPost = async function(docId, url) {
+      try {
+        const thumbUrl = await getThumbnailFromIG(url);
+        let category = await classifyCarImage(thumbUrl);
+        category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
+        await updateDoc(doc(db, "carStock", docId), { category: category });
+        toast(`Kategori diperbarui: ${category}`, 'ok');
+      } catch (err) {
+        toast('Gagal klasifikasi ulang: ' + err.message, 'err');
+      }
+    };
+
+    // Reklasifikasi semua stok yang belum berkategori
+    window.reclassifyAll = async function() {
+      const toClassify = POSTS.filter(p => p.status === 'available' && (!p.category || p.category === 'Lainnya'));
+      if (toClassify.length === 0) {
+        toast('Semua stok sudah memiliki kategori.', 'info');
+        return;
+      }
+      toast(`Memproses ${toClassify.length} stok...`, 'info');
+      for (const post of toClassify) {
+        await window.reclassifyPost(post.id, post.url);
+        await new Promise(r => setTimeout(r, 1500)); // jeda agar tidak kena rate limit
+      }
+      toast('Klasifikasi massal selesai.', 'ok');
+    };
 
     window.addStock = async function(){
       var url=document.getElementById('addUrl').value.trim(),price=document.getElementById('addPrice').value.trim(),desc=document.getElementById('addDesc').value.trim(),msg=document.getElementById('addMsg');
@@ -561,7 +607,6 @@
     const app=initializeApp({apiKey:"AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",authDomain:"akinowedding-73271.firebaseapp.com",projectId:"akinowedding-73271",storageBucket:"akinowedding-73271.appspot.com",messagingSenderId:"307666594440",appId:"1:307666594440:web:e7d3496744464f4c6d0d3d"});
     const db=getFirestore(app);
 
-    /* ✅ NAMA COLLECTION YANG BENAR: "orders" — sama persis kode asli yang berhasil */
     var ORDERS_COL = "orders";
 
     onSnapshot(
@@ -569,12 +614,10 @@
       (snap) => {
         var orders = [];
         snap.forEach((d) => { orders.push({ id: d.id, ...d.data() }); });
-        /* Kirim ke render function yang sudah ada di script utama */
         if (window.renderSosmedOrders) window.renderSosmedOrders(orders);
       },
       (err) => {
         console.error("Sosmed listener error:", err);
-        /* Kalau gagal, tetap panggil render kosong biar tab tidak kosong totalnya */
         if (window.renderSosmedOrders) window.renderSosmedOrders([]);
         document.getElementById('sosmedList').innerHTML =
           '<div class="empty" style="color:#f87171"><i class="fas fa-exclamation-triangle"></i>Gagal memuat pesanan.<br><small style="opacity:.6">Collection: <b>'+ORDERS_COL+'</b><br>Error: '+err.message+'</small></div>';
@@ -596,7 +639,6 @@
 
       try {
         await updateDoc(doc(db, ORDERS_COL, docId), { status: newStatus });
-        /* Sukses — onSnapshot akan auto re-render */
         if (window.onOrderUpdated) window.onOrderUpdated();
       } catch (err) {
         console.error("Update error:", err);
