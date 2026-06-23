@@ -432,13 +432,14 @@
         btn.addEventListener('click', async function(){
           var docId = btn.getAttribute('data-id');
           var url = btn.getAttribute('data-url');
-          // Minta admin paste URL gambar
           var imageUrl = prompt('Masukkan URL gambar mobil (copy image address dari Instagram):', '');
-          if (!imageUrl) return; // batal
+          if (!imageUrl) return;
           btn.disabled = true;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
           try {
-            let category = await classifyCarImage(imageUrl);
+            // Gunakan proxy CORS saat fetch untuk konversi base64
+            const base64 = await urlToBase64Proxy(imageUrl);
+            let category = await classifyCarFromBase64(base64);
             category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
             await updateDoc(doc(db, "carStock", docId), { category: category });
             toast(`Kategori diperbarui: ${category}`, 'ok');
@@ -466,10 +467,12 @@
 
     // ══════════════ GEMINI AI - CLASSIFICATION ══════════════
     const GEMINI_KEY = "AIzaSyA09dWuqQn2ZC-gasY1FwwneyZnhCu-BW8";
-    // Helper: URL ke base64
-    async function urlToBase64(url) {
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error(`Gagal fetch gambar: ${resp.status}`);
+    
+    // Fetch URL gambar via proxy CORS, lalu konversi ke base64
+    async function urlToBase64Proxy(url) {
+      const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+      const resp = await fetch(proxyUrl);
+      if (!resp.ok) throw new Error(`Gagal fetch gambar via proxy: ${resp.status}`);
       const blob = await resp.blob();
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -478,34 +481,10 @@
         reader.readAsDataURL(blob);
       });
     }
-    // Fungsi klasifikasi dengan fallback base64
-    async function classifyCarImage(imageUrl) {
-      // Coba kirim URL langsung
-      let res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: "Klasifikasikan mobil ini ke dalam salah satu kategori: Sedan, SUV, Truck, Sport, Hatchback, Lainnya. Jawab hanya dengan satu kata kategori (contoh: SUV)." },
-                { fileData: { mimeType: "image/jpeg", fileUri: imageUrl } }
-              ]
-            }],
-            generationConfig: { maxOutputTokens: 10 }
-          })
-        }
-      );
-      let data = await res.json();
-      // Jika sukses
-      if (data.candidates) {
-        return data.candidates[0].content.parts[0].text.trim();
-      }
-      // Fallback ke base64
-      console.warn("Gemini fileUri gagal, mencoba base64. Response:", data);
-      const base64 = await urlToBase64(imageUrl);
-      res = await fetch(
+    
+    // Klasifikasi langsung dari base64
+    async function classifyCarFromBase64(base64) {
+      const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
         {
           method: "POST",
@@ -521,12 +500,28 @@
           })
         }
       );
-      data = await res.json();
+      const data = await res.json();
       if (!data.candidates) {
-        console.error("Gemini base64 juga gagal. Response:", data);
-        throw new Error("Respons AI tidak valid setelah fallback");
+        console.error("Gemini error:", data);
+        throw new Error("Respons AI tidak valid");
       }
       return data.candidates[0].content.parts[0].text.trim();
+    }
+
+    // Wrapper untuk klasifikasi dari URL (untuk fallback oEmbed)
+    async function classifyCarImage(imageUrl) {
+      const base64 = await urlToBase64Proxy(imageUrl);
+      return await classifyCarFromBase64(base64);
+    }
+
+    // Fungsi untuk mendapatkan thumbnail dari Instagram (fallback, pakai proxy)
+    async function getThumbnailFromIG(urlIG) {
+      const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(urlIG)}`;
+      const proxied = `https://corsproxy.io/?${encodeURIComponent(oembedUrl)}`;
+      const resp = await fetch(proxied);
+      if (!resp.ok) throw new Error("Gagal fetch oEmbed");
+      const data = await resp.json();
+      return data.thumbnail_url;
     }
 
     // Reklasifikasi satu stok (dipanggil dari tombol AI dengan URL manual)
@@ -541,15 +536,7 @@
       }
     };
 
-    // Reklasifikasi semua stok yang belum berkategori (fallback pakai oEmbed + proxy)
-    async function getThumbnailFromIG(urlIG) {
-      const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(urlIG)}`;
-      const proxied = `https://corsproxy.io/?${encodeURIComponent(oembedUrl)}`;
-      const resp = await fetch(proxied);
-      if (!resp.ok) throw new Error("Gagal fetch oEmbed");
-      const data = await resp.json();
-      return data.thumbnail_url;
-    }
+    // Reklasifikasi semua stok yang belum berkategori (fallback pakai oEmbed)
     window.reclassifyAll = async function() {
       const toClassify = POSTS.filter(p => p.status === 'available' && (!p.category || p.category === 'Lainnya'));
       if (toClassify.length === 0) {
@@ -585,6 +572,7 @@
       // Prioritas: pakai URL gambar manual jika ada
       if (imageUrl) {
         try {
+          // Gunakan proxy CORS untuk mengambil gambar
           category = await classifyCarImage(imageUrl);
           category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
         } catch(err) {
