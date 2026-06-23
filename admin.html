@@ -37,7 +37,15 @@
     .tb-btn.logout{color:#f87171;border-color:rgba(248,113,113,.15)}
     .tb-btn.logout:hover{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3)}
 
-    .tabs{display:flex;gap:0;max-width:1100px;margin:1.5rem auto 0;padding:0 1.5rem}
+    /* Key Input Bar */
+    .key-bar{max-width:1100px;margin:0 auto;padding:0.75rem 1.5rem}
+    .key-bar-inner{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--rs);padding:0.65rem 1rem}
+    .key-bar-inner i{color:var(--accent);font-size:.85rem}
+    .key-bar-inner input{flex:1;min-width:200px;padding:.45rem .75rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:6px;color:var(--fg);font-family:var(--fb);font-size:.82rem;outline:none;transition:border-color .2s}
+    .key-bar-inner input:focus{border-color:var(--accent)}
+    .key-status{font-size:.7rem;color:var(--muted);margin-left:auto}
+
+    .tabs{display:flex;gap:0;max-width:1100px;margin:0 auto;padding:0 1.5rem}
     .tab-btn{flex:1;padding:.85rem .75rem;background:var(--bg-card);border:1px solid var(--border);border-bottom:none;color:var(--muted);font-family:var(--fb);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:.5rem;border-radius:var(--r) var(--r) 0 0}
     .tab-btn:not(:last-child){border-right:none}
     .tab-btn.active{background:var(--bg-el);color:var(--accent);border-color:rgba(255,221,87,.2);border-bottom:1px solid var(--bg-el);margin-bottom:-1px;position:relative;z-index:2}
@@ -182,6 +190,7 @@
       .tab-panel{padding:1rem}
       .topbar{padding:.6rem 1rem}.topbar-inner{justify-content:center}
       .topbar-actions{justify-content:center}
+      .key-bar{padding:0.5rem 1rem}.key-bar-inner{gap:0.5rem}
       .item{flex-direction:row !important;text-align:left !important;gap:.6rem;padding:.6rem .7rem}
       .item-thumb{width:56px;height:56px;border-radius:8px}
       .item-thumb iframe{transform:scale(0.1037)}
@@ -233,6 +242,17 @@
           <a href="SosialMedia.html" target="_blank" class="tb-btn"><i class="fas fa-share-nodes"></i> Sosial Media</a>
           <button class="tb-btn logout" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Keluar</button>
         </div>
+      </div>
+    </div>
+
+    <!-- ═══ BAR INPUT API KEY ═══ -->
+    <div class="key-bar">
+      <div class="key-bar-inner">
+        <i class="fas fa-key"></i>
+        <input type="password" id="groqKeyInput" placeholder="Masukkan Groq API Key..." onkeydown="if(event.key==='Enter')saveGroqKey()">
+        <button onclick="saveGroqKey()" class="tb-btn" style="background:var(--accent);color:#0a0a0f;border:none;padding:.4rem 1rem;"><i class="fas fa-save"></i> Simpan</button>
+        <button onclick="clearGroqKey()" class="tb-btn" style="color:#f87171;border-color:rgba(248,113,113,.2);"><i class="fas fa-trash"></i> Hapus</button>
+        <span class="key-status" id="keyStatus"><i class="fas fa-circle" style="color:#f87171;font-size:.45rem;"></i> Belum diset</span>
       </div>
     </div>
 
@@ -315,7 +335,7 @@
   <div class="toast-wrap" id="toasts"></div>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- SCRIPT: Login, UI, Toast, Thumbnail, Sosmed Render Functions -->
+  <!-- SCRIPT: Login, UI, Toast, Thumbnail, Key Management -->
   <!-- ═══════════════════════════════════════════════════ -->
   <script>
     var PASS='bajingan011';
@@ -326,6 +346,7 @@
     function fRp(n){return 'Rp '+Math.ceil(n).toLocaleString('id-ID')}
     var STATUS_LABEL={pending:'Menunggu Verifikasi',paid:'Pembayaran Dikonfirmasi',processing:'Sedang Diproses',completed:'Selesai',cancelled:'Dibatalkan'};
 
+    // ---- Toast ----
     function toast(msg,type){
       var ic={ok:'fa-check-circle',err:'fa-exclamation-circle',info:'fa-info-circle'};
       var t=document.createElement('div');t.className='toast '+(type||'info');
@@ -334,10 +355,12 @@
       setTimeout(function(){t.classList.add('out');setTimeout(function(){t.remove()},300)},3000);
     }
 
+    // ---- Login ----
     function doLogin(){
       if(document.getElementById('passInput').value.trim()===PASS){
         document.getElementById('loginWrap').style.display='none';
         document.getElementById('dash').classList.add('active');
+        loadGroqKeyUI();
         if(window.initStock)window.initStock();
       }else{document.getElementById('loginErr').textContent='Password salah!';}
     }
@@ -364,7 +387,36 @@
       return '<iframe src="https://www.instagram.com/p/'+code+'/embed/" allowtransparency="true" scrolling="no" frameborder="0"></iframe>';
     };
 
-    // ═══════════ PASTE/UPLOAD GAMBAR (FORM TAMBAH) ═══════════
+    // ---- Groq Key Management (UI + localStorage) ----
+    function saveGroqKey() {
+      var key = document.getElementById('groqKeyInput').value.trim();
+      if (!key) { toast('Masukkan API Key terlebih dahulu!', 'err'); return; }
+      localStorage.setItem('groq_api_key', key);
+      document.getElementById('keyStatus').innerHTML = '<i class="fas fa-check-circle" style="color:#4ade80;font-size:.45rem;"></i> Tersimpan';
+      toast('API Key berhasil disimpan di browser.', 'ok');
+      if (window.updateGroqKey) window.updateGroqKey(key);
+    }
+
+    function clearGroqKey() {
+      localStorage.removeItem('groq_api_key');
+      document.getElementById('groqKeyInput').value = '';
+      document.getElementById('keyStatus').innerHTML = '<i class="fas fa-circle" style="color:#f87171;font-size:.45rem;"></i> Belum diset';
+      toast('API Key dihapus dari browser.', 'info');
+      if (window.updateGroqKey) window.updateGroqKey(null);
+    }
+
+    function loadGroqKeyUI() {
+      var saved = localStorage.getItem('groq_api_key');
+      if (saved) {
+        document.getElementById('groqKeyInput').value = saved;
+        document.getElementById('keyStatus').innerHTML = '<i class="fas fa-check-circle" style="color:#4ade80;font-size:.45rem;"></i> Tersimpan';
+        if (window.updateGroqKey) window.updateGroqKey(saved);
+      } else {
+        document.getElementById('keyStatus').innerHTML = '<i class="fas fa-circle" style="color:#f87171;font-size:.45rem;"></i> Belum diset';
+      }
+    }
+
+    // ---- Paste Area Setup ----
     let currentImageBase64 = null;
     function setupPasteArea(){
       const area = document.getElementById('pasteArea');
@@ -411,6 +463,7 @@
     
     setupPasteArea();
 
+    // ---- Sosmed Render Functions ----
     window.renderSosmedOrders=function(orders){sosmedOrders=orders||[];renderSosmedStats();renderSosmedFilter();renderSosmedList()};
     function renderSosmedStats(){
       var o=sosmedOrders,cnt={pending:0,paid:0,processing:0,completed:0,cancelled:0};
@@ -470,6 +523,105 @@
     window.destroyStockTimer=function(){if(soldTimer){clearInterval(soldTimer);soldTimer=null}};
     window.stockGoPage=function(p){currentPage=p;renderStock()};
 
+    // ══════════════ GROQ AI - CLASSIFICATION (multimodal) ══════════════
+    // Ambil key dari localStorage (bisa diupdate via UI)
+    let GROQ_API_KEY = localStorage.getItem('groq_api_key') || "";
+    const GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+    const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+    // Fungsi untuk update key dari UI (tanpa reload)
+    window.updateGroqKey = function(newKey) {
+      GROQ_API_KEY = newKey || "";
+      if (!GROQ_API_KEY) {
+        console.warn("Groq API Key belum diset.");
+      } else {
+        console.log("Groq API Key updated.");
+      }
+    };
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function callGroq(base64Image, prompt) {
+      if (!GROQ_API_KEY) {
+        throw new Error("API Key Groq belum diset. Masukkan key di kolom atas.");
+      }
+      const response = await fetch(GROQ_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: GROQ_MODEL,
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: prompt },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: `data:image/jpeg;base64,${base64Image}`
+                  }
+                }
+              ]
+            }
+          ],
+          max_tokens: 20,
+          temperature: 0.2
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Groq API error (${response.status}): ${errText}`);
+      }
+
+      const data = await response.json();
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new Error("Respons Groq tidak valid");
+      }
+      return data.choices[0].message.content.trim();
+    }
+
+    async function classifyCarFromBase64(base64) {
+      const prompt =
+        "Klasifikasikan mobil ini ke dalam salah satu kategori: Sedan, SUV, Truck, Sport, Hatchback, Lainnya. Jawab hanya dengan satu kata kategori (contoh: SUV).";
+      const result = await callGroq(base64, prompt);
+      return result.replace(/[^a-zA-Z]/g, "").trim() || "Lainnya";
+    }
+
+    // Fungsi ambil thumbnail IG
+    async function getThumbnailFromIG(urlIG) {
+      const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(urlIG)}`;
+      const proxied = `https://corsproxy.io/?${encodeURIComponent(oembedUrl)}`;
+      const resp = await fetch(proxied);
+      if (!resp.ok) throw new Error("Gagal fetch oEmbed");
+      const data = await resp.json();
+      return data.thumbnail_url;
+    }
+
+    async function classifyCarFromUrl(url) {
+      const proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+      const resp = await fetch(proxiedUrl);
+      if (!resp.ok) throw new Error("Gagal fetch gambar");
+      const blob = await resp.blob();
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      return await classifyCarFromBase64(base64);
+    }
+
     // ═══════════ AI PASTE GLOBAL ═══════════
     let currentAiTarget = null; // { docId, btn }
     document.addEventListener('paste', function(e) {
@@ -491,6 +643,7 @@
       if (!target) return;
       const { docId, btn } = target;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      btn.disabled = true;
       try {
         const base64 = await fileToBase64(blob);
         let category = await classifyCarFromBase64(base64);
@@ -505,6 +658,7 @@
       }
     }
 
+    // ═══════════ RENDER STOCK ═══════════
     function renderStock(){
       var PER_PAGE=getPerPage();
       var avail=[],soldList=[],delList=[];
@@ -573,67 +727,7 @@
     }
     function startSoldTimer(){if(soldTimer)clearInterval(soldTimer);soldTimer=setInterval(function(){document.querySelectorAll('.timer[data-soldat]').forEach(function(el){var soldAt=parseInt(el.dataset.soldat),rem=SOLD_HOURS*3600000-(Date.now()-soldAt);if(rem<=0)return;el.innerHTML='<i class="fas fa-clock" style="font-size:.6rem"></i> '+fmtTimer(rem)})},1000)}
 
-    // ══════════════ GEMINI AI - CLASSIFICATION ══════════════
-    const GEMINI_KEY = "AIzaSyA09dWuqQn2ZC-gasY1FwwneyZnhCu-BW8";
-    
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(",")[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-    
-    async function classifyCarFromBase64(base64) {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: "Klasifikasikan mobil ini ke dalam salah satu kategori: Sedan, SUV, Truck, Sport, Hatchback, Lainnya. Jawab hanya dengan satu kata kategori (contoh: SUV)." },
-                { inlineData: { mimeType: "image/jpeg", data: base64 } }
-              ]
-            }],
-            generationConfig: { maxOutputTokens: 10 }
-          })
-        }
-      );
-      const data = await res.json();
-      if (!data.candidates) {
-        console.error("Gemini error:", data);
-        throw new Error("Respons AI tidak valid");
-      }
-      return data.candidates[0].content.parts[0].text.trim();
-    }
-
-    // Fallback untuk klasifikasi massal (pakai proxy)
-    async function getThumbnailFromIG(urlIG) {
-      const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(urlIG)}`;
-      const proxied = `https://corsproxy.io/?${encodeURIComponent(oembedUrl)}`;
-      const resp = await fetch(proxied);
-      if (!resp.ok) throw new Error("Gagal fetch oEmbed");
-      const data = await resp.json();
-      return data.thumbnail_url;
-    }
-    
-    async function classifyCarFromUrl(url) {
-      const proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
-      const resp = await fetch(proxiedUrl);
-      if (!resp.ok) throw new Error("Gagal fetch gambar");
-      const blob = await resp.blob();
-      const base64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.split(",")[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-      return await classifyCarFromBase64(base64);
-    }
-
+    // ═══════ FUNGSI ADD, EDIT, DELETE, RESTORE ═══════
     window.reclassifyAll = async function() {
       const toClassify = POSTS.filter(p => p.status === 'available' && (!p.category || p.category === 'Lainnya'));
       if (toClassify.length === 0) {
@@ -676,6 +770,7 @@
           category = cat.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
         } catch(err) {
           console.warn("Klasifikasi gagal:", err);
+          toast('Klasifikasi gagal: ' + err.message, 'err');
         }
       } else {
         try {
@@ -684,6 +779,7 @@
           category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
         } catch(err) {
           console.warn("Klasifikasi gagal:", err);
+          toast('Klasifikasi gagal: ' + err.message, 'err');
         }
       }
       
