@@ -77,9 +77,6 @@
     .paste-area img{max-height:150px;border-radius:8px;display:block;margin:0 auto}
     .paste-area p{font-size:.8rem;color:var(--muted)}
 
-    .ai-paste-popup{position:absolute;z-index:50;background:var(--bg-el);border:1px solid var(--accent);border-radius:8px;padding:.5rem;width:200px}
-    .ai-paste-popup input{width:100%;padding:.3rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--fg);font-size:.7rem;text-align:center}
-
     .edit-card{background:rgba(255,221,87,.04);border:1px solid rgba(255,221,87,.18);border-radius:var(--rs);padding:1.15rem;margin-bottom:1.5rem;animation:fadeUp .3s ease}
     .edit-card h4{font-family:var(--fd);font-size:.88rem;font-weight:600;margin-bottom:.85rem;color:var(--accent);display:flex;align-items:center;gap:.4rem}
     .edit-card input[readonly]{opacity:.45;cursor:default}
@@ -472,6 +469,42 @@
     window.initStock=function(){startSoldTimer()};
     window.destroyStockTimer=function(){if(soldTimer){clearInterval(soldTimer);soldTimer=null}};
     window.stockGoPage=function(p){currentPage=p;renderStock()};
+
+    // ═══════════ AI PASTE GLOBAL ═══════════
+    let currentAiTarget = null; // { docId, btn }
+    document.addEventListener('paste', function(e) {
+      if (!currentAiTarget) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let item of items) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          const blob = item.getAsFile();
+          processAiBlob(blob);
+          break;
+        }
+      }
+    });
+    async function processAiBlob(blob) {
+      const target = currentAiTarget;
+      currentAiTarget = null;
+      if (!target) return;
+      const { docId, btn } = target;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      try {
+        const base64 = await fileToBase64(blob);
+        let category = await classifyCarFromBase64(base64);
+        category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
+        await updateDoc(doc(db, "carStock", docId), { category });
+        toast(`Kategori diperbarui: ${category}`, 'ok');
+      } catch (err) {
+        toast('Gagal klasifikasi: ' + err.message, 'err');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+      }
+    }
+
     function renderStock(){
       var PER_PAGE=getPerPage();
       var avail=[],soldList=[],delList=[];
@@ -489,64 +522,43 @@
       var la=document.getElementById('listAvail');la.innerHTML=ha;
       la.querySelectorAll('[data-id]').forEach(function(btn){var id=btn.getAttribute('data-id');if(btn.classList.contains('btn-edit'))btn.addEventListener('click',function(){startEdit(id)});else if(btn.classList.contains('btn-sold'))btn.addEventListener('click',function(){toggleSold(id,true)});else if(btn.classList.contains('btn-del'))btn.addEventListener('click',function(){deletePost(id)})});
       
-      // ═══════════ TOMBOL AI PER STOK (PASTE GAMBAR) ═══════════
+      // Tombol AI per stok (global paste)
       la.querySelectorAll('.btn-ai').forEach(function(btn){
         btn.addEventListener('click', function(e){
           e.stopPropagation();
-          var docId = btn.getAttribute('data-id');
-          // Simpan referensi tombol asli
-          var originalHTML = btn.innerHTML;
-          btn.disabled = true;
-          btn.innerHTML = '<i class="fas fa-paste"></i> Ctrl+V';
-          btn.style.padding = '0.5rem 0.8rem';
-          
-          function handlePaste(ev) {
-            ev.preventDefault();
-            var items = ev.clipboardData?.items;
-            if (!items) return;
-            for (let item of items) {
-              if (item.type.startsWith('image/')) {
-                var blob = item.getAsFile();
-                processAIImage(blob);
-                break;
-              }
-            }
-            // Bersihkan
-            btn.removeEventListener('paste', handlePaste);
-            btn.blur();
-            document.removeEventListener('click', outsideClickHandler);
+          const docId = btn.getAttribute('data-id');
+          // Jika sudah ada yang menunggu, batalkan dulu
+          if (currentAiTarget) {
+            currentAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+            currentAiTarget.btn.disabled = false;
+            currentAiTarget = null;
           }
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-paste"></i> Tempel gambar (Ctrl+V)';
+          currentAiTarget = { docId, btn };
           
+          // Hapus target setelah 15 detik jika tidak ada paste
+          const timeout = setTimeout(() => {
+            if (currentAiTarget && currentAiTarget.btn === btn) {
+              currentAiTarget = null;
+              btn.disabled = false;
+              btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+            }
+          }, 15000);
+          
+          // Jika klik di luar, batalkan
           function outsideClickHandler(ev) {
             if (!btn.contains(ev.target)) {
-              btn.removeEventListener('paste', handlePaste);
+              clearTimeout(timeout);
+              if (currentAiTarget && currentAiTarget.btn === btn) {
+                currentAiTarget = null;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+              }
               document.removeEventListener('click', outsideClickHandler);
-              btn.disabled = false;
-              btn.innerHTML = originalHTML;
-              btn.style.padding = '';
             }
           }
-          
-          btn.addEventListener('paste', handlePaste);
-          btn.focus();
           setTimeout(() => document.addEventListener('click', outsideClickHandler), 100);
-          
-          async function processAIImage(file) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            try {
-              const base64 = await fileToBase64(file);
-              let category = await classifyCarFromBase64(base64);
-              category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
-              await updateDoc(doc(db, "carStock", docId), { category: category });
-              toast(`Kategori diperbarui: ${category}`, 'ok');
-            } catch(err) {
-              toast('Gagal klasifikasi: ' + err.message, 'err');
-            } finally {
-              btn.disabled = false;
-              btn.innerHTML = originalHTML;
-              btn.style.padding = '';
-            }
-          }
         });
       });
       
