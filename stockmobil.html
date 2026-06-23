@@ -50,6 +50,10 @@
     .sort-btn{padding:.38rem .95rem;border-radius:50px;background:var(--bg-card);border:1px solid var(--border);color:var(--muted);font-family:var(--font-body);font-size:.76rem;font-weight:500;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap}
     .sort-btn:hover{color:var(--fg);border-color:rgba(255,255,255,.12)}
     .sort-btn.active{background:var(--accent);color:#0a0a0f;border-color:var(--accent)}
+    .filter-categories{display:flex;justify-content:center;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap}
+    .cat-btn{padding:.35rem .9rem;border-radius:50px;background:var(--bg-card);border:1px solid var(--border);color:var(--muted);font-family:var(--font-body);font-size:.76rem;font-weight:500;cursor:pointer;transition:all .25s}
+    .cat-btn:hover{color:var(--fg);border-color:rgba(255,255,255,.12)}
+    .cat-btn.active{background:var(--accent);color:#0a0a0f;border-color:var(--accent)}
     .sold-section{margin-bottom:2.5rem}
     .sold-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem}
     .sold-header-left{display:flex;align-items:center;gap:.6rem}
@@ -208,19 +212,6 @@
       .ig-card-thumb-price{font-size:.72rem}
     }
   </style>
-
-<style>
-  /* ═══ AI Category Filter ═══ */
-  .cat-filter-wrap{display:flex;gap:.4rem;justify-content:center;margin-bottom:1.25rem;flex-wrap:wrap}
-  .cat-filter-btn{padding:.35rem .85rem;border-radius:50px;background:var(--bg-card);border:1px solid var(--border);color:var(--muted);font-family:var(--font-body);font-size:.72rem;font-weight:500;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:.3rem;white-space:nowrap}
-  .cat-filter-btn:hover{color:var(--fg);border-color:rgba(255,255,255,.12)}
-  .cat-filter-btn.active{background:var(--accent);color:#0a0a0f;border-color:var(--accent)}
-  .cat-filter-btn .cat-count{font-size:.6rem;opacity:.7}
-  .cat-empty-msg{grid-column:1/-1;text-align:center;padding:3rem 1rem;color:var(--muted)}
-  .cat-empty-msg i{font-size:2rem;display:block;margin-bottom:.8rem;opacity:.3}
-  .cat-empty-msg p{font-size:.9rem}
-  @media(max-width:768px){.cat-filter-btn{padding:.3rem .65rem;font-size:.65rem}}
-  </style>
 </head>
 <body>
 
@@ -300,6 +291,9 @@
       <button class="sort-btn" data-sort="price-asc" onclick="setSort('price-asc')"><i class="fas fa-arrow-up-1-9" style="font-size:.65rem"></i> Harga Terendah</button>
       <button class="sort-btn" data-sort="price-desc" onclick="setSort('price-desc')"><i class="fas fa-arrow-down-9-1" style="font-size:.65rem"></i> Harga Tertinggi</button>
     </div>
+
+    <!-- FILTER KATEGORI -->
+    <div class="filter-categories reveal" id="categoryFilter"></div>
 
     <div class="ig-counter reveal" id="igCounter"></div>
     <div class="ig-list" id="igGrid"></div>
@@ -462,7 +456,7 @@
     const app=initializeApp({apiKey:"AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",authDomain:"akinowedding-73271.firebaseapp.com",projectId:"akinowedding-73271",storageBucket:"akinowedding-73271.appspot.com",messagingSenderId:"307666594440",appId:"1:307666594440:web:e7d3496744464f4c6d0d3d"});
     const db=getFirestore(app);
 
-    var SOLD_HOURS=24,PER_PAGE=10,currentPage=0,soldListOpen=true,currentSort='newest',POSTS=[];
+    var SOLD_HOURS=24,PER_PAGE=10,currentPage=0,soldListOpen=true,currentSort='newest',POSTS=[],currentCategory='all';
 
     function escLocal(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
     function parsePrice(str){var n=parseInt((str||'').replace(/[^0-9]/g,''));return isNaN(n)?0:n}
@@ -484,10 +478,32 @@
 
     function getSortedAvail(){
       var avail=POSTS.filter(function(p){return p.status==='available'});
+      if(currentCategory!=='all'){
+        avail=avail.filter(function(p){return (p.category||'Lainnya')===currentCategory});
+      }
       if(currentSort==='newest')avail.sort(function(a,b){return toMs(b.addedAt)-toMs(a.addedAt)});
       else if(currentSort==='price-asc')avail.sort(function(a,b){return parsePrice(getEffectivePrice(a))-parsePrice(getEffectivePrice(b))});
       else if(currentSort==='price-desc')avail.sort(function(a,b){return parsePrice(getEffectivePrice(b))-parsePrice(getEffectivePrice(a))});
       return avail;
+    }
+
+    function renderCategoryFilter(){
+      var avail=getSortedAvail();
+      var cats=[...new Set(avail.map(p=>p.category||'Lainnya'))].filter(Boolean);
+      var container=document.getElementById('categoryFilter');
+      var html='<button class="cat-btn '+(currentCategory==='all'?'active':'')+'" data-cat="all">Semua</button>';
+      cats.forEach(function(cat){
+        html+='<button class="cat-btn '+(currentCategory===cat?'active':'')+'" data-cat="'+cat+'">'+cat+'</button>';
+      });
+      container.innerHTML=html;
+      container.querySelectorAll('.cat-btn').forEach(function(btn){
+        btn.addEventListener('click',function(){
+          currentCategory=btn.dataset.cat;
+          renderCategoryFilter();
+          currentPage=0;
+          renderAvailable();
+        });
+      });
     }
 
     function renderSold(){
@@ -569,139 +585,4 @@
         pnEl.innerHTML='';
         pageNums.forEach(function(p){
           if(p==='...'){var sp=document.createElement('span');sp.className='page-ellipsis';sp.textContent='...';pnEl.appendChild(sp)}
-          else{var btn=document.createElement('button');btn.className='page-num'+(p===currentPage?' active':'');btn.textContent=p+1;btn.onclick=(function(pg){return function(){goToPage(pg)}})(p);pnEl.appendChild(btn)}
-        });
-      }else{pag.style.display='none'}
-    }
-
-    window.prevPage=function(){if(currentPage>0){currentPage--;renderAvailable();scrollToGrid()}};
-    window.nextPage=function(){var tp=Math.ceil(getSortedAvail().length/PER_PAGE);if(currentPage<tp-1){currentPage++;renderAvailable();scrollToGrid()}};
-    function goToPage(pg){currentPage=pg;renderAvailable();scrollToGrid()}
-    function scrollToGrid(){var g=document.getElementById('igGrid');window.scrollTo({top:g.getBoundingClientRect().top+window.pageYOffset-80,behavior:'smooth'})}
-
-    onSnapshot(query(collection(db,"carStock"),orderBy("addedAt","desc")),(snap)=>{
-      POSTS=[];snap.forEach((d)=>POSTS.push({id:d.id,...d.data()}));
-      renderSold();renderAvailable();
-    },(err)=>{console.error("Stock listener error:",err)});
-  </script>
-
-  <script type="module">
-    import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import{getFirestore,collection,addDoc,query,orderBy,limit,serverTimestamp,onSnapshot,startAfter,getDocs}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-    const app=initializeApp({apiKey:"AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",authDomain:"akinowedding-73271.firebaseapp.com",projectId:"akinowedding-73271",storageBucket:"akinowedding-73271.appspot.com",messagingSenderId:"307666594440",appId:"1:307666594440:web:e7d3496744464f4c6d0d3d"});
-    const db=getFirestore(app);
-    const gbForm=document.getElementById('messageForm'),gbMsgs=document.getElementById('gbMsgs');
-    let lastVisible=null,loading=false;
-    gbForm.addEventListener('submit',async(e)=>{e.preventDefault();const name=document.getElementById('gb-name').value.trim(),message=document.getElementById('gb-msg').value.trim();if(name&&message){await addDoc(collection(db,"messages"),{name,message,timestamp:serverTimestamp()});gbForm.reset()}});
-    function loadMessages(){
-      onSnapshot(query(collection(db,"messages"),orderBy("timestamp","desc"),limit(10)),(snap)=>{
-        gbMsgs.innerHTML="";snap.forEach((d)=>renderMsg(d.data()));gbMsgs.scrollTop=0;
-        if(snap.docs.length>0)lastVisible=snap.docs[snap.docs.length-1];
-      });
-    }
-    gbMsgs.addEventListener("scroll",async()=>{
-      if(loading)return;
-      if(gbMsgs.scrollTop+gbMsgs.clientHeight>=gbMsgs.scrollHeight-10){
-        loading=true;
-        if(lastVisible){
-          const snap=await getDocs(query(collection(db,"messages"),orderBy("timestamp","desc"),startAfter(lastVisible),limit(10)));
-          snap.forEach((d)=>renderMsg(d.data()));
-          if(snap.docs.length>0)lastVisible=snap.docs[snap.docs.length-1];
-        }
-        loading=false;
-      }
-    });
-    function renderMsg(data){
-      const div=document.createElement("div");div.className="gb-msg";
-      div.innerHTML="<strong>"+data.name+"</strong><p>"+data.message+"</p><small>"+(data.timestamp?new Date(data.timestamp.seconds*1000).toLocaleString():"")+"</small>";
-      gbMsgs.appendChild(div);
-    }
-    loadMessages();
-  </script>
-
-  <!-- ═══ AI: Category Filter untuk halaman stock ═══ -->
-<script type="module">
-  import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-  import{getFirestore,collection,query,orderBy,onSnapshot}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-  const app=initializeApp({apiKey:"AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",authDomain:"akinowedding-73271.firebaseapp.com",projectId:"akinowedding-73271",storageBucket:"akinowedding-73271.appspot.com",messagingSenderId:"307666594440",appId:"1:307666594440:web:e7d3496744464f4c6d0d3d"});
-  const db=getFirestore(app);
-  var POSTS=[],currentCat='all',filterInited=false;
-
-  function getCodeFromUrl(u){var m=u.match(/\/p\/([A-Za-z0-9_-]+)/);return m?m[1]:null}
-
-  /* Bangun/refresh tombol filter kategori */
-  function buildFilterButtons(){
-    var avail=POSTS.filter(function(p){return p.status==='available'});
-    var catMap={};
-    avail.forEach(function(p){var c=p.category||'Lainnya';catMap[c]=(catMap[c]||0)+1});
-    var sortTabs=document.getElementById('sortTabs');
-    if(!sortTabs)return;
-    var wrap=document.getElementById('catFilterWrap');
-    if(!wrap){
-      wrap=document.createElement('div');
-      wrap.id='catFilterWrap';
-      wrap.className='cat-filter-wrap reveal';
-      sortTabs.parentNode.insertBefore(wrap,sortTabs.nextSibling);
-      /* trigger reveal animation */
-      var ro=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target)}})},{threshold:.08});
-      ro.observe(wrap);
-    }
-    var h='<button class="cat-filter-btn'+(currentCat==='all'?' active':'')+'" data-cat="all">Semua Kategori</button>';
-    Object.keys(catMap).sort().forEach(function(cat){
-      h+='<button class="cat-filter-btn'+(currentCat===cat?' active':'')+'" data-cat="'+cat+'">'+cat+' <span class="cat-count">('+catMap[cat]+')</span></button>';
-    });
-    wrap.innerHTML=h;
-    wrap.querySelectorAll('.cat-filter-btn').forEach(function(btn){
-      btn.addEventListener('click',function(){
-        currentCat=this.dataset.cat;
-        wrap.querySelectorAll('.cat-filter-btn').forEach(function(b){b.classList.toggle('active',b.dataset.cat===currentCat)});
-        applyFilter();
-      });
-    });
-  }
-
-  /* Terapkan filter ke card yang sudah ada di grid */
-  function applyFilter(){
-    var grid=document.getElementById('igGrid');
-    if(!grid)return;
-    var cards=grid.querySelectorAll('.ig-card');
-    var visibleCount=0;
-    cards.forEach(function(card){
-      var iframe=card.querySelector('.ig-card-embed');
-      if(!iframe){card.style.display='';visibleCount++;return}
-      var src=iframe.src||'';
-      var codeMatch=src.match(/\/p\/([A-Za-z0-9_-]+)/);
-      var code=codeMatch?codeMatch[1]:null;
-      var post=POSTS.find(function(p){return getCodeFromUrl(p.url)===code});
-      if(!post||post.status!=='available'){card.style.display='';visibleCount++;return}
-      var postCat=post.category||'Lainnya';
-      if(currentCat==='all'||postCat===currentCat){card.style.display='';visibleCount++}
-      else{card.style.display='none'}
-    });
-    /* Tampilkan pesan kosong jika tidak ada yang cocok */
-    var existingMsg=grid.querySelector('.cat-empty-msg');
-    if(existingMsg)existingMsg.remove();
-    if(visibleCount===0&&currentCat!=='all'){
-      var msg=document.createElement('div');
-      msg.className='cat-empty-msg';
-      msg.innerHTML='<i class="fas fa-filter"></i><p>Tidak ada mobil di kategori "<strong>'+currentCat+'</strong>"</p>';
-      grid.appendChild(msg);
-    }
-  }
-
-  /* Observer untuk re-apply filter setiap kali grid berubah (sort/page change) */
-  var gridObs=new MutationObserver(function(){applyFilter()});
-
-  onSnapshot(query(collection(db,"carStock"),orderBy("addedAt","desc")),(snap)=>{
-    POSTS=[];snap.forEach((d)=>POSTS.push({id:d.id,...d.data()}));
-    buildFilterButtons();
-    /* Mulai observe grid setelah ada di DOM */
-    var grid=document.getElementById('igGrid');
-    if(grid&&!filterInited){gridObs.observe(grid,{childList:true});filterInited=true}
-    /* Delay sedikit biar render existing selesai, lalu apply filter */
-    setTimeout(applyFilter,100);
-  },(err)=>{console.error("Cat filter error:",err)});
-</script>
-
-</body>
-</html>
+          else{var btn=document.createElement('button');btn.className='page-num'+(
