@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    /* (CSS sama seperti sebelumnya, tidak diubah agar ringkas) */
+    /* ===== CSS (sama seperti sebelumnya) ===== */
     :root{--bg:#07070d;--bg-card:rgba(255,255,255,0.04);--bg-el:#0e0e18;--fg:#f0f0f5;--fg-dim:#c0c0d0;--muted:#6a6a82;--accent:#FFDD57;--accent-dim:rgba(255,221,87,0.15);--border:rgba(255,255,255,0.07);--r:14px;--rs:10px;--fd:'Space Grotesk',sans-serif;--fb:'DM Sans',sans-serif}
     *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
     body{font-family:var(--fb);background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden}
@@ -71,10 +71,12 @@
     .form-msg.show{display:flex}
     .form-msg.ok{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:#4ade80}
     .form-msg.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171}
+    
     .paste-area{background:rgba(255,255,255,.02);border:2px dashed var(--border);border-radius:var(--rs);padding:1.5rem;text-align:center;cursor:pointer;transition:all .25s;min-height:100px;display:flex;align-items:center;justify-content:center}
     .paste-area:hover,.paste-area.drag{border-color:var(--accent);background:rgba(255,221,87,.04)}
     .paste-area img{max-height:150px;border-radius:8px;display:block;margin:0 auto}
     .paste-area p{font-size:.8rem;color:var(--muted)}
+
     .edit-card{background:rgba(255,221,87,.04);border:1px solid rgba(255,221,87,.18);border-radius:var(--rs);padding:1.15rem;margin-bottom:1.5rem;animation:fadeUp .3s ease}
     .edit-card h4{font-family:var(--fd);font-size:.88rem;font-weight:600;margin-bottom:.85rem;color:var(--accent);display:flex;align-items:center;gap:.4rem}
     .edit-card input[readonly]{opacity:.45;cursor:default}
@@ -84,6 +86,7 @@
     .edit-card .ea .btn-save:hover{box-shadow:0 4px 16px rgba(255,221,87,.3)}
     .edit-card .ea .btn-cancel{background:var(--bg-card);color:var(--muted);border:1px solid var(--border)}
     .edit-card .ea .btn-cancel:hover{color:var(--fg);border-color:rgba(255,255,255,.15)}
+
     .item{background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:var(--rs);padding:.75rem .85rem;margin-bottom:.45rem;display:flex;align-items:center;gap:.75rem;transition:border-color .2s;animation:fadeUp .3s ease;position:relative}
     .item:hover{border-color:rgba(255,255,255,.1)}
     .item-thumb{width:72px;height:72px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--bg-card);border:1px solid var(--border);position:relative;text-decoration:none;transition:border-color .25s,box-shadow .25s;display:block}
@@ -105,11 +108,16 @@
     .item-info.sold .ii-price{color:#f87171}
     .item-info.deleted .ii-price{color:var(--muted);text-decoration:line-through}
     .item-info .ii-desc{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.05rem;max-width:260px}
+    .item-info .ii-tags{font-size:.6rem;font-weight:500;margin-top:.1rem;display:flex;gap:.2rem;flex-wrap:wrap}
+    .item-info .ii-tags .tag{display:inline-flex;align-items:center;gap:.15rem;padding:.08rem .4rem;border-radius:50px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--fg-dim)}
+    .item-info .ii-tags .tag.brand{background:rgba(255,221,87,.08);border-color:rgba(255,221,87,.15);color:var(--accent)}
+    .item-info .ii-tags .tag.livery{background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.15);color:#a855f7}
     .item-info .ii-status{font-size:.63rem;font-weight:600;margin-top:.1rem;display:flex;flex-direction:column;gap:.05rem}
     .ii-status span{display:inline-flex;align-items:center;gap:.2rem;width:fit-content}
     .ii-status .edited{color:var(--accent)}
     .ii-status .timer{color:#f87171;font-family:var(--fd)}
     .item-actions{display:flex;gap:.3rem;flex-shrink:0;flex-wrap:wrap;align-items:center}
+
     .btn-sm{padding:.3rem .65rem;border-radius:7px;font-family:var(--fb);font-size:.65rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;display:inline-flex;align-items:center;gap:.2rem;border:1px solid transparent}
     .btn-sm i{font-size:.55rem}
     .btn-edit{background:rgba(255,221,87,.1);color:var(--accent);border-color:rgba(255,221,87,.2)}.btn-edit:hover{background:var(--accent);color:#0a0a0f}
@@ -119,6 +127,8 @@
     .btn-restore{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.2)}.btn-restore:hover{background:#60a5fa;color:#fff}
     .btn-update{background:var(--accent);color:#0a0a0f;border:none}.btn-update:hover{box-shadow:0 2px 10px rgba(255,221,87,.25)}
     .btn-ai{background:rgba(168,85,247,.15);color:#a855f7;border-color:rgba(168,85,247,.25)}.btn-ai:hover{background:#a855f7;color:#fff}
+    .btn-ai.active{background:#a855f7;color:#fff;border-color:#a855f7}
+
     .pagination{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:1rem 0 .25rem}
     .pg-btn{padding:.5rem 1rem;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);color:var(--muted);font-family:var(--fb);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.35rem;min-height:36px}
     .pg-btn:hover:not(:disabled){color:var(--fg);border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
@@ -176,6 +186,7 @@
       .item-actions{gap:.25rem}
       .btn-sm{padding:.25rem .5rem;font-size:.6rem}.btn-sm i{font-size:.5rem}
       .item-info .ii-price{font-size:.78rem}
+      .item-info .ii-tags .tag{font-size:.55rem;padding:.05rem .3rem}
       .item-info .ii-status{font-size:.58rem}
       .pagination{padding:.85rem 0 .15rem;gap:.6rem}
       .pg-btn{padding:.55rem 1rem;font-size:.8rem;min-height:40px;border-radius:10px}
@@ -199,18 +210,21 @@
 </head>
 <body>
 
+  <!-- ===== LOGIN ===== -->
   <div class="login-wrap" id="loginWrap">
     <div class="login-card">
       <div class="lc-icon"><i class="fas fa-shield-halved"></i></div>
       <h1>Admin Panel</h1>
       <p>Kelola stock mobil, secret car & pesanan sosial media Akino Store.</p>
-      <input type="password" id="passInput" placeholder="Masukkan password..." onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="passInput" placeholder="Masukkan password..." onkeydown="if(event.key==='Enter')doLogin()" />
       <div class="login-error" id="loginErr"></div>
       <button class="btn-login" onclick="doLogin()"><i class="fas fa-arrow-right-to-bracket"></i> Masuk</button>
     </div>
   </div>
 
+  <!-- ===== DASHBOARD ===== -->
   <div class="dash" id="dash">
+    <!-- TOPBAR -->
     <div class="topbar">
       <div class="topbar-inner">
         <div class="topbar-brand"><i class="fas fa-shield-halved"></i> Akino Admin</div>
@@ -222,86 +236,89 @@
       </div>
     </div>
 
-    <!-- BAR INPUT API KEY -->
+    <!-- KEY INPUT -->
     <div class="key-bar">
       <div class="key-bar-inner">
         <i class="fas fa-key"></i>
-        <input type="password" id="groqKeyInput" placeholder="Masukkan Groq API Key..." onkeydown="if(event.key==='Enter')saveGroqKey()">
+        <input type="password" id="groqKeyInput" placeholder="Masukkan Groq API Key..." onkeydown="if(event.key==='Enter')saveGroqKey()" />
         <button onclick="saveGroqKey()" class="tb-btn" style="background:var(--accent);color:#0a0a0f;border:none;padding:.4rem 1rem;"><i class="fas fa-save"></i> Simpan</button>
         <button onclick="clearGroqKey()" class="tb-btn" style="color:#f87171;border-color:rgba(248,113,113,.2);"><i class="fas fa-trash"></i> Hapus</button>
         <span class="key-status" id="keyStatus"><i class="fas fa-circle" style="color:#f87171;font-size:.45rem;"></i> Belum diset</span>
       </div>
     </div>
 
+    <!-- TABS -->
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('stock')"><i class="fas fa-car"></i> Stock Mobil</button>
       <button class="tab-btn" onclick="switchTab('limited')"><i class="fas fa-star"></i> Secret Car</button>
       <button class="tab-btn" onclick="switchTab('sosmed')"><i class="fas fa-share-nodes"></i> Sosmed</button>
     </div>
 
+    <!-- TAB STOCK -->
     <div class="tab-panel active" id="tabStock">
       <div class="stats" id="stockStats"></div>
       <div class="form-card">
         <h4><i class="fas fa-plus-circle"></i> Tambah Stock Baru</h4>
-        <div class="fr"><label>Link Post Instagram</label><input type="text" id="addUrl" placeholder="https://www.instagram.com/p/XXXXXX/"><div class="hint">Buka post → 3 titik → Copy Link</div></div>
+        <div class="fr"><label>Link Post Instagram</label><input type="text" id="addUrl" placeholder="https://www.instagram.com/p/XXXXXX/" /><div class="hint">Buka post → 3 titik → Copy Link</div></div>
         <div class="fr">
-          <label>Paste Gambar Mobil (Ctrl+V dari screenshot)</label>
+          <label>Gambar Mobil (paste hasil screenshot: Ctrl+V)</label>
           <div class="paste-area" id="pasteArea" tabindex="0">
             <p><i class="fas fa-paste"></i> Klik area ini lalu tekan <strong>Ctrl+V</strong> untuk paste gambar screenshot.<br>Atau klik untuk memilih file.</p>
           </div>
-          <input type="file" id="addImageFile" accept="image/*" style="display:none">
+          <input type="file" id="addImageFile" accept="image/*" style="display:none" />
         </div>
-        <div class="fr"><label>Harga</label><input type="text" id="addPrice" placeholder="Rp 3.000"></div>
+        <div class="fr"><label>Harga</label><input type="text" id="addPrice" placeholder="Rp 3.000" /></div>
         <div class="fr"><label>Keterangan / Caption</label><textarea id="addDesc" placeholder="Nama mobil, jenis layanan, keterangan..."></textarea></div>
         <div class="form-msg" id="addMsg"></div>
         <button class="btn-primary" id="addBtn" onclick="addStock()"><i class="fas fa-plus"></i> Tambah Stock</button>
       </div>
       <div class="edit-card" id="editCard" style="display:none">
         <h4><i class="fas fa-pen-to-square"></i> Edit Harga</h4>
-        <div class="fr"><label>Item</label><input type="text" id="editName" readonly></div>
-        <div class="fr"><label>Harga Saat Ini</label><input type="text" id="editOld" readonly style="color:var(--muted);text-decoration:line-through;opacity:.45"></div>
-        <div class="fr"><label>Harga Baru</label><input type="text" id="editNew" placeholder="Masukkan harga baru..." onkeydown="if(event.key==='Enter')savePrice()"></div>
+        <div class="fr"><label>Item</label><input type="text" id="editName" readonly /></div>
+        <div class="fr"><label>Harga Saat Ini</label><input type="text" id="editOld" readonly style="color:var(--muted);text-decoration:line-through;opacity:.45" /></div>
+        <div class="fr"><label>Harga Baru</label><input type="text" id="editNew" placeholder="Masukkan harga baru..." onkeydown="if(event.key==='Enter')savePrice()" /></div>
         <div class="ea"><button class="btn-save" onclick="savePrice()"><i class="fas fa-check"></i> Simpan</button><button class="btn-cancel" onclick="cancelPrice()"><i class="fas fa-xmark"></i> Batal</button></div>
       </div>
 
       <div class="sec-title">
         <i class="fas fa-check-circle"></i> Tersedia <span class="count" id="cntAvail">0</span>
-        <!-- Tombol klasifikasi semua tidak diperlukan lagi karena manual -->
       </div>
       <div id="listAvail"></div>
       <div id="pagAvail"></div>
-      <hr class="divider">
+      <hr class="divider" />
       <div class="sec-title" style="color:#f87171"><i class="fas fa-tag"></i> Terjual <span class="count" id="cntSold" style="background:rgba(248,113,113,.12);color:#f87171">0</span></div>
       <div id="listSold"></div>
-      <hr class="divider">
+      <hr class="divider" />
       <div class="sec-title" style="color:var(--muted)"><i class="fas fa-trash"></i> Dihapus <span class="count" id="cntDel" style="background:rgba(255,255,255,.05);color:var(--muted)">0</span></div>
       <div id="listDel"></div>
     </div>
 
+    <!-- TAB SECRET -->
     <div class="tab-panel" id="tabLimited">
       <div class="stats" id="secretStats"></div>
       <div class="form-card">
         <h4><i class="fas fa-plus-circle"></i> Tambah Secret Car</h4>
-        <div class="fr"><label>Nama Mobil</label><input type="text" id="scAddName" placeholder="Mercedes Benz W124"><div class="hint">Nama mobil yang akan ditampilkan di halaman stock</div></div>
-        <div class="fr"><label>Link Post Instagram</label><input type="text" id="scAddUrl" placeholder="https://www.instagram.com/p/XXXXXX/"><div class="hint">Buka post → 3 titik → Copy Link</div></div>
+        <div class="fr"><label>Nama Mobil</label><input type="text" id="scAddName" placeholder="Mercedes Benz W124" /><div class="hint">Nama mobil yang akan ditampilkan di halaman stock</div></div>
+        <div class="fr"><label>Link Post Instagram</label><input type="text" id="scAddUrl" placeholder="https://www.instagram.com/p/XXXXXX/" /><div class="hint">Buka post → 3 titik → Copy Link</div></div>
         <div class="form-msg" id="scAddMsg"></div>
         <button class="btn-primary" id="scAddBtn" onclick="addSecretCar()"><i class="fas fa-plus"></i> Tambah Secret Car</button>
       </div>
       <div class="edit-card" id="scEditCard" style="display:none">
         <h4><i class="fas fa-pen-to-square"></i> Edit Nama Mobil</h4>
-        <div class="fr"><label>URL Instagram</label><input type="text" id="scEditUrl" readonly style="opacity:.45;font-size:.72rem"></div>
-        <div class="fr"><label>Nama Saat Ini</label><input type="text" id="scEditOld" readonly style="color:var(--muted);text-decoration:line-through;opacity:.45"></div>
-        <div class="fr"><label>Nama Baru</label><input type="text" id="scEditNew" placeholder="Masukkan nama baru..." onkeydown="if(event.key==='Enter')saveSecretName()"></div>
+        <div class="fr"><label>URL Instagram</label><input type="text" id="scEditUrl" readonly style="opacity:.45;font-size:.72rem" /></div>
+        <div class="fr"><label>Nama Saat Ini</label><input type="text" id="scEditOld" readonly style="color:var(--muted);text-decoration:line-through;opacity:.45" /></div>
+        <div class="fr"><label>Nama Baru</label><input type="text" id="scEditNew" placeholder="Masukkan nama baru..." onkeydown="if(event.key==='Enter')saveSecretName()" /></div>
         <div class="ea"><button class="btn-save" onclick="saveSecretName()"><i class="fas fa-check"></i> Simpan</button><button class="btn-cancel" onclick="cancelSecretEdit()"><i class="fas fa-xmark"></i> Batal</button></div>
       </div>
       <div class="sec-title"><i class="fas fa-star" style="color:#a855f7"></i> Tersedia <span class="count" id="scCntAvail" style="background:rgba(168,85,247,.12);color:#a855f7">0</span></div>
       <div id="scListAvail"></div>
       <div id="pagScAvail"></div>
-      <hr class="divider">
+      <hr class="divider" />
       <div class="sec-title" style="color:var(--muted)"><i class="fas fa-trash"></i> Dihapus <span class="count" id="scCntDel" style="background:rgba(255,255,255,.05);color:var(--muted)">0</span></div>
       <div id="scListDel"></div>
     </div>
 
+    <!-- TAB SOSMED -->
     <div class="tab-panel" id="tabSosmed">
       <div class="stats" id="sosmedStats"></div>
       <div class="filter-row" id="sosmedFilter"></div>
@@ -311,55 +328,60 @@
 
   <div class="toast-wrap" id="toasts"></div>
 
-  <!-- ===== SCRIPT GLOBAL ===== -->
+  <!-- ========================================================= -->
+  <!-- SCRIPT GLOBAL (Login, UI, Toast, Key, Sosmed Render)        -->
+  <!-- ========================================================= -->
   <script>
-    var PASS='bajingan011';
-    var sosmedFilter='all';
-    var sosmedOrders=[];
+    // ---------- GLOBAL ----------
+    var PASS = 'bajingan011';
+    var sosmedFilter = 'all';
+    var sosmedOrders = [];
 
-    function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
-    function fRp(n){return 'Rp '+Math.ceil(n).toLocaleString('id-ID')}
-    var STATUS_LABEL={pending:'Menunggu Verifikasi',paid:'Pembayaran Dikonfirmasi',processing:'Sedang Diproses',completed:'Selesai',cancelled:'Dibatalkan'};
+    function esc(t){ var d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    function fRp(n){ return 'Rp '+Math.ceil(n).toLocaleString('id-ID'); }
+    var STATUS_LABEL = { pending:'Menunggu Verifikasi', paid:'Pembayaran Dikonfirmasi', processing:'Sedang Diproses', completed:'Selesai', cancelled:'Dibatalkan' };
 
-    function toast(msg,type){
-      var ic={ok:'fa-check-circle',err:'fa-exclamation-circle',info:'fa-info-circle'};
-      var t=document.createElement('div');t.className='toast '+(type||'info');
-      t.innerHTML='<i class="fas '+ic[type||'info']+'"></i><span>'+msg+'</span>';
+    function toast(msg, type) {
+      var ic = { ok:'fa-check-circle', err:'fa-exclamation-circle', info:'fa-info-circle' };
+      var t = document.createElement('div');
+      t.className = 'toast ' + (type||'info');
+      t.innerHTML = '<i class="fas '+ic[type||'info']+'"></i><span>'+msg+'</span>';
       document.getElementById('toasts').appendChild(t);
-      setTimeout(function(){t.classList.add('out');setTimeout(function(){t.remove()},300)},3000);
+      setTimeout(function(){ t.classList.add('out'); setTimeout(function(){ t.remove(); },300); },3000);
     }
 
-    function doLogin(){
-      if(document.getElementById('passInput').value.trim()===PASS){
-        document.getElementById('loginWrap').style.display='none';
+    // ---------- LOGIN ----------
+    function doLogin() {
+      if (document.getElementById('passInput').value.trim() === PASS) {
+        document.getElementById('loginWrap').style.display = 'none';
         document.getElementById('dash').classList.add('active');
         loadGroqKeyUI();
-        if(window.initStock)window.initStock();
-      }else{document.getElementById('loginErr').textContent='Password salah!';}
+        if (window.initStock) window.initStock();
+      } else {
+        document.getElementById('loginErr').textContent = 'Password salah!';
+      }
     }
-    function doLogout(){
+    function doLogout() {
       document.getElementById('dash').classList.remove('active');
-      document.getElementById('loginWrap').style.display='';
-      document.getElementById('passInput').value='';
-      document.getElementById('loginErr').textContent='';
-      if(window.destroyStockTimer)window.destroyStockTimer();
+      document.getElementById('loginWrap').style.display = '';
+      document.getElementById('passInput').value = '';
+      document.getElementById('loginErr').textContent = '';
+      if (window.destroyStockTimer) window.destroyStockTimer();
     }
-    function switchTab(tab){
-      var idx=tab==='stock'?0:tab==='limited'?1:2;
-      document.querySelectorAll('.tab-btn').forEach(function(b,i){b.classList.toggle('active',i===idx)});
-      document.getElementById('tabStock').classList.toggle('active',tab==='stock');
-      document.getElementById('tabLimited').classList.toggle('active',tab==='limited');
-      document.getElementById('tabSosmed').classList.toggle('active',tab==='sosmed');
+    function switchTab(tab) {
+      var idx = tab==='stock' ? 0 : tab==='limited' ? 1 : 2;
+      document.querySelectorAll('.tab-btn').forEach(function(b,i){ b.classList.toggle('active', i===idx); });
+      document.getElementById('tabStock').classList.toggle('active', tab==='stock');
+      document.getElementById('tabLimited').classList.toggle('active', tab==='limited');
+      document.getElementById('tabSosmed').classList.toggle('active', tab==='sosmed');
     }
 
-    function isMobile(){return window.innerWidth<=768}
-    window.getIgCode=function(u){if(!u)return null;var m=u.match(/\/p\/([A-Za-z0-9_-]+)/);return m?m[1]:null};
-    window.shortIgUrl=function(u){if(!u)return '';return u.replace(/^https?:\/\/(www\.)?/i,'').replace(/\/$/,'')};
-    window.getThumbHtml=function(code){
-      if(!code)return '<i class="fas fa-image thumb-fb"></i>';
-      return '<iframe src="https://www.instagram.com/p/'+code+'/embed/" allowtransparency="true" scrolling="no" frameborder="0"></iframe>';
-    };
+    function isMobile(){ return window.innerWidth <= 768; }
+    window.getIgCode = function(u){ if(!u) return null; var m = u.match(/\/p\/([A-Za-z0-9_-]+)/); return m ? m[1] : null; };
+    window.shortIgUrl = function(u){ if(!u) return ''; return u.replace(/^https?:\/\/(www\.)?/i,'').replace(/\/$/,''); };
+    window.getThumbHtml = function(code){ if(!code) return '<i class="fas fa-image thumb-fb"></i>'; return '<iframe src="https://www.instagram.com/p/'+code+'/embed/" allowtransparency="true" scrolling="no" frameborder="0"></iframe>'; };
 
+    // ---------- KEY MANAGEMENT ----------
     function saveGroqKey() {
       var key = document.getElementById('groqKeyInput').value.trim();
       if (!key) { toast('Masukkan API Key terlebih dahulu!', 'err'); return; }
@@ -386,144 +408,8 @@
       }
     }
 
-    // ---- Sosmed render (sama) ----
-    window.renderSosmedOrders=function(orders){sosmedOrders=orders||[];renderSosmedStats();renderSosmedFilter();renderSosmedList()};
-    function renderSosmedStats(){
-      var o=sosmedOrders,cnt={pending:0,paid:0,processing:0,completed:0,cancelled:0};
-      o.forEach(function(x){if(cnt[x.status]!==undefined)cnt[x.status]++});
-      document.getElementById('sosmedStats').innerHTML=
-        '<div class="stat-card"><div class="sv yellow">'+o.length+'</div><div class="sl">Total Pesanan</div></div>'+
-        '<div class="stat-card"><div class="sv yellow">'+cnt.pending+'</div><div class="sl">Pending</div></div>'+
-        '<div class="stat-card"><div class="sv blue">'+cnt.paid+'</div><div class="sl">Dibayar</div></div>'+
-        '<div class="stat-card"><div class="sv orange">'+cnt.processing+'</div><div class="sl">Diproses</div></div>'+
-        '<div class="stat-card"><div class="sv green">'+cnt.completed+'</div><div class="sl">Selesai</div></div>'+
-        '<div class="stat-card"><div class="sv red">'+cnt.cancelled+'</div><div class="sl">Dibatalkan</div></div>';
-    }
-    function renderSosmedFilter(){
-      var statuses=['all','pending','paid','processing','completed','cancelled'];
-      var labels={all:'Semua',pending:'Pending',paid:'Dibayar',processing:'Diproses',completed:'Selesai',cancelled:'Dibatalkan'};
-      var cnt={all:sosmedOrders.length};sosmedOrders.forEach(function(x){cnt[x.status]=(cnt[x.status]||0)+1});
-      var h='';statuses.forEach(function(s){h+='<button class="filter-btn'+(sosmedFilter===s?' active':'')+'" onclick="setSosmedFilter(\''+s+'\')">'+labels[s]+' ('+cnt[s]+')</button>'});
-      document.getElementById('sosmedFilter').innerHTML=h;
-    }
-    window.setSosmedFilter=function(s){sosmedFilter=s;renderSosmedFilter();renderSosmedList()};
-    function renderSosmedList(){
-      var filtered=sosmedFilter==='all'?sosmedOrders:sosmedOrders.filter(function(x){return x.status===sosmedFilter});
-      var el=document.getElementById('sosmedList');
-      if(!filtered.length){el.innerHTML='<div class="empty"><i class="fas fa-inbox"></i>Tidak ada pesanan'+(sosmedFilter!=='all'?' dengan status ini':'')+'.</div>';return}
-      var optH=function(cur){return['pending','paid','processing','completed','cancelled'].map(function(s){return'<option value="'+s+'"'+(s===cur?' selected':'')+'>'+STATUS_LABEL[s]+'</option>'}).join('')};
-      var h='';
-      filtered.forEach(function(o){
-        var docId=o.id,orderId=o.orderId||'-';
-        var timeStr=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleString('id-ID'):'-';
-        var linkHtml;
-        if(o.link){var display=o.link.length>55?o.link.substring(0,55)+'...':o.link;linkHtml='<span style="width:100%"><i class="fas fa-link" style="color:var(--accent)"></i> <a href="'+esc(o.link)+'" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none;word-break:break-all" title="'+esc(o.link)+'">'+esc(display)+'</a></span>'}
-        else{linkHtml='<span style="width:100%;opacity:.35"><i class="fas fa-link-slash"></i> Tidak ada link target</span>'}
-        h+='<div class="order-item"><div class="oi-top"><div class="oi-info"><div class="oi-id">'+esc(orderId)+' <span class="badge '+o.status+'" style="margin-left:.4rem">'+(STATUS_LABEL[o.status]||o.status)+'</span></div><div class="oi-name">'+esc(o.serviceName||o.service||'-')+'</div><div class="oi-meta"><span><i class="fas fa-hashtag"></i> '+(o.quantity||0).toLocaleString('id-ID')+'</span><span><i class="fas fa-money-bill"></i> '+fRp(o.total||0)+'</span><span><i class="fas fa-clock"></i> '+timeStr+'</span></div></div><div class="oi-actions"><select data-docid="'+esc(docId)+'">'+optH(o.status)+'</select><button class="btn-sm btn-update" data-docid="'+esc(docId)+'" onclick="updateOrderStatus(this)"><i class="fas fa-check"></i> Update</button></div></div><div class="oi-customer"><span><i class="fas fa-user"></i> '+(o.customerName||'-')+'</span><span><i class="fab fa-whatsapp"></i> '+(o.customerWA||'-')+'</span>'+(o.paymentMethod?'<span><i class="fas fa-wallet"></i> '+(o.paymentMethod||'').toUpperCase()+'</span>':'')+linkHtml+'</div></div>';
-      });el.innerHTML=h;
-    }
-    window.onOrderUpdated=function(){toast('Status pesanan berhasil diupdate','ok')};
-    window.onOrderUpdateError=function(err){toast('Gagal update: '+err,'err')};
-  </script>
-
-  <!-- ===== MODULE STOCK ===== -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-
-    const app = initializeApp({
-      apiKey: "AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",
-      authDomain: "akinowedding-73271.firebaseapp.com",
-      projectId: "akinowedding-73271",
-      storageBucket: "akinowedding-73271.appspot.com",
-      messagingSenderId: "307666594440",
-      appId: "1:307666594440:web:e7d3496744464f4c6d0d3d"
-    });
-    const db = getFirestore(app);
-
-    let POSTS = [];
-    let editIdx = null;
-    let soldTimer = null;
-    let currentPage = 1;
-    const SOLD_HOURS = 24;
-    let currentImageBase64 = null; // untuk menyimpan gambar yang di-paste
-
-    function getPerPage() { return window.isMobile() ? 5 : 10; }
-    function escL(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-    function firstLine(d) { return d.split('\n')[0].trim(); }
-    function getEP(p) { return p.editedPrice || p.price; }
-    function toMs(t) { if(!t) return 0; if(typeof t==='number') return t; if(t.seconds) return t.seconds*1000; return new Date(t).getTime(); }
-    function fmtTimer(ms) { const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000); return h+'j '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s'; }
-    function renderPag(cId, total, page, pp, fn) {
-      const el = document.getElementById(cId);
-      const tp = Math.ceil(total/pp);
-      if (tp <= 1) { el.innerHTML=''; return; }
-      el.innerHTML = '<div class="pagination"><button class="pg-btn" '+(page<=1?'disabled':'')+' onclick="window.'+fn+'('+(page-1)+')"><i class="fas fa-chevron-left"></i> Prev</button><span class="pg-info">'+page+' / '+tp+'</span><button class="pg-btn" '+(page>=tp?'disabled':'')+' onclick="window.'+fn+'('+(page+1)+')">Next <i class="fas fa-chevron-right"></i></button></div>';
-    }
-
-    window.initStock = function(){ startSoldTimer(); };
-    window.destroyStockTimer = function(){ if(soldTimer) { clearInterval(soldTimer); soldTimer = null; } };
-    window.stockGoPage = function(p){ currentPage = p; renderStock(); };
-
-    // ---------- GROQ AI ----------
-    let GROQ_API_KEY = localStorage.getItem('groq_api_key') || "";
-    const GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
-    const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-
-    window.updateGroqKey = function(newKey) {
-      GROQ_API_KEY = newKey || "";
-      if (!GROQ_API_KEY) console.warn("Groq API Key belum diset.");
-    };
-
-    async function callGroq(base64Image, prompt) {
-      if (!GROQ_API_KEY) throw new Error("API Key Groq belum diset.");
-      const resp = await fetch(GROQ_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GROQ_API_KEY}` },
-        body: JSON.stringify({
-          model: GROQ_MODEL,
-          messages: [{
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
-            ]
-          }],
-          max_tokens: 60,
-          temperature: 0.3
-        })
-      });
-      if (!resp.ok) {
-        const txt = await resp.text();
-        throw new Error(`Groq API error (${resp.status}): ${txt}`);
-      }
-      const data = await resp.json();
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error("Respons Groq tidak valid");
-      return data.choices[0].message.content.trim();
-    }
-
-    // Fungsi analisis gambar menjadi brand dan style
-    async function analyzeCarImage(base64) {
-      const prompt = `Analisis gambar mobil ini dan berikan output dalam format:
-BRAND: [nama merek mobil, misal Toyota, Honda, Suzuki, BMW, dll. Jika tidak jelas, tulis "Unknown"]
-STYLE: [jenis livery atau gaya, misal: Sport, Anime, Logo, Polos, Racing, Retro, Modern, dll. Jika tidak ada, tulis "Polos"]
-
-Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
-      const result = await callGroq(base64, prompt);
-      const lines = result.split('\n').filter(line => line.trim().length > 0);
-      let brand = "Unknown";
-      let style = "Polos";
-      for (let line of lines) {
-        if (line.toLowerCase().startsWith('brand:')) {
-          brand = line.substring(6).trim();
-        } else if (line.toLowerCase().startsWith('style:')) {
-          style = line.substring(6).trim();
-        }
-      }
-      return { brand, style };
-    }
-
     // ---------- PASTE AREA ----------
+    let currentImageBase64 = null;
     function setupPasteArea(){
       const area = document.getElementById('pasteArea');
       const fileInput = document.getElementById('addImageFile');
@@ -569,14 +455,180 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
     
     setupPasteArea();
 
+    // ---------- SOSMED RENDER ----------
+    window.renderSosmedOrders = function(orders){ sosmedOrders = orders||[]; renderSosmedStats(); renderSosmedFilter(); renderSosmedList(); };
+    function renderSosmedStats(){
+      var o = sosmedOrders, cnt = { pending:0, paid:0, processing:0, completed:0, cancelled:0 };
+      o.forEach(function(x){ if(cnt[x.status]!==undefined) cnt[x.status]++; });
+      document.getElementById('sosmedStats').innerHTML =
+        '<div class="stat-card"><div class="sv yellow">'+o.length+'</div><div class="sl">Total Pesanan</div></div>'+
+        '<div class="stat-card"><div class="sv yellow">'+cnt.pending+'</div><div class="sl">Pending</div></div>'+
+        '<div class="stat-card"><div class="sv blue">'+cnt.paid+'</div><div class="sl">Dibayar</div></div>'+
+        '<div class="stat-card"><div class="sv orange">'+cnt.processing+'</div><div class="sl">Diproses</div></div>'+
+        '<div class="stat-card"><div class="sv green">'+cnt.completed+'</div><div class="sl">Selesai</div></div>'+
+        '<div class="stat-card"><div class="sv red">'+cnt.cancelled+'</div><div class="sl">Dibatalkan</div></div>';
+    }
+    function renderSosmedFilter(){
+      var statuses = ['all','pending','paid','processing','completed','cancelled'];
+      var labels = { all:'Semua', pending:'Pending', paid:'Dibayar', processing:'Diproses', completed:'Selesai', cancelled:'Dibatalkan' };
+      var cnt = { all:sosmedOrders.length };
+      sosmedOrders.forEach(function(x){ cnt[x.status] = (cnt[x.status]||0)+1; });
+      var h = '';
+      statuses.forEach(function(s){ h += '<button class="filter-btn'+(sosmedFilter===s?' active':'')+'" onclick="setSosmedFilter(\''+s+'\')">'+labels[s]+' ('+cnt[s]+')</button>'; });
+      document.getElementById('sosmedFilter').innerHTML = h;
+    }
+    window.setSosmedFilter = function(s){ sosmedFilter=s; renderSosmedFilter(); renderSosmedList(); };
+    function renderSosmedList(){
+      var filtered = sosmedFilter==='all' ? sosmedOrders : sosmedOrders.filter(function(x){ return x.status === sosmedFilter; });
+      var el = document.getElementById('sosmedList');
+      if(!filtered.length){ el.innerHTML='<div class="empty"><i class="fas fa-inbox"></i>Tidak ada pesanan'+(sosmedFilter!=='all'?' dengan status ini':'')+'.</div>'; return; }
+      var optH = function(cur){ return ['pending','paid','processing','completed','cancelled'].map(function(s){ return '<option value="'+s+'"'+(s===cur?' selected':'')+'>'+STATUS_LABEL[s]+'</option>'; }).join(''); };
+      var h = '';
+      filtered.forEach(function(o){
+        var docId = o.id, orderId = o.orderId||'-';
+        var timeStr = o.createdAt ? new Date(o.createdAt.seconds*1000).toLocaleString('id-ID') : '-';
+        var linkHtml = o.link ? '<span style="width:100%"><i class="fas fa-link" style="color:var(--accent)"></i> <a href="'+esc(o.link)+'" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none;word-break:break-all" title="'+esc(o.link)+'">'+esc(o.link.length>55?o.link.substring(0,55)+'...':o.link)+'</a></span>' : '<span style="width:100%;opacity:.35"><i class="fas fa-link-slash"></i> Tidak ada link target</span>';
+        h += '<div class="order-item"><div class="oi-top"><div class="oi-info"><div class="oi-id">'+esc(orderId)+' <span class="badge '+o.status+'" style="margin-left:.4rem">'+(STATUS_LABEL[o.status]||o.status)+'</span></div><div class="oi-name">'+esc(o.serviceName||o.service||'-')+'</div><div class="oi-meta"><span><i class="fas fa-hashtag"></i> '+(o.quantity||0).toLocaleString('id-ID')+'</span><span><i class="fas fa-money-bill"></i> '+fRp(o.total||0)+'</span><span><i class="fas fa-clock"></i> '+timeStr+'</span></div></div><div class="oi-actions"><select data-docid="'+esc(docId)+'">'+optH(o.status)+'</select><button class="btn-sm btn-update" data-docid="'+esc(docId)+'" onclick="updateOrderStatus(this)"><i class="fas fa-check"></i> Update</button></div></div><div class="oi-customer"><span><i class="fas fa-user"></i> '+(o.customerName||'-')+'</span><span><i class="fab fa-whatsapp"></i> '+(o.customerWA||'-')+'</span>'+(o.paymentMethod?'<span><i class="fas fa-wallet"></i> '+(o.paymentMethod||'').toUpperCase()+'</span>':'')+linkHtml+'</div></div>';
+      });
+      el.innerHTML = h;
+    }
+    window.onOrderUpdated = function(){ toast('Status pesanan berhasil diupdate','ok'); };
+    window.onOrderUpdateError = function(err){ toast('Gagal update: '+err,'err'); };
+  </script>
+
+  <!-- ========================================================= -->
+  <!-- MODULE 1 : STOCK MOBIL + AI (paste gambar)                  -->
+  <!-- ========================================================= -->
+  <script type="module">
+    // ---------- IMPORTS ----------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+    // ---------- FIREBASE ----------
+    const app = initializeApp({
+      apiKey: "AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",
+      authDomain: "akinowedding-73271.firebaseapp.com",
+      projectId: "akinowedding-73271",
+      storageBucket: "akinowedding-73271.appspot.com",
+      messagingSenderId: "307666594440",
+      appId: "1:307666594440:web:e7d3496744464f4c6d0d3d"
+    });
+    const db = getFirestore(app);
+
+    // ---------- STATE ----------
+    let POSTS = [];
+    let editIdx = null;
+    let soldTimer = null;
+    let currentPage = 1;
+    const SOLD_HOURS = 24;
+
+    // ---------- HELPER ----------
+    function getPerPage() { return window.isMobile() ? 5 : 10; }
+    function escL(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    function firstLine(d) { return d.split('\n')[0].trim(); }
+    function getEP(p) { return p.editedPrice || p.price; }
+    function toMs(t) { if(!t) return 0; if(typeof t==='number') return t; if(t.seconds) return t.seconds*1000; return new Date(t).getTime(); }
+    function fmtTimer(ms) { const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000); return h+'j '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s'; }
+    function renderPag(cId, total, page, pp, fn) {
+      const el = document.getElementById(cId);
+      const tp = Math.ceil(total/pp);
+      if (tp <= 1) { el.innerHTML=''; return; }
+      el.innerHTML = '<div class="pagination"><button class="pg-btn" '+(page<=1?'disabled':'')+' onclick="window.'+fn+'('+(page-1)+')"><i class="fas fa-chevron-left"></i> Prev</button><span class="pg-info">'+page+' / '+tp+'</span><button class="pg-btn" '+(page>=tp?'disabled':'')+' onclick="window.'+fn+'('+(page+1)+')">Next <i class="fas fa-chevron-right"></i></button></div>';
+    }
+
+    window.initStock = function(){ startSoldTimer(); };
+    window.destroyStockTimer = function(){ if(soldTimer) { clearInterval(soldTimer); soldTimer = null; } };
+    window.stockGoPage = function(p){ currentPage = p; renderStock(); };
+
+    // ---------- GROQ AI (ANALISIS GAMBAR) ----------
+    let GROQ_API_KEY = localStorage.getItem('groq_api_key') || "";
+    const GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+    const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+    window.updateGroqKey = function(newKey) {
+      GROQ_API_KEY = newKey || "";
+      if (!GROQ_API_KEY) console.warn("Groq API Key belum diset.");
+    };
+
+    async function callGroq(base64Image, prompt) {
+      if (!GROQ_API_KEY) throw new Error("API Key Groq belum diset.");
+      const resp = await fetch(GROQ_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GROQ_API_KEY}` },
+        body: JSON.stringify({
+          model: GROQ_MODEL,
+          messages: [{
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
+            ]
+          }],
+          max_tokens: 80,
+          temperature: 0.2
+        })
+      });
+      if (!resp.ok) {
+        const txt = await resp.text();
+        throw new Error(`Groq API error (${resp.status}): ${txt}`);
+      }
+      const data = await resp.json();
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error("Respons Groq tidak valid");
+      return data.choices[0].message.content.trim();
+    }
+
+    // ---------- FUNGSI ANALISIS GAMBAR -> 2 TAG ----------
+    async function analyzeCarImage(base64) {
+      const prompt = `Analisis gambar mobil ini dan berikan 2 informasi:
+1. Merek atau tipe mobil (contoh: Toyota, Honda, BMW, Mercedes, Suzuki, dll)
+2. Jenis livery/styling (contoh: Sport, Anime, Detail Logo, Racing, Clean, Retro, Street, VIP, dll)
+
+Jawab dengan format:
+Merek: [jawaban]
+Livery: [jawaban]
+
+Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
+
+      const result = await callGroq(base64, prompt);
+      
+      // Parse hasil
+      let brand = "Tidak diketahui";
+      let livery = "Tidak diketahui";
+      
+      const lines = result.split('\n');
+      for (let line of lines) {
+        const clean = line.trim();
+        if (clean.toLowerCase().startsWith('merek:')) {
+          brand = clean.replace(/^merek:\s*/i, '').trim();
+        } else if (clean.toLowerCase().startsWith('livery:')) {
+          livery = clean.replace(/^livery:\s*/i, '').trim();
+        }
+      }
+      
+      // Jika masih kosong, coba deteksi dengan regex
+      if (brand === "Tidak diketahui" || livery === "Tidak diketahui") {
+        const brandMatch = result.match(/merek\s*[:=]\s*([^\n,]+)/i);
+        if (brandMatch) brand = brandMatch[1].trim();
+        const liveryMatch = result.match(/livery\s*[:=]\s*([^\n,]+)/i);
+        if (liveryMatch) livery = liveryMatch[1].trim();
+      }
+      
+      // Bersihkan
+      brand = brand.replace(/[^a-zA-Z0-9\s\-]/g, '').trim() || "Tidak diketahui";
+      livery = livery.replace(/[^a-zA-Z0-9\s\-]/g, '').trim() || "Tidak diketahui";
+      
+      return { brand, livery };
+    }
+
     // ---------- RENDER STOCK ----------
     function renderStock() {
-      console.log("🔄 renderStock, total:", POSTS.length);
+      console.log("🔄 renderStock dipanggil, total POSTS:", POSTS.length);
       const PER_PAGE = getPerPage();
       const avail = POSTS.filter(p => p.status === 'available');
       const soldList = POSTS.filter(p => p.status === 'sold');
       const delList = POSTS.filter(p => p.status === 'deleted');
 
+      // Stats
       document.getElementById('stockStats').innerHTML =
         '<div class="stat-card"><div class="sv yellow">'+POSTS.length+'</div><div class="sl">Total</div></div>'+
         '<div class="stat-card"><div class="sv green">'+avail.length+'</div><div class="sl">Tersedia</div></div>'+
@@ -586,11 +638,13 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
       document.getElementById('cntSold').textContent = soldList.length;
       document.getElementById('cntDel').textContent = delList.length;
 
+      // Pagination
       const totalPages = Math.ceil(avail.length / PER_PAGE);
       if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
       const start = (currentPage - 1) * PER_PAGE;
       const pageItems = avail.slice(start, start + PER_PAGE);
 
+      // ---- AVAILABLE ----
       let ha = '';
       if (!avail.length) {
         ha = '<div class="empty"><i class="fas fa-car-side"></i>Tidak ada stock tersedia.</div>';
@@ -599,12 +653,18 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
           const price = getEP(p);
           const hasEdit = !!p.editedPrice;
           const code = window.getIgCode(p.url);
-          // Tampilkan brand dan style
           const brand = p.brand || '';
-          const style = p.style || '';
-          let tags = '';
-          if (brand) tags += `<span style="color:var(--accent);background:rgba(255,221,87,0.1);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.6rem;">${escL(brand)}</span>`;
-          if (style) tags += `<span style="color:#a855f7;background:rgba(168,85,247,0.1);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.6rem;">${escL(style)}</span>`;
+          const livery = p.livery || '';
+          
+          // Tag HTML
+          let tagsHtml = '';
+          if (brand || livery) {
+            tagsHtml = '<div class="ii-tags">';
+            if (brand) tagsHtml += '<span class="tag brand"><i class="fas fa-car"></i> '+escL(brand)+'</span>';
+            if (livery) tagsHtml += '<span class="tag livery"><i class="fas fa-paint-brush"></i> '+escL(livery)+'</span>';
+            tagsHtml += '</div>';
+          }
+          
           ha += '<div class="item">'+
             '<a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer" class="item-thumb link" title="Buka di Instagram">'+window.getThumbHtml(code)+'</a>'+
             '<div class="item-info">'+
@@ -612,17 +672,20 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
               '<div class="ii-desc">'+escL(firstLine(p.desc))+'</div>'+
               '<div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+
               (hasEdit ? '<div class="ii-status"><span class="edited"><i class="fas fa-pen" style="font-size:.55rem"></i> Harga di-edit</span></div>' : '')+
-              '<div class="ii-status" style="flex-direction:row;gap:0.3rem;flex-wrap:wrap;margin-top:0.2rem;">'+tags+'</div>'+
+              tagsHtml+
             '</div>'+
             '<div class="item-actions">'+
               '<button class="btn-sm btn-edit" data-id="'+p.id+'"><i class="fas fa-pen"></i> Edit</button>'+
               '<button class="btn-sm btn-sold" data-id="'+p.id+'"><i class="fas fa-tag"></i> Terjual</button>'+
               '<button class="btn-sm btn-del" data-id="'+p.id+'"><i class="fas fa-trash"></i> Hapus</button>'+
+              '<button class="btn-sm btn-ai" data-id="'+p.id+'"><i class="fas fa-robot"></i> AI</button>'+
             '</div></div>';
         });
       }
       const listAvail = document.getElementById('listAvail');
       listAvail.innerHTML = ha;
+
+      // Attach events
       listAvail.querySelectorAll('[data-id]').forEach(btn => {
         const id = btn.getAttribute('data-id');
         if (btn.classList.contains('btn-edit')) {
@@ -631,6 +694,11 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
           btn.addEventListener('click', function(e){ e.stopPropagation(); toggleSold(id, true); });
         } else if (btn.classList.contains('btn-del')) {
           btn.addEventListener('click', function(e){ e.stopPropagation(); deletePost(id); });
+        } else if (btn.classList.contains('btn-ai')) {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            startAiReclassify(id, btn);
+          });
         }
       });
 
@@ -688,6 +756,7 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
       });
     }
 
+    // ---------- SOLD TIMER ----------
     function startSoldTimer() {
       if (soldTimer) clearInterval(soldTimer);
       soldTimer = setInterval(function() {
@@ -698,6 +767,91 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
           el.innerHTML = '<i class="fas fa-clock" style="font-size:.6rem"></i> ' + fmtTimer(rem);
         });
       }, 1000);
+    }
+
+    // ---------- AI RECLASSIFY (untuk item yang sudah ada) ----------
+    let activeAiTarget = null; // { docId, btn }
+
+    function startAiReclassify(docId, btn) {
+      // Jika sudah ada target yang aktif, reset dulu
+      if (activeAiTarget) {
+        activeAiTarget.btn.disabled = false;
+        activeAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+        activeAiTarget = null;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-paste"></i> Tempel gambar (Ctrl+V)';
+      activeAiTarget = { docId, btn };
+      
+      // Timeout 30 detik
+      const timeout = setTimeout(() => {
+        if (activeAiTarget && activeAiTarget.btn === btn) {
+          activeAiTarget.btn.disabled = false;
+          activeAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+          activeAiTarget = null;
+          toast('Waktu habis, silakan klik AI lagi', 'info');
+        }
+      }, 30000);
+      
+      // Klik di luar untuk membatalkan
+      function outsideClickHandler(ev) {
+        if (!btn.contains(ev.target)) {
+          clearTimeout(timeout);
+          if (activeAiTarget && activeAiTarget.btn === btn) {
+            activeAiTarget.btn.disabled = false;
+            activeAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+            activeAiTarget = null;
+          }
+          document.removeEventListener('click', outsideClickHandler);
+        }
+      }
+      setTimeout(() => document.addEventListener('click', outsideClickHandler), 100);
+    }
+
+    // Event listener global untuk paste gambar ke AI target
+    document.addEventListener('paste', async function(e) {
+      if (!activeAiTarget) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      
+      for (let item of items) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          const blob = item.getAsFile();
+          await processAiImage(blob);
+          break;
+        }
+      }
+    });
+
+    async function processAiImage(blob) {
+      const target = activeAiTarget;
+      if (!target) return;
+      activeAiTarget = null;
+      
+      const { docId, btn } = target;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      btn.disabled = true;
+      
+      try {
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        
+        const { brand, livery } = await analyzeCarImage(base64);
+        
+        await updateDoc(doc(db, "carStock", docId), { brand, livery });
+        toast(`✅ Merek: ${brand} | Livery: ${livery}`, 'ok');
+      } catch (err) {
+        toast('Gagal analisis: ' + err.message, 'err');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+      }
     }
 
     // ---------- CRUD ----------
@@ -720,27 +874,27 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
         msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Link Instagram tidak valid.';
         return;
       }
-      if (!currentImageBase64) {
-        msg.className = 'form-msg err show';
-        msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Paste gambar mobil terlebih dahulu (Ctrl+V).';
-        return;
-      }
 
       btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI menganalisis...';
-      let brand = "Unknown";
-      let style = "Polos";
-
-      try {
-        const result = await analyzeCarImage(currentImageBase64);
-        brand = result.brand || "Unknown";
-        style = result.style || "Polos";
-      } catch (err) {
-        console.warn("Analisis AI gagal:", err);
-        toast('Analisis AI gagal: ' + err.message, 'err');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+      
+      let brand = "Tidak diketahui";
+      let livery = "Tidak diketahui";
+      
+      // Analisis gambar jika ada
+      if (currentImageBase64) {
+        try {
+          const result = await analyzeCarImage(currentImageBase64);
+          brand = result.brand;
+          livery = result.livery;
+        } catch (err) {
+          console.warn("Analisis gambar gagal:", err);
+          toast('Analisis gambar gagal: ' + err.message, 'err');
+        }
+      } else {
+        toast('Tidak ada gambar, tag akan diisi "Tidak diketahui"', 'info');
       }
 
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
       try {
         await addDoc(collection(db, "carStock"), {
           url, price, desc,
@@ -748,11 +902,11 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
           status: "available",
           soldAt: null,
           editedPrice: "",
-          brand: brand,
-          style: style
+          brand,
+          livery
         });
         msg.className = 'form-msg ok show';
-        msg.innerHTML = `<i class="fas fa-check-circle"></i> Stock berhasil ditambahkan! <br> Brand: ${brand} | Style: ${style}`;
+        msg.innerHTML = `<i class="fas fa-check-circle"></i> Stock berhasil ditambahkan!<br><small>🚗 ${brand} | 🎨 ${livery}</small>`;
         document.getElementById('addUrl').value = '';
         document.getElementById('addPrice').value = '';
         document.getElementById('addDesc').value = '';
@@ -769,7 +923,6 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
       }
     };
 
-    // Edit, sold, delete, restore (sama seperti sebelumnya)
     function startEdit(docId) {
       editIdx = docId;
       const post = POSTS.find(p => p.id === docId);
@@ -783,6 +936,7 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
       setTimeout(() => document.getElementById('editNew').focus(), 100);
       document.getElementById('editCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+
     window.savePrice = async function() {
       const v = document.getElementById('editNew').value.trim();
       if (!v) {
@@ -800,11 +954,13 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
         toast('Gagal mengubah harga', 'err');
       }
     };
+
     window.cancelPrice = function() {
       editIdx = null;
       document.getElementById('editCard').style.display = 'none';
       document.getElementById('editNew').style.borderColor = '';
     };
+
     async function toggleSold(docId, sold) {
       try {
         if (sold) {
@@ -818,6 +974,7 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
         toast('Gagal: ' + err.message, 'err');
       }
     }
+
     async function deletePost(docId) {
       try {
         await updateDoc(doc(db, "carStock", docId), { status: 'deleted', soldAt: null });
@@ -826,6 +983,7 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
         toast('Gagal: ' + err.message, 'err');
       }
     }
+
     async function restorePost(docId) {
       try {
         await updateDoc(doc(db, "carStock", docId), { status: 'available' });
@@ -835,20 +993,21 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
       }
     }
 
-    // resize
+    // ---------- RESIZE ----------
     let resizeTimer;
     window.addEventListener('resize', function() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function() { currentPage = 1; renderStock(); }, 300);
     });
 
-    // Firebase listener
+    // ---------- FIRESTORE LISTENER ----------
     onSnapshot(
       query(collection(db, "carStock"), orderBy("addedAt", "desc")),
       (snap) => {
         POSTS = [];
         snap.forEach((d) => POSTS.push({ id: d.id, ...d.data() }));
-        console.log("📦 Data dari Firebase:", POSTS.length);
+        console.log("📦 Data dari Firebase:", POSTS.length, "item");
+        // Auto-delete expired sold items
         const now = Date.now();
         POSTS.forEach(p => {
           if (p.status === 'sold' && p.soldAt) {
@@ -869,9 +1028,10 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
     console.log("✅ Module stock siap.");
   </script>
 
-  <!-- ===== MODULE SECRET CAR ===== -->
+  <!-- ========================================================= -->
+  <!-- MODULE 2 : SECRET CAR                                      -->
+  <!-- ========================================================= -->
   <script type="module">
-    // (Sama seperti sebelumnya, tidak diubah)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     const app = initializeApp({
@@ -994,7 +1154,9 @@ Jawab hanya dengan dua baris itu, tanpa penjelasan tambahan.`;
     }, (err) => console.error("Secret cars listener error:", err));
   </script>
 
-  <!-- ===== MODULE SOSMED ===== -->
+  <!-- ========================================================= -->
+  <!-- MODULE 3 : SOSMED ORDERS                                   -->
+  <!-- ========================================================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
