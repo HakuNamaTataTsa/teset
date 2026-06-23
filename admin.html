@@ -242,6 +242,7 @@
       <div class="form-card">
         <h4><i class="fas fa-plus-circle"></i> Tambah Stock Baru</h4>
         <div class="fr"><label>Link Post Instagram</label><input type="text" id="addUrl" placeholder="https://www.instagram.com/p/XXXXXX/"><div class="hint">Buka post → 3 titik → Copy Link</div></div>
+        <div class="fr"><label>URL Gambar Mobil (copy image address)</label><input type="text" id="addImageUrl" placeholder="https://instagram.fsub1-1.fna.fbcdn.net/..."><div class="hint">Klik kanan foto di Instagram → Copy image address → tempel di sini.</div></div>
         <div class="fr"><label>Harga</label><input type="text" id="addPrice" placeholder="Rp 3.000"></div>
         <div class="fr"><label>Keterangan / Caption</label><textarea id="addDesc" placeholder="Nama mobil, jenis layanan, keterangan..."></textarea></div>
         <div class="form-msg" id="addMsg"></div>
@@ -428,15 +429,25 @@
       la.querySelectorAll('[data-id]').forEach(function(btn){var id=btn.getAttribute('data-id');if(btn.classList.contains('btn-edit'))btn.addEventListener('click',function(){startEdit(id)});else if(btn.classList.contains('btn-sold'))btn.addEventListener('click',function(){toggleSold(id,true)});else if(btn.classList.contains('btn-del'))btn.addEventListener('click',function(){deletePost(id)})});
       // Event untuk tombol AI
       la.querySelectorAll('.btn-ai').forEach(function(btn){
-        btn.addEventListener('click', function(){
+        btn.addEventListener('click', async function(){
           var docId = btn.getAttribute('data-id');
           var url = btn.getAttribute('data-url');
+          // Minta admin paste URL gambar
+          var imageUrl = prompt('Masukkan URL gambar mobil (copy image address dari Instagram):', '');
+          if (!imageUrl) return; // batal
           btn.disabled = true;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-          window.reclassifyPost(docId, url).finally(function(){
+          try {
+            let category = await classifyCarImage(imageUrl);
+            category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
+            await updateDoc(doc(db, "carStock", docId), { category: category });
+            toast(`Kategori diperbarui: ${category}`, 'ok');
+          } catch(err) {
+            toast('Gagal klasifikasi: ' + err.message, 'err');
+          } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-robot"></i> AI';
-          });
+          }
         });
       });
       renderPag('pagAvail',avail.length,currentPage,PER_PAGE,'stockGoPage');
@@ -455,14 +466,18 @@
 
     // ══════════════ GEMINI AI - CLASSIFICATION ══════════════
     const GEMINI_KEY = "AIzaSyA09dWuqQn2ZC-gasY1FwwneyZnhCu-BW8";
+    // Fungsi untuk mendapatkan thumbnail dari Instagram (fallback, pakai proxy)
     async function getThumbnailFromIG(urlIG) {
-      const oembed = `https://api.instagram.com/oembed?url=${encodeURIComponent(urlIG)}`;
-      const resp = await fetch(oembed);
+      const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(urlIG)}`;
+      const proxied = `https://corsproxy.io/?${encodeURIComponent(oembedUrl)}`;
+      const resp = await fetch(proxied);
+      if (!resp.ok) throw new Error("Gagal fetch oEmbed");
       const data = await resp.json();
       return data.thumbnail_url;
     }
+    // Fungsi klasifikasi gambar (menerima URL gambar publik)
     async function classifyCarImage(imageUrl) {
-      const proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(imageUrl);
+      // Karena ini URL publik (dari Instagram CDN), tidak perlu proxy
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
         {
@@ -472,7 +487,7 @@
             contents: [{
               parts: [
                 { text: "Klasifikasikan mobil ini ke dalam salah satu kategori: Sedan, SUV, Truck, Sport, Hatchback, Lainnya. Jawab hanya dengan satu kata kategori (contoh: SUV)." },
-                { fileData: { mimeType: "image/jpeg", fileUri: proxiedUrl } }
+                { fileData: { mimeType: "image/jpeg", fileUri: imageUrl } }
               ]
             }],
             generationConfig: { maxOutputTokens: 10 }
@@ -480,14 +495,14 @@
         }
       );
       const data = await res.json();
+      if (!data.candidates) throw new Error("Respons AI tidak valid");
       return data.candidates[0].content.parts[0].text.trim();
     }
 
-    // Reklasifikasi satu stok
-    window.reclassifyPost = async function(docId, url) {
+    // Reklasifikasi satu stok (dipanggil dari tombol AI dengan URL manual)
+    window.reclassifyPost = async function(docId, imageUrl) {
       try {
-        const thumbUrl = await getThumbnailFromIG(url);
-        let category = await classifyCarImage(thumbUrl);
+        let category = await classifyCarImage(imageUrl);
         category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
         await updateDoc(doc(db, "carStock", docId), { category: category });
         toast(`Kategori diperbarui: ${category}`, 'ok');
@@ -496,7 +511,7 @@
       }
     };
 
-    // Reklasifikasi semua stok yang belum berkategori
+    // Reklasifikasi semua stok yang belum berkategori (fallback pakai oEmbed)
     window.reclassifyAll = async function() {
       const toClassify = POSTS.filter(p => p.status === 'available' && (!p.category || p.category === 'Lainnya'));
       if (toClassify.length === 0) {
@@ -505,31 +520,62 @@
       }
       toast(`Memproses ${toClassify.length} stok...`, 'info');
       for (const post of toClassify) {
-        await window.reclassifyPost(post.id, post.url);
-        await new Promise(r => setTimeout(r, 1500)); // jeda agar tidak kena rate limit
+        try {
+          const thumbUrl = await getThumbnailFromIG(post.url);
+          let category = await classifyCarImage(thumbUrl);
+          category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
+          await updateDoc(doc(db, "carStock", post.id), { category: category });
+        } catch (err) {
+          console.warn(`Gagal klasifikasi stok ${post.id}:`, err);
+          // Lanjutkan ke stok berikutnya
+        }
+        await new Promise(r => setTimeout(r, 1500)); // jeda
       }
       toast('Klasifikasi massal selesai.', 'ok');
     };
 
     window.addStock = async function(){
-      var url=document.getElementById('addUrl').value.trim(),price=document.getElementById('addPrice').value.trim(),desc=document.getElementById('addDesc').value.trim(),msg=document.getElementById('addMsg');
+      var url=document.getElementById('addUrl').value.trim();
+      var price=document.getElementById('addPrice').value.trim();
+      var desc=document.getElementById('addDesc').value.trim();
+      var imageUrl=document.getElementById('addImageUrl').value.trim(); // URL gambar manual
+      var msg=document.getElementById('addMsg');
       msg.className='form-msg';msg.style.display='none';
       if(!url||!price||!desc){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Semua field wajib diisi.';return}
       var code=window.getIgCode(url);if(!code){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Link Instagram tidak valid.';return}
       var btn=document.getElementById('addBtn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> AI mengklasifikasi...';
       let category = "Lainnya";
-      try {
-        const thumbUrl = await getThumbnailFromIG(url);
-        category = await classifyCarImage(thumbUrl);
-        category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
-      } catch(err) {
-        console.warn("Klasifikasi gagal:", err);
+      // Prioritas: pakai URL gambar manual jika ada
+      if (imageUrl) {
+        try {
+          category = await classifyCarImage(imageUrl);
+          category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
+        } catch(err) {
+          console.warn("Klasifikasi via URL manual gagal:", err);
+          // Fallback ke oEmbed
+          try {
+            const thumbUrl = await getThumbnailFromIG(url);
+            category = await classifyCarImage(thumbUrl);
+            category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
+          } catch(e) {
+            console.warn("Klasifikasi fallback juga gagal:", e);
+          }
+        }
+      } else {
+        // Tidak ada URL gambar, coba oEmbed
+        try {
+          const thumbUrl = await getThumbnailFromIG(url);
+          category = await classifyCarImage(thumbUrl);
+          category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
+        } catch(err) {
+          console.warn("Klasifikasi gagal:", err);
+        }
       }
       btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
       try{
         await addDoc(collection(db,"carStock"),{url:url,price:price,desc:desc,addedAt:Date.now(),status:"available",soldAt:null,editedPrice:"",category:category});
         msg.className='form-msg ok show';msg.innerHTML='<i class="fas fa-check-circle"></i> Stock berhasil ditambahkan! (AI: '+category+')';
-        document.getElementById('addUrl').value='';document.getElementById('addPrice').value='';document.getElementById('addDesc').value='';currentPage=1;
+        document.getElementById('addUrl').value='';document.getElementById('addImageUrl').value='';document.getElementById('addPrice').value='';document.getElementById('addDesc').value='';currentPage=1;
         setTimeout(function(){msg.style.display='none'},4000)
       }catch(err){msg.className='form-msg err show';msg.innerHTML='<i class="fas fa-exclamation-circle"></i> Gagal: '+err.message}
       finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-plus"></i> Tambah Stock'}
