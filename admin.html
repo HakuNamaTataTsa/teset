@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
+    /* (CSS sama seperti sebelumnya, tidak berubah) */
     :root{--bg:#07070d;--bg-card:rgba(255,255,255,0.04);--bg-el:#0e0e18;--fg:#f0f0f5;--fg-dim:#c0c0d0;--muted:#6a6a82;--accent:#FFDD57;--accent-dim:rgba(255,221,87,0.15);--border:rgba(255,255,255,0.07);--r:14px;--rs:10px;--fd:'Space Grotesk',sans-serif;--fb:'DM Sans',sans-serif}
     *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
     body{font-family:var(--fb);background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden}
@@ -37,7 +38,6 @@
     .tb-btn.logout{color:#f87171;border-color:rgba(248,113,113,.15)}
     .tb-btn.logout:hover{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3)}
 
-    /* Key Input Bar */
     .key-bar{max-width:1100px;margin:0 auto;padding:0.75rem 1.5rem}
     .key-bar-inner{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--rs);padding:0.65rem 1rem}
     .key-bar-inner i{color:var(--accent);font-size:.85rem}
@@ -80,10 +80,8 @@
     .form-msg.ok{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:#4ade80}
     .form-msg.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171}
 
-    .paste-area{background:rgba(255,255,255,.02);border:2px dashed var(--border);border-radius:var(--rs);padding:1.5rem;text-align:center;cursor:pointer;transition:all .25s;min-height:100px;display:flex;align-items:center;justify-content:center}
-    .paste-area:hover,.paste-area.drag{border-color:var(--accent);background:rgba(255,221,87,.04)}
-    .paste-area img{max-height:150px;border-radius:8px;display:block;margin:0 auto}
-    .paste-area p{font-size:.8rem;color:var(--muted)}
+    /* area upload dihilangkan, tapi kita sisakan sebagai fallback jika diperlukan */
+    .upload-area{display:none;}
 
     .edit-card{background:rgba(255,221,87,.04);border:1px solid rgba(255,221,87,.18);border-radius:var(--rs);padding:1.15rem;margin-bottom:1.5rem;animation:fadeUp .3s ease}
     .edit-card h4{font-family:var(--fd);font-size:.88rem;font-weight:600;margin-bottom:.85rem;color:var(--accent);display:flex;align-items:center;gap:.4rem}
@@ -133,7 +131,7 @@
     .btn-del{background:rgba(239,68,68,.08);color:#f87171;border-color:rgba(239,68,68,.15)}.btn-del:hover{background:#ef4444;color:#fff}
     .btn-restore{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.2)}.btn-restore:hover{background:#60a5fa;color:#fff}
     .btn-update{background:var(--accent);color:#0a0a0f;border:none}.btn-update:hover{box-shadow:0 2px 10px rgba(255,221,87,.25)}
-    .btn-ai{background:rgba(168,85,247,.15);color:#a855f7;border-color:rgba(168,85,247,.25);position:relative}.btn-ai:hover{background:#a855f7;color:#fff}
+    .btn-ai{background:rgba(168,85,247,.15);color:#a855f7;border-color:rgba(168,85,247,.25)}.btn-ai:hover{background:#a855f7;color:#fff}
 
     .pagination{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:1rem 0 .25rem}
     .pg-btn{padding:.5rem 1rem;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);color:var(--muted);font-family:var(--fb);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.35rem;min-height:36px}
@@ -267,12 +265,10 @@
       <div class="form-card">
         <h4><i class="fas fa-plus-circle"></i> Tambah Stock Baru</h4>
         <div class="fr"><label>Link Post Instagram</label><input type="text" id="addUrl" placeholder="https://www.instagram.com/p/XXXXXX/"><div class="hint">Buka post → 3 titik → Copy Link</div></div>
-        <div class="fr">
-          <label>Gambar Mobil (copy lalu paste di area ini, atau klik untuk upload)</label>
-          <div class="paste-area" id="pasteArea" tabindex="0">
-            <p><i class="fas fa-paste"></i> Klik area ini lalu tekan <strong>Ctrl+V</strong> untuk paste gambar yang sudah di-copy dari Instagram.<br>Atau klik untuk memilih file.</p>
-          </div>
-          <input type="file" id="addImageFile" accept="image/*" style="display:none">
+        <!-- Area upload disembunyikan, gambar diambil otomatis dari link -->
+        <div class="fr" style="display:none;">
+          <label>Gambar (opsional, fallback)</label>
+          <input type="file" id="addImageFile" accept="image/*">
         </div>
         <div class="fr"><label>Harga</label><input type="text" id="addPrice" placeholder="Rp 3.000"></div>
         <div class="fr"><label>Keterangan / Caption</label><textarea id="addDesc" placeholder="Nama mobil, jenis layanan, keterangan..."></textarea></div>
@@ -416,54 +412,7 @@
       }
     }
 
-    // ---- Paste Area Setup ----
-    let currentImageBase64 = null;
-    function setupPasteArea(){
-      const area = document.getElementById('pasteArea');
-      const fileInput = document.getElementById('addImageFile');
-      
-      area.addEventListener('click', () => fileInput.click());
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) processFile(file);
-      });
-      
-      area.addEventListener('paste', (e) => {
-        const items = e.clipboardData?.items;
-        if (!items) return;
-        for (let item of items) {
-          if (item.type.startsWith('image/')) {
-            const blob = item.getAsFile();
-            processFile(blob);
-            e.preventDefault();
-            break;
-          }
-        }
-      });
-      
-      area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('drag'); });
-      area.addEventListener('dragleave', () => area.classList.remove('drag'));
-      area.addEventListener('drop', (e) => {
-        e.preventDefault();
-        area.classList.remove('drag');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) processFile(file);
-      });
-    }
-    
-    function processFile(file) {
-      const reader = new FileReader();
-      reader.onload = function() {
-        const base64 = reader.result.split(',')[1];
-        currentImageBase64 = base64;
-        document.getElementById('pasteArea').innerHTML = `<img src="data:image/jpeg;base64,${base64}" alt="Preview">`;
-      };
-      reader.readAsDataURL(file);
-    }
-    
-    setupPasteArea();
-
-    // ---- Sosmed Render Functions ----
+    // ---- Sosmed Render Functions (sama seperti sebelumnya) ----
     window.renderSosmedOrders=function(orders){sosmedOrders=orders||[];renderSosmedStats();renderSosmedFilter();renderSosmedList()};
     function renderSosmedStats(){
       var o=sosmedOrders,cnt={pending:0,paid:0,processing:0,completed:0,cancelled:0};
@@ -504,9 +453,17 @@
   </script>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- MODULE 1: Firebase — Stock Mobil (REALTIME)              -->
+  <!-- MODULE 1: Firebase — Stock Mobil (REALTIME) + GROQ AI + Instagram Downloader -->
   <!-- ═══════════════════════════════════════════════════ -->
+  <script type="importmap">
+    {
+      "imports": {
+        "@totallynotdavid/downloader": "https://cdn.jsdelivr.net/npm/@totallynotdavid/downloader@1.0.5/index.mjs"
+      }
+    }
+  </script>
   <script type="module">
+    import { resolve } from "@totallynotdavid/downloader";
     import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import{getFirestore,collection,query,orderBy,onSnapshot,addDoc,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     const app=initializeApp({apiKey:"AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",authDomain:"akinowedding-73271.firebaseapp.com",projectId:"akinowedding-73271",storageBucket:"akinowedding-73271.appspot.com",messagingSenderId:"307666594440",appId:"1:307666594440:web:e7d3496744464f4c6d0d3d"});
@@ -524,19 +481,13 @@
     window.stockGoPage=function(p){currentPage=p;renderStock()};
 
     // ══════════════ GROQ AI - CLASSIFICATION (multimodal) ══════════════
-    // Ambil key dari localStorage (bisa diupdate via UI)
     let GROQ_API_KEY = localStorage.getItem('groq_api_key') || "";
     const GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
     const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-    // Fungsi untuk update key dari UI (tanpa reload)
     window.updateGroqKey = function(newKey) {
       GROQ_API_KEY = newKey || "";
-      if (!GROQ_API_KEY) {
-        console.warn("Groq API Key belum diset.");
-      } else {
-        console.log("Groq API Key updated.");
-      }
+      if (!GROQ_API_KEY) console.warn("Groq API Key belum diset.");
     };
 
     function fileToBase64(file) {
@@ -549,41 +500,21 @@
     }
 
     async function callGroq(base64Image, prompt) {
-      if (!GROQ_API_KEY) {
-        throw new Error("API Key Groq belum diset. Masukkan key di kolom atas.");
-      }
+      if (!GROQ_API_KEY) throw new Error("API Key Groq belum diset. Masukkan key di kolom atas.");
       const response = await fetch(GROQ_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${GROQ_API_KEY}`
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GROQ_API_KEY}` },
         body: JSON.stringify({
           model: GROQ_MODEL,
-          messages: [
-            {
-              role: "user",
-              content: [
-                { type: "text", text: prompt },
-                {
-                  type: "image_url",
-                  image_url: {
-                    url: `data:image/jpeg;base64,${base64Image}`
-                  }
-                }
-              ]
-            }
-          ],
+          messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }] }],
           max_tokens: 20,
           temperature: 0.2
         })
       });
-
       if (!response.ok) {
         const errText = await response.text();
         throw new Error(`Groq API error (${response.status}): ${errText}`);
       }
-
       const data = await response.json();
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
         throw new Error("Respons Groq tidak valid");
@@ -592,26 +523,53 @@
     }
 
     async function classifyCarFromBase64(base64) {
-      const prompt =
-        "Klasifikasikan mobil ini ke dalam salah satu kategori: Sedan, SUV, Truck, Sport, Hatchback, Lainnya. Jawab hanya dengan satu kata kategori (contoh: SUV).";
+      const prompt = "Klasifikasikan mobil ini ke dalam salah satu kategori: Sedan, SUV, Truck, Sport, Hatchback, Lainnya. Jawab hanya dengan satu kata kategori (contoh: SUV).";
       const result = await callGroq(base64, prompt);
       return result.replace(/[^a-zA-Z]/g, "").trim() || "Lainnya";
     }
 
-    // Fungsi ambil thumbnail IG
-    async function getThumbnailFromIG(urlIG) {
-      const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(urlIG)}`;
-      const proxied = `https://corsproxy.io/?${encodeURIComponent(oembedUrl)}`;
-      const resp = await fetch(proxied);
-      if (!resp.ok) throw new Error("Gagal fetch oEmbed");
-      const data = await resp.json();
-      return data.thumbnail_url;
+    // ═══════════ FUNGSI AMBIL GAMBAR DARI INSTAGRAM (menggunakan library) ═══════════
+    async function getImageUrlFromInstagram(postUrl) {
+      try {
+        const result = await resolve(postUrl);
+        // result.urls berisi array objek dengan property 'url'
+        if (result && result.urls && result.urls.length > 0) {
+          // Ambil yang pertama (biasanya gambar terbaik)
+          const imageUrl = result.urls[0].url;
+          if (imageUrl) return imageUrl;
+        }
+        throw new Error("Tidak ada gambar ditemukan.");
+      } catch (err) {
+        console.warn("Library downloader gagal, mencoba fallback oEmbed...", err);
+        // Fallback: coba oEmbed (meskipun tidak memberikan thumbnail lagi, kita coba)
+        try {
+          const oembedUrl = `https://api.instagram.com/oembed?url=${encodeURIComponent(postUrl)}`;
+          const resp = await fetch(oembedUrl);
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data.thumbnail_url) return data.thumbnail_url;
+          }
+        } catch (e) {}
+        // Fallback terakhir: coba scrape meta tag menggunakan CORS proxy
+        try {
+          const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(postUrl)}`;
+          const proxyResp = await fetch(proxyUrl);
+          if (proxyResp.ok) {
+            const html = await proxyResp.text();
+            const match = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]+)"/i);
+            if (match && match[1]) return match[1];
+          }
+        } catch (e) {}
+        throw new Error("Gagal mengambil gambar dari link Instagram. Pastikan link benar dan coba lagi.");
+      }
     }
 
-    async function classifyCarFromUrl(url) {
-      const proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
-      const resp = await fetch(proxiedUrl);
-      if (!resp.ok) throw new Error("Gagal fetch gambar");
+    // Fungsi untuk klasifikasi langsung dari URL Instagram
+    async function classifyCarFromInstagram(postUrl) {
+      const imageUrl = await getImageUrlFromInstagram(postUrl);
+      // Ambil gambar sebagai blob
+      const resp = await fetch(imageUrl);
+      if (!resp.ok) throw new Error("Gagal mengambil gambar dari URL: " + imageUrl);
       const blob = await resp.blob();
       const base64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -620,42 +578,6 @@
         reader.readAsDataURL(blob);
       });
       return await classifyCarFromBase64(base64);
-    }
-
-    // ═══════════ AI PASTE GLOBAL ═══════════
-    let currentAiTarget = null; // { docId, btn }
-    document.addEventListener('paste', function(e) {
-      if (!currentAiTarget) return;
-      const items = e.clipboardData?.items;
-      if (!items) return;
-      for (let item of items) {
-        if (item.type.startsWith('image/')) {
-          e.preventDefault();
-          const blob = item.getAsFile();
-          processAiBlob(blob);
-          break;
-        }
-      }
-    });
-    async function processAiBlob(blob) {
-      const target = currentAiTarget;
-      currentAiTarget = null;
-      if (!target) return;
-      const { docId, btn } = target;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      btn.disabled = true;
-      try {
-        const base64 = await fileToBase64(blob);
-        let category = await classifyCarFromBase64(base64);
-        category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
-        await updateDoc(doc(db, "carStock", docId), { category });
-        toast(`Kategori diperbarui: ${category}`, 'ok');
-      } catch (err) {
-        toast('Gagal klasifikasi: ' + err.message, 'err');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-robot"></i> AI';
-      }
     }
 
     // ═══════════ RENDER STOCK ═══════════
@@ -676,40 +598,26 @@
       var la=document.getElementById('listAvail');la.innerHTML=ha;
       la.querySelectorAll('[data-id]').forEach(function(btn){var id=btn.getAttribute('data-id');if(btn.classList.contains('btn-edit'))btn.addEventListener('click',function(){startEdit(id)});else if(btn.classList.contains('btn-sold'))btn.addEventListener('click',function(){toggleSold(id,true)});else if(btn.classList.contains('btn-del'))btn.addEventListener('click',function(){deletePost(id)})});
       
-      // Tombol AI per stok (global paste)
+      // Tombol AI per stok: langsung ambil gambar dari link Instagram
       la.querySelectorAll('.btn-ai').forEach(function(btn){
-        btn.addEventListener('click', function(e){
+        btn.addEventListener('click', async function(e){
           e.stopPropagation();
           const docId = btn.getAttribute('data-id');
-          if (currentAiTarget) {
-            currentAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
-            currentAiTarget.btn.disabled = false;
-            currentAiTarget = null;
-          }
+          const post = POSTS.find(p => p.id === docId);
+          if (!post) { toast('Data item tidak ditemukan', 'err'); return; }
           btn.disabled = true;
-          btn.innerHTML = '<i class="fas fa-paste"></i> Tempel gambar (Ctrl+V)';
-          currentAiTarget = { docId, btn };
-          
-          const timeout = setTimeout(() => {
-            if (currentAiTarget && currentAiTarget.btn === btn) {
-              currentAiTarget = null;
-              btn.disabled = false;
-              btn.innerHTML = '<i class="fas fa-robot"></i> AI';
-            }
-          }, 15000);
-          
-          function outsideClickHandler(ev) {
-            if (!btn.contains(ev.target)) {
-              clearTimeout(timeout);
-              if (currentAiTarget && currentAiTarget.btn === btn) {
-                currentAiTarget = null;
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-robot"></i> AI';
-              }
-              document.removeEventListener('click', outsideClickHandler);
-            }
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+          try {
+            let category = await classifyCarFromInstagram(post.url);
+            category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
+            await updateDoc(doc(db, "carStock", docId), { category });
+            toast(`Kategori diperbarui: ${category}`, 'ok');
+          } catch (err) {
+            toast('Gagal klasifikasi: ' + err.message, 'err');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-robot"></i> AI';
           }
-          setTimeout(() => document.addEventListener('click', outsideClickHandler), 100);
         });
       });
       
@@ -737,8 +645,7 @@
       toast(`Memproses ${toClassify.length} stok...`, 'info');
       for (const post of toClassify) {
         try {
-          const thumbUrl = await getThumbnailFromIG(post.url);
-          let category = await classifyCarFromUrl(thumbUrl);
+          let category = await classifyCarFromInstagram(post.url);
           category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
           await updateDoc(doc(db, "carStock", post.id), { category: category });
         } catch (err) {
@@ -764,23 +671,12 @@
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI mengklasifikasi...';
       let category = "Lainnya";
       
-      if (currentImageBase64) {
-        try {
-          let cat = await classifyCarFromBase64(currentImageBase64);
-          category = cat.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
-        } catch(err) {
-          console.warn("Klasifikasi gagal:", err);
-          toast('Klasifikasi gagal: ' + err.message, 'err');
-        }
-      } else {
-        try {
-          const thumbUrl = await getThumbnailFromIG(url);
-          category = await classifyCarFromUrl(thumbUrl);
-          category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
-        } catch(err) {
-          console.warn("Klasifikasi gagal:", err);
-          toast('Klasifikasi gagal: ' + err.message, 'err');
-        }
+      try {
+        category = await classifyCarFromInstagram(url);
+        category = category.replace(/[^a-zA-Z]/g, '').trim() || "Lainnya";
+      } catch(err) {
+        console.warn("Klasifikasi gagal:", err);
+        toast('Klasifikasi gagal: ' + err.message, 'err');
       }
       
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
@@ -791,8 +687,6 @@
         document.getElementById('addUrl').value = '';
         document.getElementById('addPrice').value = '';
         document.getElementById('addDesc').value = '';
-        document.getElementById('pasteArea').innerHTML = '<p><i class="fas fa-paste"></i> Klik area ini lalu tekan <strong>Ctrl+V</strong> untuk paste gambar yang sudah di-copy dari Instagram.<br>Atau klik untuk memilih file.</p>';
-        currentImageBase64 = null;
         currentPage = 1;
         setTimeout(() => { msg.style.display = 'none' }, 4000);
       } catch(err) {
