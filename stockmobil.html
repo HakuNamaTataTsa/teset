@@ -585,4 +585,57 @@
         pnEl.innerHTML='';
         pageNums.forEach(function(p){
           if(p==='...'){var sp=document.createElement('span');sp.className='page-ellipsis';sp.textContent='...';pnEl.appendChild(sp)}
-          else{var btn=document.createElement('button');btn.className='page-num'+(
+          else{var btn=document.createElement('button');btn.className='page-num'+(p===currentPage?' active':'');btn.textContent=p+1;btn.onclick=(function(pg){return function(){goToPage(pg)}})(p);pnEl.appendChild(btn)}
+        });
+      }else{pag.style.display='none'}
+    }
+
+    window.prevPage=function(){if(currentPage>0){currentPage--;renderAvailable();scrollToGrid()}};
+    window.nextPage=function(){var tp=Math.ceil(getSortedAvail().length/PER_PAGE);if(currentPage<tp-1){currentPage++;renderAvailable();scrollToGrid()}};
+    function goToPage(pg){currentPage=pg;renderAvailable();scrollToGrid()}
+    function scrollToGrid(){var g=document.getElementById('igGrid');window.scrollTo({top:g.getBoundingClientRect().top+window.pageYOffset-80,behavior:'smooth'})}
+
+    onSnapshot(query(collection(db,"carStock"),orderBy("addedAt","desc")),(snap)=>{
+      POSTS=[];snap.forEach((d)=>POSTS.push({id:d.id,...d.data()}));
+      renderSold();
+      renderCategoryFilter(); // render ulang filter
+      renderAvailable();
+    },(err)=>{console.error("Stock listener error:",err)});
+  </script>
+
+  <script type="module">
+    import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import{getFirestore,collection,addDoc,query,orderBy,limit,serverTimestamp,onSnapshot,startAfter,getDocs}from"https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    const app=initializeApp({apiKey:"AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",authDomain:"akinowedding-73271.firebaseapp.com",projectId:"akinowedding-73271",storageBucket:"akinowedding-73271.appspot.com",messagingSenderId:"307666594440",appId:"1:307666594440:web:e7d3496744464f4c6d0d3d"});
+    const db=getFirestore(app);
+    const gbForm=document.getElementById('messageForm'),gbMsgs=document.getElementById('gbMsgs');
+    let lastVisible=null,loading=false;
+    gbForm.addEventListener('submit',async(e)=>{e.preventDefault();const name=document.getElementById('gb-name').value.trim(),message=document.getElementById('gb-msg').value.trim();if(name&&message){await addDoc(collection(db,"messages"),{name,message,timestamp:serverTimestamp()});gbForm.reset()}});
+    function loadMessages(){
+      onSnapshot(query(collection(db,"messages"),orderBy("timestamp","desc"),limit(10)),(snap)=>{
+        gbMsgs.innerHTML="";snap.forEach((d)=>renderMsg(d.data()));gbMsgs.scrollTop=0;
+        if(snap.docs.length>0)lastVisible=snap.docs[snap.docs.length-1];
+      });
+    }
+    gbMsgs.addEventListener("scroll",async()=>{
+      if(loading)return;
+      if(gbMsgs.scrollTop+gbMsgs.clientHeight>=gbMsgs.scrollHeight-10){
+        loading=true;
+        if(lastVisible){
+          const snap=await getDocs(query(collection(db,"messages"),orderBy("timestamp","desc"),startAfter(lastVisible),limit(10)));
+          snap.forEach((d)=>renderMsg(d.data()));
+          if(snap.docs.length>0)lastVisible=snap.docs[snap.docs.length-1];
+        }
+        loading=false;
+      }
+    });
+    function renderMsg(data){
+      const div=document.createElement("div");div.className="gb-msg";
+      div.innerHTML="<strong>"+data.name+"</strong><p>"+data.message+"</p><small>"+(data.timestamp?new Date(data.timestamp.seconds*1000).toLocaleString():"")+"</small>";
+      gbMsgs.appendChild(div);
+    }
+    loadMessages();
+  </script>
+
+</body>
+</html>
