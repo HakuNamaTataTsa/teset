@@ -497,7 +497,7 @@
   </script>
 
 <!-- ========================================================= -->
-<!-- MODULE 1 : STOCK MOBIL + AI (paste gambar) + EDIT TAG      -->
+<!-- MODULE 1 : STOCK MOBIL + AI (paste gambar) + EDIT          -->
 <!-- ========================================================= -->
 <script type="module">
   // ---------- IMPORTS ----------
@@ -517,8 +517,8 @@
 
   // ---------- STATE ----------
   let POSTS = [];
-  let editIdx = null;          // untuk edit harga
-  let editTagIdx = null;       // untuk edit tag
+  let editIdx = null;          // edit harga
+  let editDescIdx = null;      // edit deskripsi
   let soldTimer = null;
   let currentPage = 1;
   const SOLD_HOURS = 24;
@@ -565,8 +565,8 @@
             { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
           ]
         }],
-        max_tokens: 80,
-        temperature: 0.2
+        max_tokens: 30,
+        temperature: 0.1
       })
     });
     if (!resp.ok) {
@@ -578,47 +578,28 @@
     return data.choices[0].message.content.trim();
   }
 
-  // ---------- FUNGSI ANALISIS GAMBAR -> 2 TAG ----------
+  // ---------- FUNGSI ANALISIS GAMBAR -> TIPE MOBIL (1 TAG) ----------
   async function analyzeCarImage(base64) {
-    const prompt = `Analisis gambar mobil ini dan berikan 2 informasi:
-1. Merek atau tipe mobil (contoh: Toyota, Honda, BMW, Mercedes, Suzuki, dll)
-2. Jenis livery/styling (contoh: Sport, Anime, Detail Logo, Racing, Clean, Retro, Street, VIP, dll)
+    // Prompt dengan instruksi "pikir 2-3 kali" agar lebih akurat
+    const prompt = `Analisis gambar mobil ini dengan teliti. Pikirkan 2-3 kali sebelum menjawab.
 
-Jawab dengan format:
-Merek: [jawaban]
-Livery: [jawaban]
+Tugas: Sebutkan merek atau tipe mobil yang terlihat pada gambar.
+Contoh jawaban yang benar: BMW, Toyota, Honda, Subaru, Mercedes, Suzuki, Daihatsu, Mitsubishi, Nissan, Ford, Hyundai, Kia, Audi, Volkswagen, Porsche, Ferrari, Lamborghini, Lexus, Mazda, dll.
 
-Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
+Jika mobil tidak jelas atau tidak bisa dikenali, jawab "Lainnya".
+Jawab HANYA dengan SATU KATA (nama merek/tipe). Jangan tambahkan kalimat lain.`;
 
     const result = await callGroq(base64, prompt);
-    
-    // Parse hasil
-    let brand = "Tidak diketahui";
-    let livery = "Tidak diketahui";
-    
-    const lines = result.split('\n');
-    for (let line of lines) {
-      const clean = line.trim();
-      if (clean.toLowerCase().startsWith('merek:')) {
-        brand = clean.replace(/^merek:\s*/i, '').trim();
-      } else if (clean.toLowerCase().startsWith('livery:')) {
-        livery = clean.replace(/^livery:\s*/i, '').trim();
-      }
+    // Bersihkan hasil (hanya huruf dan spasi, max 30 karakter)
+    let category = result.replace(/[^a-zA-Z\s]/g, '').trim();
+    // Jika hasilnya panjang (misal kalimat), ambil kata pertama
+    if (category.includes(' ')) {
+      const words = category.split(' ');
+      category = words[0];
     }
-    
-    // Jika masih kosong, coba deteksi dengan regex
-    if (brand === "Tidak diketahui" || livery === "Tidak diketahui") {
-      const brandMatch = result.match(/merek\s*[:=]\s*([^\n,]+)/i);
-      if (brandMatch) brand = brandMatch[1].trim();
-      const liveryMatch = result.match(/livery\s*[:=]\s*([^\n,]+)/i);
-      if (liveryMatch) livery = liveryMatch[1].trim();
-    }
-    
-    // Bersihkan
-    brand = brand.replace(/[^a-zA-Z0-9\s\-]/g, '').trim() || "Tidak diketahui";
-    livery = livery.replace(/[^a-zA-Z0-9\s\-]/g, '').trim() || "Tidak diketahui";
-    
-    return { brand, livery };
+    // Jika kosong atau tidak valid, default ke "Lainnya"
+    if (!category || category.length < 2) category = "Lainnya";
+    return category;
   }
 
   // ---------- RENDER STOCK ----------
@@ -652,18 +633,16 @@ Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
     } else {
       pageItems.forEach(p => {
         const price = getEP(p);
-        const hasEdit = !!p.editedPrice;
+        const hasEditPrice = !!p.editedPrice;
         const code = window.getIgCode(p.url);
-        const brand = p.brand || '';
-        const livery = p.livery || '';
+        const category = p.category || '';
         
-        // Tag HTML
-        let tagsHtml = '';
-        if (brand || livery) {
-          tagsHtml = '<div class="ii-tags">';
-          if (brand) tagsHtml += '<span class="tag brand"><i class="fas fa-car"></i> '+escL(brand)+'</span>';
-          if (livery) tagsHtml += '<span class="tag livery"><i class="fas fa-paint-brush"></i> '+escL(livery)+'</span>';
-          tagsHtml += '</div>';
+        // Tag HTML (hanya 1 tag: tipe mobil)
+        let tagHtml = '';
+        if (category && category !== 'Lainnya') {
+          tagHtml = '<div class="ii-tags"><span class="tag brand"><i class="fas fa-car"></i> '+escL(category)+'</span></div>';
+        } else if (category === 'Lainnya') {
+          tagHtml = '<div class="ii-tags"><span class="tag" style="opacity:0.4"><i class="fas fa-car"></i> Lainnya</span></div>';
         }
         
         ha += '<div class="item">'+
@@ -672,12 +651,13 @@ Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
             '<div class="ii-price">'+escL(price)+'</div>'+
             '<div class="ii-desc">'+escL(firstLine(p.desc))+'</div>'+
             '<div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+
-            (hasEdit ? '<div class="ii-status"><span class="edited"><i class="fas fa-pen" style="font-size:.55rem"></i> Harga di-edit</span></div>' : '')+
-            tagsHtml+
+            (hasEditPrice ? '<div class="ii-status"><span class="edited"><i class="fas fa-pen" style="font-size:.55rem"></i> Harga di-edit</span></div>' : '')+
+            tagHtml+
           '</div>'+
           '<div class="item-actions">'+
-            '<button class="btn-sm btn-edit" data-id="'+p.id+'"><i class="fas fa-pen"></i> Edit</button>'+
-            '<button class="btn-sm btn-edit-tag" data-id="'+p.id+'"><i class="fas fa-tags"></i> Edit Tag</button>'+
+            '<button class="btn-sm btn-edit" data-id="'+p.id+'"><i class="fas fa-pen"></i> Harga</button>'+
+            '<button class="btn-sm btn-edit-desc" data-id="'+p.id+'"><i class="fas fa-pen-to-square"></i> Deskripsi</button>'+
+            '<button class="btn-sm btn-edit-tag" data-id="'+p.id+'"><i class="fas fa-tag"></i> Tipe</button>'+
             '<button class="btn-sm btn-sold" data-id="'+p.id+'"><i class="fas fa-tag"></i> Terjual</button>'+
             '<button class="btn-sm btn-del" data-id="'+p.id+'"><i class="fas fa-trash"></i> Hapus</button>'+
             '<button class="btn-sm btn-ai" data-id="'+p.id+'"><i class="fas fa-robot"></i> AI</button>'+
@@ -692,6 +672,8 @@ Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
       const id = btn.getAttribute('data-id');
       if (btn.classList.contains('btn-edit')) {
         btn.addEventListener('click', function(e){ e.stopPropagation(); startEdit(id); });
+      } else if (btn.classList.contains('btn-edit-desc')) {
+        btn.addEventListener('click', function(e){ e.stopPropagation(); startEditDesc(id); });
       } else if (btn.classList.contains('btn-edit-tag')) {
         btn.addEventListener('click', function(e){ e.stopPropagation(); startEditTag(id); });
       } else if (btn.classList.contains('btn-sold')) {
@@ -774,7 +756,7 @@ Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
   }
 
   // ---------- AI RECLASSIFY (untuk item yang sudah ada) ----------
-  let activeAiTarget = null; // { docId, btn }
+  let activeAiTarget = null;
 
   function startAiReclassify(docId, btn) {
     if (activeAiTarget) {
@@ -837,9 +819,9 @@ Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
-      const { brand, livery } = await analyzeCarImage(base64);
-      await updateDoc(doc(db, "carStock", docId), { brand, livery });
-      toast(`✅ Merek: ${brand} | Livery: ${livery}`, 'ok');
+      const category = await analyzeCarImage(base64);
+      await updateDoc(doc(db, "carStock", docId), { category });
+      toast(`✅ Tipe: ${category}`, 'ok');
     } catch (err) {
       toast('Gagal analisis: ' + err.message, 'err');
     } finally {
@@ -848,63 +830,110 @@ Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
     }
   }
 
-  // ---------- EDIT TAG (BRAND & LIVERY) ----------
+  // ---------- EDIT TAG (TIPE MOBIL) ----------
   function startEditTag(docId) {
-    editTagIdx = docId;
     const post = POSTS.find(p => p.id === docId);
     if (!post) return;
-    // Buat panel edit tag (gunakan editCard yang sudah ada, atau buat baru)
-    // Saya akan gunakan elemen terpisah: editTagCard
+    // Buat panel edit tag
     let card = document.getElementById('editTagCard');
     if (!card) {
-      // Buat card jika belum ada
       card = document.createElement('div');
       card.id = 'editTagCard';
       card.className = 'edit-card';
       card.style.display = 'none';
       card.innerHTML = `
-        <h4><i class="fas fa-tags"></i> Edit Brand & Livery</h4>
-        <div class="fr"><label>Merek</label><input type="text" id="editBrand" placeholder="Toyota, Honda, dll"></div>
-        <div class="fr"><label>Livery / Styling</label><input type="text" id="editLivery" placeholder="Sport, Anime, Racing, dll"></div>
+        <h4><i class="fas fa-tag"></i> Edit Tipe Mobil</h4>
+        <div class="fr"><label>Tipe Mobil</label><input type="text" id="editTagInput" placeholder="BMW, Toyota, Honda, dll"></div>
         <div class="ea">
           <button class="btn-save" id="saveTagBtn"><i class="fas fa-check"></i> Simpan</button>
           <button class="btn-cancel" id="cancelTagBtn"><i class="fas fa-xmark"></i> Batal</button>
         </div>
       `;
-      // Sisipkan setelah editCard yang sudah ada
       const editCard = document.getElementById('editCard');
       editCard.parentNode.insertBefore(card, editCard.nextSibling);
-      // Event listeners
-      document.getElementById('saveTagBtn').addEventListener('click', saveTags);
+      document.getElementById('saveTagBtn').addEventListener('click', saveTag);
       document.getElementById('cancelTagBtn').addEventListener('click', cancelTagEdit);
-      document.getElementById('editBrand').addEventListener('keydown', function(e) { if (e.key === 'Enter') saveTags(); });
-      document.getElementById('editLivery').addEventListener('keydown', function(e) { if (e.key === 'Enter') saveTags(); });
+      document.getElementById('editTagInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') saveTag(); });
     }
-    // Isi data
-    document.getElementById('editBrand').value = post.brand || '';
-    document.getElementById('editLivery').value = post.livery || '';
+    document.getElementById('editTagInput').value = post.category || '';
     card.style.display = '';
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    document.getElementById('editBrand').focus();
+    document.getElementById('editTagInput').focus();
+    window._editTagDocId = docId;
   }
 
-  window.saveTags = async function() {
-    const brand = document.getElementById('editBrand').value.trim();
-    const livery = document.getElementById('editLivery').value.trim();
-    if (!editTagIdx) return;
+  window.saveTag = async function() {
+    const value = document.getElementById('editTagInput').value.trim();
+    const docId = window._editTagDocId;
+    if (!docId) return;
     try {
-      await updateDoc(doc(db, "carStock", editTagIdx), { brand, livery });
-      editTagIdx = null;
+      await updateDoc(doc(db, "carStock", docId), { category: value || "Lainnya" });
       document.getElementById('editTagCard').style.display = 'none';
-      toast('Tag berhasil diupdate!', 'ok');
+      toast('Tipe mobil berhasil diupdate!', 'ok');
     } catch (err) {
-      toast('Gagal update tag: ' + err.message, 'err');
+      toast('Gagal update: ' + err.message, 'err');
     }
   };
 
   window.cancelTagEdit = function() {
-    editTagIdx = null;
     const card = document.getElementById('editTagCard');
+    if (card) card.style.display = 'none';
+    window._editTagDocId = null;
+  };
+
+  // ---------- EDIT DESKRIPSI ----------
+  function startEditDesc(docId) {
+    editDescIdx = docId;
+    const post = POSTS.find(p => p.id === docId);
+    if (!post) return;
+    let card = document.getElementById('editDescCard');
+    if (!card) {
+      card = document.createElement('div');
+      card.id = 'editDescCard';
+      card.className = 'edit-card';
+      card.style.display = 'none';
+      card.innerHTML = `
+        <h4><i class="fas fa-pen-to-square"></i> Edit Deskripsi</h4>
+        <div class="fr"><label>Deskripsi Saat Ini</label><textarea id="editDescOld" readonly style="color:var(--muted);opacity:.6;min-height:40px;resize:none;"></textarea></div>
+        <div class="fr"><label>Deskripsi Baru</label><textarea id="editDescNew" placeholder="Tulis deskripsi baru..." rows="3"></textarea></div>
+        <div class="ea">
+          <button class="btn-save" id="saveDescBtn"><i class="fas fa-check"></i> Simpan</button>
+          <button class="btn-cancel" id="cancelDescBtn"><i class="fas fa-xmark"></i> Batal</button>
+        </div>
+      `;
+      const editCard = document.getElementById('editCard');
+      editCard.parentNode.insertBefore(card, editCard.nextSibling);
+      document.getElementById('saveDescBtn').addEventListener('click', saveDesc);
+      document.getElementById('cancelDescBtn').addEventListener('click', cancelDescEdit);
+      document.getElementById('editDescNew').addEventListener('keydown', function(e) { if (e.key === 'Enter' && e.ctrlKey) saveDesc(); });
+    }
+    document.getElementById('editDescOld').value = post.desc || '';
+    document.getElementById('editDescNew').value = post.desc || '';
+    card.style.display = '';
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('editDescNew').focus();
+  }
+
+  window.saveDesc = async function() {
+    const newDesc = document.getElementById('editDescNew').value.trim();
+    if (!editDescIdx) return;
+    if (!newDesc) {
+      toast('Deskripsi tidak boleh kosong!', 'err');
+      return;
+    }
+    try {
+      await updateDoc(doc(db, "carStock", editDescIdx), { desc: newDesc });
+      editDescIdx = null;
+      document.getElementById('editDescCard').style.display = 'none';
+      toast('Deskripsi berhasil diupdate!', 'ok');
+    } catch (err) {
+      toast('Gagal update deskripsi: ' + err.message, 'err');
+    }
+  };
+
+  window.cancelDescEdit = function() {
+    editDescIdx = null;
+    const card = document.getElementById('editDescCard');
     if (card) card.style.display = 'none';
   };
 
@@ -932,20 +961,17 @@ Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
     
-    let brand = "Tidak diketahui";
-    let livery = "Tidak diketahui";
+    let category = "Lainnya";
     
     if (currentImageBase64) {
       try {
-        const result = await analyzeCarImage(currentImageBase64);
-        brand = result.brand;
-        livery = result.livery;
+        category = await analyzeCarImage(currentImageBase64);
       } catch (err) {
         console.warn("Analisis gambar gagal:", err);
         toast('Analisis gambar gagal: ' + err.message, 'err');
       }
     } else {
-      toast('Tidak ada gambar, tag akan diisi "Tidak diketahui"', 'info');
+      toast('Tidak ada gambar, tipe akan diisi "Lainnya"', 'info');
     }
 
     try {
@@ -955,11 +981,10 @@ Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
         status: "available",
         soldAt: null,
         editedPrice: "",
-        brand,
-        livery
+        category
       });
       msg.className = 'form-msg ok show';
-      msg.innerHTML = `<i class="fas fa-check-circle"></i> Stock berhasil ditambahkan!<br><small>🚗 ${brand} | 🎨 ${livery}</small>`;
+      msg.innerHTML = `<i class="fas fa-check-circle"></i> Stock berhasil ditambahkan!<br><small>🚗 ${category}</small>`;
       document.getElementById('addUrl').value = '';
       document.getElementById('addPrice').value = '';
       document.getElementById('addDesc').value = '';
