@@ -496,90 +496,91 @@
     window.onOrderUpdateError = function(err){ toast('Gagal update: '+err,'err'); };
   </script>
 
-  <!-- ========================================================= -->
-  <!-- MODULE 1 : STOCK MOBIL + AI (paste gambar)                  -->
-  <!-- ========================================================= -->
-  <script type="module">
-    // ---------- IMPORTS ----------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+<!-- ========================================================= -->
+<!-- MODULE 1 : STOCK MOBIL + AI (paste gambar) + EDIT TAG      -->
+<!-- ========================================================= -->
+<script type="module">
+  // ---------- IMPORTS ----------
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+  import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-    // ---------- FIREBASE ----------
-    const app = initializeApp({
-      apiKey: "AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",
-      authDomain: "akinowedding-73271.firebaseapp.com",
-      projectId: "akinowedding-73271",
-      storageBucket: "akinowedding-73271.appspot.com",
-      messagingSenderId: "307666594440",
-      appId: "1:307666594440:web:e7d3496744464f4c6d0d3d"
+  // ---------- FIREBASE ----------
+  const app = initializeApp({
+    apiKey: "AIzaSyD4sgRYUhk08Y4oZPR4GXJbSuX1fHjXBtg",
+    authDomain: "akinowedding-73271.firebaseapp.com",
+    projectId: "akinowedding-73271",
+    storageBucket: "akinowedding-73271.appspot.com",
+    messagingSenderId: "307666594440",
+    appId: "1:307666594440:web:e7d3496744464f4c6d0d3d"
+  });
+  const db = getFirestore(app);
+
+  // ---------- STATE ----------
+  let POSTS = [];
+  let editIdx = null;          // untuk edit harga
+  let editTagIdx = null;       // untuk edit tag
+  let soldTimer = null;
+  let currentPage = 1;
+  const SOLD_HOURS = 24;
+
+  // ---------- HELPER ----------
+  function getPerPage() { return window.isMobile() ? 5 : 10; }
+  function escL(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+  function firstLine(d) { return d.split('\n')[0].trim(); }
+  function getEP(p) { return p.editedPrice || p.price; }
+  function toMs(t) { if(!t) return 0; if(typeof t==='number') return t; if(t.seconds) return t.seconds*1000; return new Date(t).getTime(); }
+  function fmtTimer(ms) { const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000); return h+'j '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s'; }
+  function renderPag(cId, total, page, pp, fn) {
+    const el = document.getElementById(cId);
+    const tp = Math.ceil(total/pp);
+    if (tp <= 1) { el.innerHTML=''; return; }
+    el.innerHTML = '<div class="pagination"><button class="pg-btn" '+(page<=1?'disabled':'')+' onclick="window.'+fn+'('+(page-1)+')"><i class="fas fa-chevron-left"></i> Prev</button><span class="pg-info">'+page+' / '+tp+'</span><button class="pg-btn" '+(page>=tp?'disabled':'')+' onclick="window.'+fn+'('+(page+1)+')">Next <i class="fas fa-chevron-right"></i></button></div>';
+  }
+
+  window.initStock = function(){ startSoldTimer(); };
+  window.destroyStockTimer = function(){ if(soldTimer) { clearInterval(soldTimer); soldTimer = null; } };
+  window.stockGoPage = function(p){ currentPage = p; renderStock(); };
+
+  // ---------- GROQ AI (ANALISIS GAMBAR) ----------
+  let GROQ_API_KEY = localStorage.getItem('groq_api_key') || "";
+  const GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+  const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+  window.updateGroqKey = function(newKey) {
+    GROQ_API_KEY = newKey || "";
+    if (!GROQ_API_KEY) console.warn("Groq API Key belum diset.");
+  };
+
+  async function callGroq(base64Image, prompt) {
+    if (!GROQ_API_KEY) throw new Error("API Key Groq belum diset.");
+    const resp = await fetch(GROQ_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GROQ_API_KEY}` },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
+          ]
+        }],
+        max_tokens: 80,
+        temperature: 0.2
+      })
     });
-    const db = getFirestore(app);
-
-    // ---------- STATE ----------
-    let POSTS = [];
-    let editIdx = null;
-    let soldTimer = null;
-    let currentPage = 1;
-    const SOLD_HOURS = 24;
-
-    // ---------- HELPER ----------
-    function getPerPage() { return window.isMobile() ? 5 : 10; }
-    function escL(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-    function firstLine(d) { return d.split('\n')[0].trim(); }
-    function getEP(p) { return p.editedPrice || p.price; }
-    function toMs(t) { if(!t) return 0; if(typeof t==='number') return t; if(t.seconds) return t.seconds*1000; return new Date(t).getTime(); }
-    function fmtTimer(ms) { const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000); return h+'j '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s'; }
-    function renderPag(cId, total, page, pp, fn) {
-      const el = document.getElementById(cId);
-      const tp = Math.ceil(total/pp);
-      if (tp <= 1) { el.innerHTML=''; return; }
-      el.innerHTML = '<div class="pagination"><button class="pg-btn" '+(page<=1?'disabled':'')+' onclick="window.'+fn+'('+(page-1)+')"><i class="fas fa-chevron-left"></i> Prev</button><span class="pg-info">'+page+' / '+tp+'</span><button class="pg-btn" '+(page>=tp?'disabled':'')+' onclick="window.'+fn+'('+(page+1)+')">Next <i class="fas fa-chevron-right"></i></button></div>';
+    if (!resp.ok) {
+      const txt = await resp.text();
+      throw new Error(`Groq API error (${resp.status}): ${txt}`);
     }
+    const data = await resp.json();
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error("Respons Groq tidak valid");
+    return data.choices[0].message.content.trim();
+  }
 
-    window.initStock = function(){ startSoldTimer(); };
-    window.destroyStockTimer = function(){ if(soldTimer) { clearInterval(soldTimer); soldTimer = null; } };
-    window.stockGoPage = function(p){ currentPage = p; renderStock(); };
-
-    // ---------- GROQ AI (ANALISIS GAMBAR) ----------
-    let GROQ_API_KEY = localStorage.getItem('groq_api_key') || "";
-    const GROQ_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
-    const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-
-    window.updateGroqKey = function(newKey) {
-      GROQ_API_KEY = newKey || "";
-      if (!GROQ_API_KEY) console.warn("Groq API Key belum diset.");
-    };
-
-    async function callGroq(base64Image, prompt) {
-      if (!GROQ_API_KEY) throw new Error("API Key Groq belum diset.");
-      const resp = await fetch(GROQ_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GROQ_API_KEY}` },
-        body: JSON.stringify({
-          model: GROQ_MODEL,
-          messages: [{
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
-            ]
-          }],
-          max_tokens: 80,
-          temperature: 0.2
-        })
-      });
-      if (!resp.ok) {
-        const txt = await resp.text();
-        throw new Error(`Groq API error (${resp.status}): ${txt}`);
-      }
-      const data = await resp.json();
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error("Respons Groq tidak valid");
-      return data.choices[0].message.content.trim();
-    }
-
-    // ---------- FUNGSI ANALISIS GAMBAR -> 2 TAG ----------
-    async function analyzeCarImage(base64) {
-      const prompt = `Analisis gambar mobil ini dan berikan 2 informasi:
+  // ---------- FUNGSI ANALISIS GAMBAR -> 2 TAG ----------
+  async function analyzeCarImage(base64) {
+    const prompt = `Analisis gambar mobil ini dan berikan 2 informasi:
 1. Merek atau tipe mobil (contoh: Toyota, Honda, BMW, Mercedes, Suzuki, dll)
 2. Jenis livery/styling (contoh: Sport, Anime, Detail Logo, Racing, Clean, Retro, Street, VIP, dll)
 
@@ -589,444 +590,495 @@ Livery: [jawaban]
 
 Jika tidak yakin, tulis "Tidak diketahui" untuk yang tidak jelas.`;
 
-      const result = await callGroq(base64, prompt);
-      
-      // Parse hasil
-      let brand = "Tidak diketahui";
-      let livery = "Tidak diketahui";
-      
-      const lines = result.split('\n');
-      for (let line of lines) {
-        const clean = line.trim();
-        if (clean.toLowerCase().startsWith('merek:')) {
-          brand = clean.replace(/^merek:\s*/i, '').trim();
-        } else if (clean.toLowerCase().startsWith('livery:')) {
-          livery = clean.replace(/^livery:\s*/i, '').trim();
+    const result = await callGroq(base64, prompt);
+    
+    // Parse hasil
+    let brand = "Tidak diketahui";
+    let livery = "Tidak diketahui";
+    
+    const lines = result.split('\n');
+    for (let line of lines) {
+      const clean = line.trim();
+      if (clean.toLowerCase().startsWith('merek:')) {
+        brand = clean.replace(/^merek:\s*/i, '').trim();
+      } else if (clean.toLowerCase().startsWith('livery:')) {
+        livery = clean.replace(/^livery:\s*/i, '').trim();
+      }
+    }
+    
+    // Jika masih kosong, coba deteksi dengan regex
+    if (brand === "Tidak diketahui" || livery === "Tidak diketahui") {
+      const brandMatch = result.match(/merek\s*[:=]\s*([^\n,]+)/i);
+      if (brandMatch) brand = brandMatch[1].trim();
+      const liveryMatch = result.match(/livery\s*[:=]\s*([^\n,]+)/i);
+      if (liveryMatch) livery = liveryMatch[1].trim();
+    }
+    
+    // Bersihkan
+    brand = brand.replace(/[^a-zA-Z0-9\s\-]/g, '').trim() || "Tidak diketahui";
+    livery = livery.replace(/[^a-zA-Z0-9\s\-]/g, '').trim() || "Tidak diketahui";
+    
+    return { brand, livery };
+  }
+
+  // ---------- RENDER STOCK ----------
+  function renderStock() {
+    console.log("🔄 renderStock dipanggil, total POSTS:", POSTS.length);
+    const PER_PAGE = getPerPage();
+    const avail = POSTS.filter(p => p.status === 'available');
+    const soldList = POSTS.filter(p => p.status === 'sold');
+    const delList = POSTS.filter(p => p.status === 'deleted');
+
+    // Stats
+    document.getElementById('stockStats').innerHTML =
+      '<div class="stat-card"><div class="sv yellow">'+POSTS.length+'</div><div class="sl">Total</div></div>'+
+      '<div class="stat-card"><div class="sv green">'+avail.length+'</div><div class="sl">Tersedia</div></div>'+
+      '<div class="stat-card"><div class="sv red">'+soldList.length+'</div><div class="sl">Terjual</div></div>'+
+      '<div class="stat-card"><div class="sv blue">'+delList.length+'</div><div class="sl">Dihapus</div></div>';
+    document.getElementById('cntAvail').textContent = avail.length;
+    document.getElementById('cntSold').textContent = soldList.length;
+    document.getElementById('cntDel').textContent = delList.length;
+
+    // Pagination
+    const totalPages = Math.ceil(avail.length / PER_PAGE);
+    if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+    const start = (currentPage - 1) * PER_PAGE;
+    const pageItems = avail.slice(start, start + PER_PAGE);
+
+    // ---- AVAILABLE ----
+    let ha = '';
+    if (!avail.length) {
+      ha = '<div class="empty"><i class="fas fa-car-side"></i>Tidak ada stock tersedia.</div>';
+    } else {
+      pageItems.forEach(p => {
+        const price = getEP(p);
+        const hasEdit = !!p.editedPrice;
+        const code = window.getIgCode(p.url);
+        const brand = p.brand || '';
+        const livery = p.livery || '';
+        
+        // Tag HTML
+        let tagsHtml = '';
+        if (brand || livery) {
+          tagsHtml = '<div class="ii-tags">';
+          if (brand) tagsHtml += '<span class="tag brand"><i class="fas fa-car"></i> '+escL(brand)+'</span>';
+          if (livery) tagsHtml += '<span class="tag livery"><i class="fas fa-paint-brush"></i> '+escL(livery)+'</span>';
+          tagsHtml += '</div>';
         }
-      }
-      
-      // Jika masih kosong, coba deteksi dengan regex
-      if (brand === "Tidak diketahui" || livery === "Tidak diketahui") {
-        const brandMatch = result.match(/merek\s*[:=]\s*([^\n,]+)/i);
-        if (brandMatch) brand = brandMatch[1].trim();
-        const liveryMatch = result.match(/livery\s*[:=]\s*([^\n,]+)/i);
-        if (liveryMatch) livery = liveryMatch[1].trim();
-      }
-      
-      // Bersihkan
-      brand = brand.replace(/[^a-zA-Z0-9\s\-]/g, '').trim() || "Tidak diketahui";
-      livery = livery.replace(/[^a-zA-Z0-9\s\-]/g, '').trim() || "Tidak diketahui";
-      
-      return { brand, livery };
-    }
-
-    // ---------- RENDER STOCK ----------
-    function renderStock() {
-      console.log("🔄 renderStock dipanggil, total POSTS:", POSTS.length);
-      const PER_PAGE = getPerPage();
-      const avail = POSTS.filter(p => p.status === 'available');
-      const soldList = POSTS.filter(p => p.status === 'sold');
-      const delList = POSTS.filter(p => p.status === 'deleted');
-
-      // Stats
-      document.getElementById('stockStats').innerHTML =
-        '<div class="stat-card"><div class="sv yellow">'+POSTS.length+'</div><div class="sl">Total</div></div>'+
-        '<div class="stat-card"><div class="sv green">'+avail.length+'</div><div class="sl">Tersedia</div></div>'+
-        '<div class="stat-card"><div class="sv red">'+soldList.length+'</div><div class="sl">Terjual</div></div>'+
-        '<div class="stat-card"><div class="sv blue">'+delList.length+'</div><div class="sl">Dihapus</div></div>';
-      document.getElementById('cntAvail').textContent = avail.length;
-      document.getElementById('cntSold').textContent = soldList.length;
-      document.getElementById('cntDel').textContent = delList.length;
-
-      // Pagination
-      const totalPages = Math.ceil(avail.length / PER_PAGE);
-      if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
-      const start = (currentPage - 1) * PER_PAGE;
-      const pageItems = avail.slice(start, start + PER_PAGE);
-
-      // ---- AVAILABLE ----
-      let ha = '';
-      if (!avail.length) {
-        ha = '<div class="empty"><i class="fas fa-car-side"></i>Tidak ada stock tersedia.</div>';
-      } else {
-        pageItems.forEach(p => {
-          const price = getEP(p);
-          const hasEdit = !!p.editedPrice;
-          const code = window.getIgCode(p.url);
-          const brand = p.brand || '';
-          const livery = p.livery || '';
-          
-          // Tag HTML
-          let tagsHtml = '';
-          if (brand || livery) {
-            tagsHtml = '<div class="ii-tags">';
-            if (brand) tagsHtml += '<span class="tag brand"><i class="fas fa-car"></i> '+escL(brand)+'</span>';
-            if (livery) tagsHtml += '<span class="tag livery"><i class="fas fa-paint-brush"></i> '+escL(livery)+'</span>';
-            tagsHtml += '</div>';
-          }
-          
-          ha += '<div class="item">'+
-            '<a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer" class="item-thumb link" title="Buka di Instagram">'+window.getThumbHtml(code)+'</a>'+
-            '<div class="item-info">'+
-              '<div class="ii-price">'+escL(price)+'</div>'+
-              '<div class="ii-desc">'+escL(firstLine(p.desc))+'</div>'+
-              '<div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+
-              (hasEdit ? '<div class="ii-status"><span class="edited"><i class="fas fa-pen" style="font-size:.55rem"></i> Harga di-edit</span></div>' : '')+
-              tagsHtml+
-            '</div>'+
-            '<div class="item-actions">'+
-              '<button class="btn-sm btn-edit" data-id="'+p.id+'"><i class="fas fa-pen"></i> Edit</button>'+
-              '<button class="btn-sm btn-sold" data-id="'+p.id+'"><i class="fas fa-tag"></i> Terjual</button>'+
-              '<button class="btn-sm btn-del" data-id="'+p.id+'"><i class="fas fa-trash"></i> Hapus</button>'+
-              '<button class="btn-sm btn-ai" data-id="'+p.id+'"><i class="fas fa-robot"></i> AI</button>'+
-            '</div></div>';
-        });
-      }
-      const listAvail = document.getElementById('listAvail');
-      listAvail.innerHTML = ha;
-
-      // Attach events
-      listAvail.querySelectorAll('[data-id]').forEach(btn => {
-        const id = btn.getAttribute('data-id');
-        if (btn.classList.contains('btn-edit')) {
-          btn.addEventListener('click', function(e){ e.stopPropagation(); startEdit(id); });
-        } else if (btn.classList.contains('btn-sold')) {
-          btn.addEventListener('click', function(e){ e.stopPropagation(); toggleSold(id, true); });
-        } else if (btn.classList.contains('btn-del')) {
-          btn.addEventListener('click', function(e){ e.stopPropagation(); deletePost(id); });
-        } else if (btn.classList.contains('btn-ai')) {
-          btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            startAiReclassify(id, btn);
-          });
-        }
-      });
-
-      renderPag('pagAvail', avail.length, currentPage, PER_PAGE, 'stockGoPage');
-
-      // ---- SOLD ----
-      let hs = '';
-      if (!soldList.length) {
-        hs = '<div class="empty"><i class="fas fa-tag"></i>Tidak ada stock terjual.</div>';
-      } else {
-        soldList.forEach(p => {
-          const price = getEP(p);
-          const rem = SOLD_HOURS * 3600000 - (Date.now() - toMs(p.soldAt));
-          const timerTxt = rem > 0 ? fmtTimer(rem) : 'Segera dihapus';
-          const code = window.getIgCode(p.url);
-          hs += '<div class="item sold">'+
-            '<a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer" class="item-thumb link" title="Buka di Instagram">'+window.getThumbHtml(code)+'</a>'+
-            '<div class="item-info sold">'+
-              '<div class="ii-price">'+escL(price)+'</div>'+
-              '<div class="ii-desc">'+escL(firstLine(p.desc))+'</div>'+
-              '<div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+
-              '<div class="ii-status"><span class="timer" data-soldat="'+toMs(p.soldAt)+'"><i class="fas fa-clock" style="font-size:.6rem"></i> '+timerTxt+'</span></div>'+
-            '</div>'+
-            '<div class="item-actions"><button class="btn-sm btn-unsold" data-id="'+p.id+'"><i class="fas fa-rotate-left"></i> Batalkan</button></div></div>';
-        });
-      }
-      const listSold = document.getElementById('listSold');
-      listSold.innerHTML = hs;
-      listSold.querySelectorAll('.btn-unsold').forEach(btn => {
-        btn.addEventListener('click', function(){ toggleSold(btn.getAttribute('data-id'), false); });
-      });
-
-      // ---- DELETED ----
-      let hd = '';
-      if (!delList.length) {
-        hd = '<div class="empty"><i class="fas fa-trash"></i>Tidak ada stock dihapus.</div>';
-      } else {
-        delList.forEach(p => {
-          const price = getEP(p);
-          const code = window.getIgCode(p.url);
-          hd += '<div class="item" style="opacity:.45">'+
-            '<div class="item-thumb">'+window.getThumbHtml(code)+'</div>'+
-            '<div class="item-info deleted">'+
-              '<div class="ii-price">'+escL(price)+'</div>'+
-              '<div class="ii-desc">'+escL(firstLine(p.desc))+'</div>'+
-              '<div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+
-            '</div>'+
-            '<div class="item-actions"><button class="btn-sm btn-restore" data-id="'+p.id+'"><i class="fas fa-rotate-left"></i> Pulihkan</button></div></div>';
-        });
-      }
-      const listDel = document.getElementById('listDel');
-      listDel.innerHTML = hd;
-      listDel.querySelectorAll('.btn-restore').forEach(btn => {
-        btn.addEventListener('click', function(){ restorePost(btn.getAttribute('data-id')); });
+        
+        ha += '<div class="item">'+
+          '<a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer" class="item-thumb link" title="Buka di Instagram">'+window.getThumbHtml(code)+'</a>'+
+          '<div class="item-info">'+
+            '<div class="ii-price">'+escL(price)+'</div>'+
+            '<div class="ii-desc">'+escL(firstLine(p.desc))+'</div>'+
+            '<div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+
+            (hasEdit ? '<div class="ii-status"><span class="edited"><i class="fas fa-pen" style="font-size:.55rem"></i> Harga di-edit</span></div>' : '')+
+            tagsHtml+
+          '</div>'+
+          '<div class="item-actions">'+
+            '<button class="btn-sm btn-edit" data-id="'+p.id+'"><i class="fas fa-pen"></i> Edit</button>'+
+            '<button class="btn-sm btn-edit-tag" data-id="'+p.id+'"><i class="fas fa-tags"></i> Edit Tag</button>'+
+            '<button class="btn-sm btn-sold" data-id="'+p.id+'"><i class="fas fa-tag"></i> Terjual</button>'+
+            '<button class="btn-sm btn-del" data-id="'+p.id+'"><i class="fas fa-trash"></i> Hapus</button>'+
+            '<button class="btn-sm btn-ai" data-id="'+p.id+'"><i class="fas fa-robot"></i> AI</button>'+
+          '</div></div>';
       });
     }
+    const listAvail = document.getElementById('listAvail');
+    listAvail.innerHTML = ha;
 
-    // ---------- SOLD TIMER ----------
-    function startSoldTimer() {
-      if (soldTimer) clearInterval(soldTimer);
-      soldTimer = setInterval(function() {
-        document.querySelectorAll('.timer[data-soldat]').forEach(el => {
-          const soldAt = parseInt(el.dataset.soldat);
-          const rem = SOLD_HOURS * 3600000 - (Date.now() - soldAt);
-          if (rem <= 0) return;
-          el.innerHTML = '<i class="fas fa-clock" style="font-size:.6rem"></i> ' + fmtTimer(rem);
+    // Attach events
+    listAvail.querySelectorAll('[data-id]').forEach(btn => {
+      const id = btn.getAttribute('data-id');
+      if (btn.classList.contains('btn-edit')) {
+        btn.addEventListener('click', function(e){ e.stopPropagation(); startEdit(id); });
+      } else if (btn.classList.contains('btn-edit-tag')) {
+        btn.addEventListener('click', function(e){ e.stopPropagation(); startEditTag(id); });
+      } else if (btn.classList.contains('btn-sold')) {
+        btn.addEventListener('click', function(e){ e.stopPropagation(); toggleSold(id, true); });
+      } else if (btn.classList.contains('btn-del')) {
+        btn.addEventListener('click', function(e){ e.stopPropagation(); deletePost(id); });
+      } else if (btn.classList.contains('btn-ai')) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          startAiReclassify(id, btn);
         });
-      }, 1000);
+      }
+    });
+
+    renderPag('pagAvail', avail.length, currentPage, PER_PAGE, 'stockGoPage');
+
+    // ---- SOLD ----
+    let hs = '';
+    if (!soldList.length) {
+      hs = '<div class="empty"><i class="fas fa-tag"></i>Tidak ada stock terjual.</div>';
+    } else {
+      soldList.forEach(p => {
+        const price = getEP(p);
+        const rem = SOLD_HOURS * 3600000 - (Date.now() - toMs(p.soldAt));
+        const timerTxt = rem > 0 ? fmtTimer(rem) : 'Segera dihapus';
+        const code = window.getIgCode(p.url);
+        hs += '<div class="item sold">'+
+          '<a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer" class="item-thumb link" title="Buka di Instagram">'+window.getThumbHtml(code)+'</a>'+
+          '<div class="item-info sold">'+
+            '<div class="ii-price">'+escL(price)+'</div>'+
+            '<div class="ii-desc">'+escL(firstLine(p.desc))+'</div>'+
+            '<div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+
+            '<div class="ii-status"><span class="timer" data-soldat="'+toMs(p.soldAt)+'"><i class="fas fa-clock" style="font-size:.6rem"></i> '+timerTxt+'</span></div>'+
+          '</div>'+
+          '<div class="item-actions"><button class="btn-sm btn-unsold" data-id="'+p.id+'"><i class="fas fa-rotate-left"></i> Batalkan</button></div></div>';
+      });
     }
+    const listSold = document.getElementById('listSold');
+    listSold.innerHTML = hs;
+    listSold.querySelectorAll('.btn-unsold').forEach(btn => {
+      btn.addEventListener('click', function(){ toggleSold(btn.getAttribute('data-id'), false); });
+    });
 
-    // ---------- AI RECLASSIFY (untuk item yang sudah ada) ----------
-    let activeAiTarget = null; // { docId, btn }
+    // ---- DELETED ----
+    let hd = '';
+    if (!delList.length) {
+      hd = '<div class="empty"><i class="fas fa-trash"></i>Tidak ada stock dihapus.</div>';
+    } else {
+      delList.forEach(p => {
+        const price = getEP(p);
+        const code = window.getIgCode(p.url);
+        hd += '<div class="item" style="opacity:.45">'+
+          '<div class="item-thumb">'+window.getThumbHtml(code)+'</div>'+
+          '<div class="item-info deleted">'+
+            '<div class="ii-price">'+escL(price)+'</div>'+
+            '<div class="ii-desc">'+escL(firstLine(p.desc))+'</div>'+
+            '<div class="ii-link"><i class="fab fa-instagram"></i> <a href="'+escL(p.url)+'" target="_blank" rel="noopener noreferrer">'+escL(window.shortIgUrl(p.url))+'</a></div>'+
+          '</div>'+
+          '<div class="item-actions"><button class="btn-sm btn-restore" data-id="'+p.id+'"><i class="fas fa-rotate-left"></i> Pulihkan</button></div></div>';
+      });
+    }
+    const listDel = document.getElementById('listDel');
+    listDel.innerHTML = hd;
+    listDel.querySelectorAll('.btn-restore').forEach(btn => {
+      btn.addEventListener('click', function(){ restorePost(btn.getAttribute('data-id')); });
+    });
+  }
 
-    function startAiReclassify(docId, btn) {
-      // Jika sudah ada target yang aktif, reset dulu
-      if (activeAiTarget) {
+  // ---------- SOLD TIMER ----------
+  function startSoldTimer() {
+    if (soldTimer) clearInterval(soldTimer);
+    soldTimer = setInterval(function() {
+      document.querySelectorAll('.timer[data-soldat]').forEach(el => {
+        const soldAt = parseInt(el.dataset.soldat);
+        const rem = SOLD_HOURS * 3600000 - (Date.now() - soldAt);
+        if (rem <= 0) return;
+        el.innerHTML = '<i class="fas fa-clock" style="font-size:.6rem"></i> ' + fmtTimer(rem);
+      });
+    }, 1000);
+  }
+
+  // ---------- AI RECLASSIFY (untuk item yang sudah ada) ----------
+  let activeAiTarget = null; // { docId, btn }
+
+  function startAiReclassify(docId, btn) {
+    if (activeAiTarget) {
+      activeAiTarget.btn.disabled = false;
+      activeAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+      activeAiTarget = null;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-paste"></i> Tempel gambar (Ctrl+V)';
+    activeAiTarget = { docId, btn };
+    
+    const timeout = setTimeout(() => {
+      if (activeAiTarget && activeAiTarget.btn === btn) {
         activeAiTarget.btn.disabled = false;
         activeAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
         activeAiTarget = null;
+        toast('Waktu habis, silakan klik AI lagi', 'info');
       }
-      
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-paste"></i> Tempel gambar (Ctrl+V)';
-      activeAiTarget = { docId, btn };
-      
-      // Timeout 30 detik
-      const timeout = setTimeout(() => {
+    }, 30000);
+    
+    function outsideClickHandler(ev) {
+      if (!btn.contains(ev.target)) {
+        clearTimeout(timeout);
         if (activeAiTarget && activeAiTarget.btn === btn) {
           activeAiTarget.btn.disabled = false;
           activeAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
           activeAiTarget = null;
-          toast('Waktu habis, silakan klik AI lagi', 'info');
         }
-      }, 30000);
-      
-      // Klik di luar untuk membatalkan
-      function outsideClickHandler(ev) {
-        if (!btn.contains(ev.target)) {
-          clearTimeout(timeout);
-          if (activeAiTarget && activeAiTarget.btn === btn) {
-            activeAiTarget.btn.disabled = false;
-            activeAiTarget.btn.innerHTML = '<i class="fas fa-robot"></i> AI';
-            activeAiTarget = null;
-          }
-          document.removeEventListener('click', outsideClickHandler);
-        }
-      }
-      setTimeout(() => document.addEventListener('click', outsideClickHandler), 100);
-    }
-
-    // Event listener global untuk paste gambar ke AI target
-    document.addEventListener('paste', async function(e) {
-      if (!activeAiTarget) return;
-      const items = e.clipboardData?.items;
-      if (!items) return;
-      
-      for (let item of items) {
-        if (item.type.startsWith('image/')) {
-          e.preventDefault();
-          const blob = item.getAsFile();
-          await processAiImage(blob);
-          break;
-        }
-      }
-    });
-
-    async function processAiImage(blob) {
-      const target = activeAiTarget;
-      if (!target) return;
-      activeAiTarget = null;
-      
-      const { docId, btn } = target;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      btn.disabled = true;
-      
-      try {
-        const base64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(',')[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        
-        const { brand, livery } = await analyzeCarImage(base64);
-        
-        await updateDoc(doc(db, "carStock", docId), { brand, livery });
-        toast(`✅ Merek: ${brand} | Livery: ${livery}`, 'ok');
-      } catch (err) {
-        toast('Gagal analisis: ' + err.message, 'err');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+        document.removeEventListener('click', outsideClickHandler);
       }
     }
+    setTimeout(() => document.addEventListener('click', outsideClickHandler), 100);
+  }
 
-    // ---------- CRUD ----------
-    window.addStock = async function() {
-      const url = document.getElementById('addUrl').value.trim();
-      const price = document.getElementById('addPrice').value.trim();
-      const desc = document.getElementById('addDesc').value.trim();
-      const msg = document.getElementById('addMsg');
-      const btn = document.getElementById('addBtn');
-
-      msg.className = 'form-msg';
-      msg.style.display = 'none';
-      if (!url || !price || !desc) {
-        msg.className = 'form-msg err show';
-        msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Semua field wajib diisi.';
-        return;
+  document.addEventListener('paste', async function(e) {
+    if (!activeAiTarget) return;
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const blob = item.getAsFile();
+        await processAiImage(blob);
+        break;
       }
-      if (!window.getIgCode(url)) {
-        msg.className = 'form-msg err show';
-        msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Link Instagram tidak valid.';
-        return;
-      }
+    }
+  });
 
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-      
-      let brand = "Tidak diketahui";
-      let livery = "Tidak diketahui";
-      
-      // Analisis gambar jika ada
-      if (currentImageBase64) {
-        try {
-          const result = await analyzeCarImage(currentImageBase64);
-          brand = result.brand;
-          livery = result.livery;
-        } catch (err) {
-          console.warn("Analisis gambar gagal:", err);
-          toast('Analisis gambar gagal: ' + err.message, 'err');
-        }
-      } else {
-        toast('Tidak ada gambar, tag akan diisi "Tidak diketahui"', 'info');
-      }
+  async function processAiImage(blob) {
+    const target = activeAiTarget;
+    if (!target) return;
+    activeAiTarget = null;
+    const { docId, btn } = target;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
+    try {
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      const { brand, livery } = await analyzeCarImage(base64);
+      await updateDoc(doc(db, "carStock", docId), { brand, livery });
+      toast(`✅ Merek: ${brand} | Livery: ${livery}`, 'ok');
+    } catch (err) {
+      toast('Gagal analisis: ' + err.message, 'err');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-robot"></i> AI';
+    }
+  }
 
-      try {
-        await addDoc(collection(db, "carStock"), {
-          url, price, desc,
-          addedAt: Date.now(),
-          status: "available",
-          soldAt: null,
-          editedPrice: "",
-          brand,
-          livery
-        });
-        msg.className = 'form-msg ok show';
-        msg.innerHTML = `<i class="fas fa-check-circle"></i> Stock berhasil ditambahkan!<br><small>🚗 ${brand} | 🎨 ${livery}</small>`;
-        document.getElementById('addUrl').value = '';
-        document.getElementById('addPrice').value = '';
-        document.getElementById('addDesc').value = '';
-        document.getElementById('pasteArea').innerHTML = '<p><i class="fas fa-paste"></i> Klik area ini lalu tekan <strong>Ctrl+V</strong> untuk paste gambar screenshot.<br>Atau klik untuk memilih file.</p>';
-        currentImageBase64 = null;
-        currentPage = 1;
-        setTimeout(() => { msg.style.display = 'none'; }, 5000);
-      } catch (err) {
-        msg.className = 'form-msg err show';
-        msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Gagal: ' + err.message;
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-plus"></i> Tambah Stock';
-      }
-    };
+  // ---------- EDIT TAG (BRAND & LIVERY) ----------
+  function startEditTag(docId) {
+    editTagIdx = docId;
+    const post = POSTS.find(p => p.id === docId);
+    if (!post) return;
+    // Buat panel edit tag (gunakan editCard yang sudah ada, atau buat baru)
+    // Saya akan gunakan elemen terpisah: editTagCard
+    let card = document.getElementById('editTagCard');
+    if (!card) {
+      // Buat card jika belum ada
+      card = document.createElement('div');
+      card.id = 'editTagCard';
+      card.className = 'edit-card';
+      card.style.display = 'none';
+      card.innerHTML = `
+        <h4><i class="fas fa-tags"></i> Edit Brand & Livery</h4>
+        <div class="fr"><label>Merek</label><input type="text" id="editBrand" placeholder="Toyota, Honda, dll"></div>
+        <div class="fr"><label>Livery / Styling</label><input type="text" id="editLivery" placeholder="Sport, Anime, Racing, dll"></div>
+        <div class="ea">
+          <button class="btn-save" id="saveTagBtn"><i class="fas fa-check"></i> Simpan</button>
+          <button class="btn-cancel" id="cancelTagBtn"><i class="fas fa-xmark"></i> Batal</button>
+        </div>
+      `;
+      // Sisipkan setelah editCard yang sudah ada
+      const editCard = document.getElementById('editCard');
+      editCard.parentNode.insertBefore(card, editCard.nextSibling);
+      // Event listeners
+      document.getElementById('saveTagBtn').addEventListener('click', saveTags);
+      document.getElementById('cancelTagBtn').addEventListener('click', cancelTagEdit);
+      document.getElementById('editBrand').addEventListener('keydown', function(e) { if (e.key === 'Enter') saveTags(); });
+      document.getElementById('editLivery').addEventListener('keydown', function(e) { if (e.key === 'Enter') saveTags(); });
+    }
+    // Isi data
+    document.getElementById('editBrand').value = post.brand || '';
+    document.getElementById('editLivery').value = post.livery || '';
+    card.style.display = '';
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('editBrand').focus();
+  }
 
-    function startEdit(docId) {
-      editIdx = docId;
-      const post = POSTS.find(p => p.id === docId);
-      if (!post) return;
-      const price = getEP(post);
-      document.getElementById('editCard').style.display = '';
-      document.getElementById('editName').value = firstLine(post.desc);
-      document.getElementById('editOld').value = price;
-      document.getElementById('editNew').value = '';
-      document.getElementById('editNew').placeholder = price;
-      setTimeout(() => document.getElementById('editNew').focus(), 100);
-      document.getElementById('editCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  window.saveTags = async function() {
+    const brand = document.getElementById('editBrand').value.trim();
+    const livery = document.getElementById('editLivery').value.trim();
+    if (!editTagIdx) return;
+    try {
+      await updateDoc(doc(db, "carStock", editTagIdx), { brand, livery });
+      editTagIdx = null;
+      document.getElementById('editTagCard').style.display = 'none';
+      toast('Tag berhasil diupdate!', 'ok');
+    } catch (err) {
+      toast('Gagal update tag: ' + err.message, 'err');
+    }
+  };
+
+  window.cancelTagEdit = function() {
+    editTagIdx = null;
+    const card = document.getElementById('editTagCard');
+    if (card) card.style.display = 'none';
+  };
+
+  // ---------- CRUD ----------
+  window.addStock = async function() {
+    const url = document.getElementById('addUrl').value.trim();
+    const price = document.getElementById('addPrice').value.trim();
+    const desc = document.getElementById('addDesc').value.trim();
+    const msg = document.getElementById('addMsg');
+    const btn = document.getElementById('addBtn');
+
+    msg.className = 'form-msg';
+    msg.style.display = 'none';
+    if (!url || !price || !desc) {
+      msg.className = 'form-msg err show';
+      msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Semua field wajib diisi.';
+      return;
+    }
+    if (!window.getIgCode(url)) {
+      msg.className = 'form-msg err show';
+      msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Link Instagram tidak valid.';
+      return;
     }
 
-    window.savePrice = async function() {
-      const v = document.getElementById('editNew').value.trim();
-      if (!v) {
-        document.getElementById('editNew').style.borderColor = '#f87171';
-        setTimeout(() => { document.getElementById('editNew').style.borderColor = ''; }, 1500);
-        return;
-      }
-      if (!editIdx) return;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+    
+    let brand = "Tidak diketahui";
+    let livery = "Tidak diketahui";
+    
+    if (currentImageBase64) {
       try {
-        await updateDoc(doc(db, "carStock", editIdx), { editedPrice: v });
-        editIdx = null;
-        document.getElementById('editCard').style.display = 'none';
-        toast('Harga berhasil diubah', 'ok');
+        const result = await analyzeCarImage(currentImageBase64);
+        brand = result.brand;
+        livery = result.livery;
       } catch (err) {
-        toast('Gagal mengubah harga', 'err');
+        console.warn("Analisis gambar gagal:", err);
+        toast('Analisis gambar gagal: ' + err.message, 'err');
       }
-    };
+    } else {
+      toast('Tidak ada gambar, tag akan diisi "Tidak diketahui"', 'info');
+    }
 
-    window.cancelPrice = function() {
+    try {
+      await addDoc(collection(db, "carStock"), {
+        url, price, desc,
+        addedAt: Date.now(),
+        status: "available",
+        soldAt: null,
+        editedPrice: "",
+        brand,
+        livery
+      });
+      msg.className = 'form-msg ok show';
+      msg.innerHTML = `<i class="fas fa-check-circle"></i> Stock berhasil ditambahkan!<br><small>🚗 ${brand} | 🎨 ${livery}</small>`;
+      document.getElementById('addUrl').value = '';
+      document.getElementById('addPrice').value = '';
+      document.getElementById('addDesc').value = '';
+      document.getElementById('pasteArea').innerHTML = '<p><i class="fas fa-paste"></i> Klik area ini lalu tekan <strong>Ctrl+V</strong> untuk paste gambar screenshot.<br>Atau klik untuk memilih file.</p>';
+      currentImageBase64 = null;
+      currentPage = 1;
+      setTimeout(() => { msg.style.display = 'none'; }, 5000);
+    } catch (err) {
+      msg.className = 'form-msg err show';
+      msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Gagal: ' + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-plus"></i> Tambah Stock';
+    }
+  };
+
+  function startEdit(docId) {
+    editIdx = docId;
+    const post = POSTS.find(p => p.id === docId);
+    if (!post) return;
+    const price = getEP(post);
+    document.getElementById('editCard').style.display = '';
+    document.getElementById('editName').value = firstLine(post.desc);
+    document.getElementById('editOld').value = price;
+    document.getElementById('editNew').value = '';
+    document.getElementById('editNew').placeholder = price;
+    setTimeout(() => document.getElementById('editNew').focus(), 100);
+    document.getElementById('editCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  window.savePrice = async function() {
+    const v = document.getElementById('editNew').value.trim();
+    if (!v) {
+      document.getElementById('editNew').style.borderColor = '#f87171';
+      setTimeout(() => { document.getElementById('editNew').style.borderColor = ''; }, 1500);
+      return;
+    }
+    if (!editIdx) return;
+    try {
+      await updateDoc(doc(db, "carStock", editIdx), { editedPrice: v });
       editIdx = null;
       document.getElementById('editCard').style.display = 'none';
-      document.getElementById('editNew').style.borderColor = '';
-    };
-
-    async function toggleSold(docId, sold) {
-      try {
-        if (sold) {
-          await updateDoc(doc(db, "carStock", docId), { status: 'sold', soldAt: Date.now() });
-          toast('Ditandai terjual', 'info');
-        } else {
-          await updateDoc(doc(db, "carStock", docId), { status: 'available', soldAt: null });
-          toast('Dibatalkan dari terjual', 'ok');
-        }
-      } catch (err) {
-        toast('Gagal: ' + err.message, 'err');
-      }
+      toast('Harga berhasil diubah', 'ok');
+    } catch (err) {
+      toast('Gagal mengubah harga', 'err');
     }
+  };
 
-    async function deletePost(docId) {
-      try {
-        await updateDoc(doc(db, "carStock", docId), { status: 'deleted', soldAt: null });
-        toast('Stock dihapus', 'err');
-      } catch (err) {
-        toast('Gagal: ' + err.message, 'err');
+  window.cancelPrice = function() {
+    editIdx = null;
+    document.getElementById('editCard').style.display = 'none';
+    document.getElementById('editNew').style.borderColor = '';
+  };
+
+  async function toggleSold(docId, sold) {
+    try {
+      if (sold) {
+        await updateDoc(doc(db, "carStock", docId), { status: 'sold', soldAt: Date.now() });
+        toast('Ditandai terjual', 'info');
+      } else {
+        await updateDoc(doc(db, "carStock", docId), { status: 'available', soldAt: null });
+        toast('Dibatalkan dari terjual', 'ok');
       }
+    } catch (err) {
+      toast('Gagal: ' + err.message, 'err');
     }
+  }
 
-    async function restorePost(docId) {
-      try {
-        await updateDoc(doc(db, "carStock", docId), { status: 'available' });
-        toast('Stock dipulihkan', 'ok');
-      } catch (err) {
-        toast('Gagal: ' + err.message, 'err');
-      }
+  async function deletePost(docId) {
+    try {
+      await updateDoc(doc(db, "carStock", docId), { status: 'deleted', soldAt: null });
+      toast('Stock dihapus', 'err');
+    } catch (err) {
+      toast('Gagal: ' + err.message, 'err');
     }
+  }
 
-    // ---------- RESIZE ----------
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function() { currentPage = 1; renderStock(); }, 300);
-    });
+  async function restorePost(docId) {
+    try {
+      await updateDoc(doc(db, "carStock", docId), { status: 'available' });
+      toast('Stock dipulihkan', 'ok');
+    } catch (err) {
+      toast('Gagal: ' + err.message, 'err');
+    }
+  }
 
-    // ---------- FIRESTORE LISTENER ----------
-    onSnapshot(
-      query(collection(db, "carStock"), orderBy("addedAt", "desc")),
-      (snap) => {
-        POSTS = [];
-        snap.forEach((d) => POSTS.push({ id: d.id, ...d.data() }));
-        console.log("📦 Data dari Firebase:", POSTS.length, "item");
-        // Auto-delete expired sold items
-        const now = Date.now();
-        POSTS.forEach(p => {
-          if (p.status === 'sold' && p.soldAt) {
-            if (now - toMs(p.soldAt) > SOLD_HOURS * 3600000) {
-              updateDoc(doc(db, "carStock", p.id), { status: 'deleted', soldAt: null }).catch(() => {});
-            }
+  // ---------- RESIZE ----------
+  let resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() { currentPage = 1; renderStock(); }, 300);
+  });
+
+  // ---------- FIRESTORE LISTENER ----------
+  onSnapshot(
+    query(collection(db, "carStock"), orderBy("addedAt", "desc")),
+    (snap) => {
+      POSTS = [];
+      snap.forEach((d) => POSTS.push({ id: d.id, ...d.data() }));
+      console.log("📦 Data dari Firebase:", POSTS.length, "item");
+      const now = Date.now();
+      POSTS.forEach(p => {
+        if (p.status === 'sold' && p.soldAt) {
+          if (now - toMs(p.soldAt) > SOLD_HOURS * 3600000) {
+            updateDoc(doc(db, "carStock", p.id), { status: 'deleted', soldAt: null }).catch(() => {});
           }
-        });
-        renderStock();
-        startSoldTimer();
-      },
-      (err) => {
-        console.error("Stock listener error:", err);
-        toast('Gagal memuat data dari Firebase', 'err');
-      }
-    );
+        }
+      });
+      renderStock();
+      startSoldTimer();
+    },
+    (err) => {
+      console.error("Stock listener error:", err);
+      toast('Gagal memuat data dari Firebase', 'err');
+    }
+  );
 
-    console.log("✅ Module stock siap.");
-  </script>
+  console.log("✅ Module stock siap.");
+</script>
 
   <!-- ========================================================= -->
   <!-- MODULE 2 : SECRET CAR                                      -->
