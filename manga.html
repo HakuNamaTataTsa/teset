@@ -13,7 +13,7 @@
 
   <style>
     /* ============================================================
-       ROOT VARIABLES & DARK THEME
+       ROOT VARIABLES
        ============================================================ */
     :root {
       --bg-primary: #0f0f0f;
@@ -21,7 +21,6 @@
       --bg-card: #1f1f1f;
       --bg-card-hover: #2a2a2a;
       --bg-glass: rgba(31, 31, 31, 0.7);
-      --bg-glass-light: rgba(31, 31, 31, 0.4);
       --fg-primary: #f0f0f0;
       --fg-secondary: #a0a0a0;
       --fg-muted: #6b6b6b;
@@ -36,16 +35,15 @@
       --font: 'Inter', sans-serif;
       --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       --navbar-height: 68px;
+      --card-width: 170px;
     }
 
-    /* Light Theme */
     body.light-theme {
       --bg-primary: #f5f5f8;
       --bg-secondary: #ffffff;
       --bg-card: #ffffff;
       --bg-card-hover: #f0f0f5;
       --bg-glass: rgba(255, 255, 255, 0.7);
-      --bg-glass-light: rgba(255, 255, 255, 0.4);
       --fg-primary: #121212;
       --fg-secondary: #555555;
       --fg-muted: #888888;
@@ -53,21 +51,14 @@
       --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     }
 
-    /* ============================================================
-       RESET & BASE
-       ============================================================ */
-    *,
-    *::before,
-    *::after {
+    * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     html {
       scroll-behavior: smooth;
     }
-
     body {
       font-family: var(--font);
       background: var(--bg-primary);
@@ -77,17 +68,14 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-
     a {
       text-decoration: none;
       color: inherit;
     }
-
     img {
       display: block;
       max-width: 100%;
     }
-
     button {
       cursor: pointer;
       font-family: var(--font);
@@ -96,7 +84,6 @@
       color: inherit;
     }
 
-    /* Scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -110,92 +97,7 @@
     }
 
     /* ============================================================
-       UTILITY
-       ============================================================ */
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    .section-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .section-title .accent-line {
-      flex: 1;
-      height: 2px;
-      background: linear-gradient(to right, var(--accent), transparent);
-      margin-left: 0.5rem;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 0.15rem 0.6rem;
-      border-radius: 20px;
-      font-size: 0.6rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-    .badge-ongoing {
-      background: rgba(239, 68, 68, 0.2);
-      color: #ef4444;
-    }
-    .badge-completed {
-      background: rgba(34, 197, 94, 0.2);
-      color: #22c55e;
-    }
-    .badge-hiatus {
-      background: rgba(234, 179, 8, 0.2);
-      color: #eab308;
-    }
-    .badge-rating {
-      background: rgba(59, 130, 246, 0.15);
-      color: var(--accent);
-    }
-
-    .rating-star {
-      color: #f59e0b;
-      font-size: 0.7rem;
-    }
-
-    /* Skeleton loading */
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: var(--radius-sm);
-    }
-    @keyframes shimmer {
-      0% {
-        background-position: -200% 0;
-      }
-      100% {
-        background-position: 200% 0;
-      }
-    }
-
-    /* Glassmorphism */
-    .glass {
-      background: var(--bg-glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-color);
-    }
-    .glass-light {
-      background: var(--bg-glass-light);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid var(--border-color);
-    }
-
-    /* ============================================================
-       NAVBAR (sama dengan home)
+       NAVBAR
        ============================================================ */
     .navbar {
       position: fixed;
@@ -214,7 +116,6 @@
       background: var(--bg-glass);
       box-shadow: var(--shadow);
     }
-
     .navbar-inner {
       display: flex;
       align-items: center;
@@ -225,8 +126,6 @@
       padding: 0 20px;
       gap: 1rem;
     }
-
-    /* Logo */
     .navbar .logo {
       display: flex;
       align-items: center;
@@ -244,7 +143,6 @@
       color: var(--accent);
     }
 
-    /* Menu tengah */
     .nav-menu {
       display: flex;
       align-items: center;
@@ -273,14 +171,12 @@
       background: var(--accent-dim);
     }
 
-    /* Kanan: Search, Theme, Login */
     .nav-actions {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       flex-shrink: 0;
     }
-
     .nav-actions .search-toggle {
       display: flex;
       align-items: center;
@@ -338,7 +234,6 @@
       color: #fff;
     }
 
-    /* Hamburger */
     .hamburger {
       display: none;
       flex-direction: column;
@@ -366,7 +261,6 @@
       transform: rotate(-45deg) translate(4px, -4px);
     }
 
-    /* Mobile menu */
     .mobile-menu {
       display: none;
       position: fixed;
@@ -629,26 +523,46 @@
     }
 
     /* ============================================================
-       MANGA GRID
+       SECTION HEADER
        ============================================================ */
-    .manga-grid {
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .section-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-header h2 i {
+      color: var(--accent);
+    }
+    .section-header .view-all {
+      font-size: 0.8rem;
+      color: var(--fg-secondary);
+      transition: color var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .section-header .view-all:hover {
+      color: var(--accent);
+    }
+
+    /* ============================================================
+       SECTION SLIDER (horizontal scroll di mobile)
+       ============================================================ */
+    .section-slider {
       display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
       gap: 1.2rem;
-    }
-    .manga-grid.cols-6 {
-      grid-template-columns: repeat(6, 1fr);
-    }
-    .manga-grid.cols-5 {
-      grid-template-columns: repeat(5, 1fr);
-    }
-    .manga-grid.cols-4 {
-      grid-template-columns: repeat(4, 1fr);
-    }
-    .manga-grid.cols-3 {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    .manga-grid.cols-2 {
-      grid-template-columns: repeat(2, 1fr);
+      padding-bottom: 0.5rem;
     }
 
     .manga-card {
@@ -658,6 +572,8 @@
       transition: all var(--transition);
       border: 1px solid var(--border-color);
       position: relative;
+      cursor: pointer;
+      width: 100%;
     }
     .manga-card:hover {
       transform: translateY(-6px);
@@ -715,7 +631,6 @@
       justify-content: center;
       box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3);
     }
-
     .manga-card .read-btn {
       position: absolute;
       bottom: 0;
@@ -737,6 +652,28 @@
     .manga-card:hover .read-btn {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    .badge-ongoing {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+    .badge-completed {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+    .badge-hiatus {
+      background: rgba(234, 179, 8, 0.2);
+      color: #eab308;
+    }
+    .badge-rating {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent);
+    }
+    .badge-origin {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--fg-secondary);
     }
 
     /* ============================================================
@@ -921,7 +858,6 @@
         transform: translateY(0);
       }
     }
-
     @keyframes slideUp {
       from {
         opacity: 0;
@@ -932,13 +868,12 @@
         transform: translateY(0);
       }
     }
-
     .animate-slide-up {
       animation: slideUp 0.5s ease forwards;
     }
 
     /* ============================================================
-       TOAST NOTIFICATION
+       TOAST
        ============================================================ */
     .toast-container {
       position: fixed;
@@ -977,14 +912,13 @@
     }
 
     /* ============================================================
-       FOOTER (sama dengan home webmu)
+       FOOTER
        ============================================================ */
     .footer {
       padding: 3rem 1.5rem 1.5rem;
       border-top: 1px solid var(--border-color);
       margin-top: 3rem;
     }
-
     .footer-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -993,34 +927,28 @@
       margin: 0 auto 2rem;
       text-align: left;
     }
-
     .footer-grid h4 {
       font-size: 0.85rem;
       color: var(--fg-primary);
       margin-bottom: 0.8rem;
     }
-
     .footer-grid p,
     .footer-grid a {
       font-size: 0.8rem;
       color: var(--fg-secondary);
       line-height: 1.8;
     }
-
     .footer-grid a {
       display: block;
       transition: color 0.2s;
     }
-
     .footer-grid a:hover {
       color: var(--accent);
     }
-
     .footer-grid .brand-footer {
       font-weight: 600;
       color: var(--accent);
     }
-
     .footer-bottom {
       max-width: 1000px;
       margin: 0 auto;
@@ -1032,147 +960,29 @@
     }
 
     /* ============================================================
-       RESPONSIVE
-       ============================================================ */
-    @media (max-width: 1200px) {
-      .manga-grid.cols-6 {
-        grid-template-columns: repeat(5, 1fr);
-      }
-      .layout-two-col {
-        grid-template-columns: 1fr 260px;
-      }
-    }
-
-    @media (max-width: 1024px) {
-      .manga-grid.cols-6 {
-        grid-template-columns: repeat(4, 1fr);
-      }
-      .manga-grid.cols-5 {
-        grid-template-columns: repeat(4, 1fr);
-      }
-      .layout-two-col {
-        grid-template-columns: 1fr;
-      }
-      .sidebar {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-      }
-    }
-
-    @media (max-width: 768px) {
-      :root {
-        --navbar-height: 60px;
-      }
-
-      .nav-menu {
-        display: none;
-      }
-      .hamburger {
-        display: flex;
-      }
-
-      .nav-actions .search-toggle span {
-        display: none;
-      }
-      .nav-actions .login-btn span {
-        display: none;
-      }
-
-      .hero-slider {
-        height: 320px;
-      }
-      .hero-slider .slide {
-        padding: 1.5rem;
-      }
-      .hero-slider .slide .content h2 {
-        font-size: 1.5rem;
-      }
-      .hero-slider .slide .content .sinopsis {
-        font-size: 0.8rem;
-        -webkit-line-clamp: 2;
-      }
-
-      .manga-grid.cols-6,
-      .manga-grid.cols-5,
-      .manga-grid.cols-4 {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .sidebar {
-        grid-template-columns: 1fr;
-      }
-
-      .latest-item .thumb {
-        flex: 0 0 60px;
-        width: 60px;
-        height: 84px;
-      }
-      .latest-item .detail h4 {
-        font-size: 0.8rem;
-      }
-
-      .footer-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-        text-align: center;
-      }
-
-      .footer-grid h4 {
-        text-align: center;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .manga-grid.cols-6,
-      .manga-grid.cols-5,
-      .manga-grid.cols-4 {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .hero-slider {
-        height: 260px;
-      }
-      .hero-slider .slide .content h2 {
-        font-size: 1.2rem;
-      }
-      .hero-slider .slide .content .meta {
-        font-size: 0.65rem;
-      }
-      .hero-slider .slide .content .actions .btn-read,
-      .hero-slider .slide .content .actions .btn-bookmark {
-        font-size: 0.7rem;
-        padding: 0.3rem 1rem;
-      }
-
-      .genre-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    /* ============================================================
-       SKELETON PLACEHOLDER
+       SKELETON
        ============================================================ */
     .skeleton-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
       gap: 1.2rem;
     }
-    .skeleton-grid .skeleton-card {
+    .skeleton-card {
       background: var(--bg-card);
       border-radius: var(--radius);
       overflow: hidden;
       border: 1px solid var(--border-color);
     }
-    .skeleton-grid .skeleton-card .skeleton-img {
+    .skeleton-card .skeleton-img {
       aspect-ratio: 2/3;
       background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
     }
-    .skeleton-grid .skeleton-card .skeleton-text {
+    .skeleton-card .skeleton-text {
       padding: 0.6rem 0.7rem 0.8rem;
     }
-    .skeleton-grid .skeleton-card .skeleton-text .line {
+    .skeleton-card .skeleton-text .line {
       height: 12px;
       background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
       background-size: 200% 100%;
@@ -1180,28 +990,15 @@
       border-radius: 4px;
       margin-bottom: 0.3rem;
     }
-    .skeleton-grid .skeleton-card .skeleton-text .line.short {
+    .skeleton-card .skeleton-text .line.short {
       width: 60%;
     }
-
-    @media (max-width: 1200px) {
-      .skeleton-grid {
-        grid-template-columns: repeat(5, 1fr);
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
       }
-    }
-    @media (max-width: 1024px) {
-      .skeleton-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-    @media (max-width: 768px) {
-      .skeleton-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-    @media (max-width: 480px) {
-      .skeleton-grid {
-        grid-template-columns: repeat(2, 1fr);
+      100% {
+        background-position: 200% 0;
       }
     }
 
@@ -1236,22 +1033,166 @@
         transform: rotate(360deg);
       }
     }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1200px) {
+      .section-slider {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+      .layout-two-col {
+        grid-template-columns: 1fr 260px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .section-slider {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      .layout-two-col {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --navbar-height: 60px;
+        --card-width: 140px;
+      }
+
+      .nav-menu {
+        display: none;
+      }
+      .hamburger {
+        display: flex;
+      }
+      .nav-actions .search-toggle span {
+        display: none;
+      }
+      .nav-actions .login-btn span {
+        display: none;
+      }
+
+      .hero-slider {
+        height: 320px;
+      }
+      .hero-slider .slide {
+        padding: 1.5rem;
+      }
+      .hero-slider .slide .content h2 {
+        font-size: 1.5rem;
+      }
+      .hero-slider .slide .content .sinopsis {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 2;
+      }
+
+      /* 🔥 SECTION SLIDER DI MOBILE: horizontal scroll */
+      .section-slider {
+        display: flex;
+        gap: 0.8rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        /* grid di override jadi flex */
+      }
+      .section-slider .manga-card {
+        flex: 0 0 140px;
+        scroll-snap-align: start;
+        width: 140px;
+      }
+      .section-slider .manga-card .info h4 {
+        font-size: 0.75rem;
+      }
+      .section-slider .manga-card .info .meta {
+        font-size: 0.6rem;
+      }
+
+      .skeleton-grid {
+        display: flex;
+        gap: 0.8rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+      }
+      .skeleton-grid .skeleton-card {
+        flex: 0 0 140px;
+        scroll-snap-align: start;
+      }
+
+      .latest-item .thumb {
+        flex: 0 0 60px;
+        width: 60px;
+        height: 84px;
+      }
+      .latest-item .detail h4 {
+        font-size: 0.8rem;
+      }
+
+      .sidebar {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        text-align: center;
+      }
+      .footer-grid h4 {
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      :root {
+        --card-width: 120px;
+      }
+      .section-slider .manga-card {
+        flex: 0 0 120px;
+        width: 120px;
+      }
+      .skeleton-grid .skeleton-card {
+        flex: 0 0 120px;
+      }
+      .hero-slider {
+        height: 260px;
+      }
+      .hero-slider .slide .content h2 {
+        font-size: 1.2rem;
+      }
+      .hero-slider .slide .content .meta {
+        font-size: 0.65rem;
+      }
+      .hero-slider .slide .content .actions .btn-read,
+      .hero-slider .slide .content .actions .btn-bookmark {
+        font-size: 0.7rem;
+        padding: 0.3rem 1rem;
+      }
+      .genre-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
   </style>
 </head>
 <body>
 
   <!-- ============================================================
-  NAVBAR (sama dengan home)
+  NAVBAR
   ============================================================ -->
   <nav class="navbar" id="navbar">
     <div class="navbar-inner">
-      <!-- Logo -->
       <a href="index.html" class="logo">
         <i class="fas fa-store"></i>
         Akino<span>Store</span>
       </a>
-
-      <!-- Menu Tengah -->
       <ul class="nav-menu" id="navMenu">
         <li><a href="#hero" class="active">Home</a></li>
         <li><a href="#popular">Popular</a></li>
@@ -1261,23 +1202,14 @@
         <li><a href="#ongoing">Ongoing</a></li>
         <li><a href="#" id="bookmarkLink">Bookmark</a></li>
       </ul>
-
-      <!-- Kanan -->
       <div class="nav-actions">
         <button class="search-toggle" id="searchToggle">
           <i class="fas fa-search"></i>
           <span>Search...</span>
         </button>
-        <button class="theme-btn" id="themeToggle" title="Toggle theme">
-          <i class="fas fa-moon"></i>
-        </button>
-        <button class="login-btn" id="loginBtn">
-          <i class="fas fa-user"></i>
-          <span>Login</span>
-        </button>
-        <button class="hamburger" id="hamburger" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
+        <button class="theme-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+        <button class="login-btn" id="loginBtn"><i class="fas fa-user"></i><span>Login</span></button>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
@@ -1323,101 +1255,85 @@
 
         <!-- SECTION 1: TRENDING TODAY -->
         <section id="trending">
-          <div class="section-title">
-            🔥 Trending Today
-            <span class="accent-line"></span>
+          <div class="section-header">
+            <h2>🔥 Trending Today</h2>
+            <a href="browse.html?sort=rating" class="view-all">Lihat Lainnya <i class="fas fa-arrow-right"></i></a>
           </div>
-          <div class="manga-grid cols-6" id="trendingGrid"></div>
+          <div class="section-slider" id="trendingGrid"></div>
         </section>
 
         <!-- SECTION 2: LATEST UPDATE -->
         <section id="latest" style="margin-top: 2.5rem;">
-          <div class="section-title">
-            📰 Latest Update
-            <span class="accent-line"></span>
+          <div class="section-header">
+            <h2>📰 Latest Update</h2>
+            <a href="browse.html?sort=latestUploadedChapter" class="view-all">Lihat Lainnya <i class="fas fa-arrow-right"></i></a>
           </div>
           <div class="latest-list" id="latestList"></div>
         </section>
 
         <!-- SECTION 3: POPULAR THIS WEEK -->
         <section id="popular" style="margin-top: 2.5rem;">
-          <div class="section-title">
-            ⭐ Popular This Week
-            <span class="accent-line"></span>
+          <div class="section-header">
+            <h2>⭐ Popular This Week</h2>
+            <a href="browse.html?sort=followedCount" class="view-all">Lihat Lainnya <i class="fas fa-arrow-right"></i></a>
           </div>
-          <div class="manga-grid cols-5" id="popularGrid"></div>
+          <div class="section-slider" id="popularGrid"></div>
         </section>
 
         <!-- SECTION 4: COMPLETED -->
         <section id="completed" style="margin-top: 2.5rem;">
-          <div class="section-title">
-            ✅ Completed Manga
-            <span class="accent-line"></span>
+          <div class="section-header">
+            <h2>✅ Completed Manga</h2>
+            <a href="browse.html?status=completed" class="view-all">Lihat Lainnya <i class="fas fa-arrow-right"></i></a>
           </div>
-          <div class="manga-grid cols-4" id="completedGrid"></div>
+          <div class="section-slider" id="completedGrid"></div>
         </section>
 
         <!-- SECTION 5: ONGOING -->
         <section id="ongoing" style="margin-top: 2.5rem;">
-          <div class="section-title">
-            🔄 Ongoing Manga
-            <span class="accent-line"></span>
+          <div class="section-header">
+            <h2>🔄 Ongoing Manga</h2>
+            <a href="browse.html?status=ongoing" class="view-all">Lihat Lainnya <i class="fas fa-arrow-right"></i></a>
           </div>
-          <div class="manga-grid cols-4" id="ongoingGrid"></div>
+          <div class="section-slider" id="ongoingGrid"></div>
         </section>
 
         <!-- SECTION 6: MANGA (Japan) -->
         <section id="manga-origin" style="margin-top: 2.5rem;">
-          <div class="section-title">
-            <i class="fas fa-flag" style="color:var(--accent);"></i> 🇯🇵 Manga Terbaru
-            <span class="accent-line"></span>
+          <div class="section-header">
+            <h2><i class="fas fa-flag" style="color:var(--accent);"></i> 🇯🇵 Manga Terbaru</h2>
+            <a href="browse.html?origin=ja" class="view-all">Lihat Lainnya <i class="fas fa-arrow-right"></i></a>
           </div>
-          <div class="manga-grid cols-4" id="mangaOriginGrid"></div>
-          <div style="text-align:right; margin-top:0.5rem;">
-            <a href="browse.html?origin=ja" class="view-all" style="font-size:0.8rem; color:var(--fg-secondary); transition:color var(--transition);">
-              Lihat Lainnya <i class="fas fa-arrow-right"></i>
-            </a>
-          </div>
+          <div class="section-slider" id="mangaOriginGrid"></div>
         </section>
 
         <!-- SECTION 7: MANHWA (Korea) -->
         <section id="manhwa-origin" style="margin-top: 2.5rem;">
-          <div class="section-title">
-            <i class="fas fa-flag" style="color:var(--accent);"></i> 🇰🇷 Manhwa Terbaru
-            <span class="accent-line"></span>
+          <div class="section-header">
+            <h2><i class="fas fa-flag" style="color:var(--accent);"></i> 🇰🇷 Manhwa Terbaru</h2>
+            <a href="browse.html?origin=ko" class="view-all">Lihat Lainnya <i class="fas fa-arrow-right"></i></a>
           </div>
-          <div class="manga-grid cols-4" id="manhwaOriginGrid"></div>
-          <div style="text-align:right; margin-top:0.5rem;">
-            <a href="browse.html?origin=ko" class="view-all" style="font-size:0.8rem; color:var(--fg-secondary); transition:color var(--transition);">
-              Lihat Lainnya <i class="fas fa-arrow-right"></i>
-            </a>
-          </div>
+          <div class="section-slider" id="manhwaOriginGrid"></div>
         </section>
 
         <!-- SECTION 8: MANHUA (China) -->
         <section id="manhua-origin" style="margin-top: 2.5rem;">
-          <div class="section-title">
-            <i class="fas fa-flag" style="color:var(--accent);"></i> 🇨🇳 Manhua Terbaru
-            <span class="accent-line"></span>
+          <div class="section-header">
+            <h2><i class="fas fa-flag" style="color:var(--accent);"></i> 🇨🇳 Manhua Terbaru</h2>
+            <a href="browse.html?origin=zh" class="view-all">Lihat Lainnya <i class="fas fa-arrow-right"></i></a>
           </div>
-          <div class="manga-grid cols-4" id="manhuaOriginGrid"></div>
-          <div style="text-align:right; margin-top:0.5rem;">
-            <a href="browse.html?origin=zh" class="view-all" style="font-size:0.8rem; color:var(--fg-secondary); transition:color var(--transition);">
-              Lihat Lainnya <i class="fas fa-arrow-right"></i>
-            </a>
-          </div>
+          <div class="section-slider" id="manhuaOriginGrid"></div>
         </section>
 
         <!-- SECTION 9: GENRE -->
         <section id="genres" style="margin-top: 2.5rem;">
-          <div class="section-title">
-            🏷️ Genre
-            <span class="accent-line"></span>
+          <div class="section-header">
+            <h2>🏷️ Genre</h2>
           </div>
           <div class="genre-grid" id="genreGrid"></div>
         </section>
 
-        <!-- Infinite Scroll Trigger -->
+        <!-- Infinite Scroll Trigger (untuk trending) -->
         <div class="infinite-trigger" id="infiniteTrigger">
           <div class="spinner"></div>
           <span>Load more...</span>
@@ -1432,25 +1348,21 @@
           <h4><i class="fas fa-star"></i> Top Rating</h4>
           <div id="topRatingList"></div>
         </div>
-
         <!-- Most Viewed -->
         <div class="widget">
           <h4><i class="fas fa-eye"></i> Most Viewed</h4>
           <div id="mostViewedList"></div>
         </div>
-
         <!-- Newest -->
         <div class="widget">
           <h4><i class="fas fa-clock"></i> Newest</h4>
           <div id="newestList"></div>
         </div>
-
         <!-- Random -->
         <div class="widget">
           <h4><i class="fas fa-random"></i> Random</h4>
           <div id="randomList"></div>
         </div>
-
         <!-- Ad Placeholder -->
         <div class="widget" style="text-align:center; padding:2rem 1rem; background:var(--bg-card); border:1px dashed var(--border-color);">
           <i class="fas fa-ad" style="font-size:2rem; color:var(--fg-muted);"></i>
@@ -1467,7 +1379,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- ============================================================
-  FOOTER (sama dengan home webmu)
+  FOOTER
   ============================================================ -->
   <footer class="footer" aria-label="Footer">
     <div class="footer-grid">
@@ -1528,7 +1440,7 @@
     // ============================================================
     // DOM REFS
     // ============================================================
-    const $ = (id) => document.getElementById(id);
+    const $ = id => document.getElementById(id);
     const heroSlides = $('heroSlides');
     const heroDots = $('heroDots');
     const trendingGrid = $('trendingGrid');
@@ -1579,22 +1491,13 @@
     }
 
     function getStatusBadge(status) {
-      const map = {
-        'ongoing': 'badge-ongoing',
-        'completed': 'badge-completed',
-        'hiatus': 'badge-hiatus',
-        'cancelled': 'badge-hiatus',
-      };
+      const map = { 'ongoing': 'badge-ongoing', 'completed': 'badge-completed', 'hiatus': 'badge-hiatus',
+        'cancelled': 'badge-hiatus' };
       return map[status] || '';
     }
 
     function getStatusLabel(status) {
-      const map = {
-        'ongoing': 'Ongoing',
-        'completed': 'Completed',
-        'hiatus': 'Hiatus',
-        'cancelled': 'Cancelled',
-      };
+      const map = { 'ongoing': 'Ongoing', 'completed': 'Completed', 'hiatus': 'Hiatus', 'cancelled': 'Cancelled' };
       return map[status] || status || 'Unknown';
     }
 
@@ -1675,7 +1578,7 @@
     }
 
     // ============================================================
-    // FETCH MANGA LIST (dengan konversi originalLanguage)
+    // FETCH MANGA LIST
     // ============================================================
     async function fetchMangaList(params = {}, append = false) {
       if (state.isFetching) return;
@@ -1683,7 +1586,6 @@
 
       try {
         const finalParams = { ...params };
-        // Konversi originalLanguage ke array
         if (finalParams.originalLanguage) {
           finalParams['originalLanguage[]'] = [finalParams.originalLanguage];
           delete finalParams.originalLanguage;
@@ -1696,13 +1598,11 @@
           'contentRating[]': ['safe', 'suggestive', 'erotica'],
           'includes[]': ['cover_art', 'artist', 'author'],
         };
-        // Hanya tambahkan order jika tidak ada di params
         if (!finalParams.order) {
           defaultParams.order = { latestUploadedChapter: 'desc' };
         }
 
         const merged = { ...defaultParams, ...finalParams };
-        console.log('📦 Params:', merged);
         const data = await apiFetch('/manga', merged);
         const items = data.data || [];
         state.total = data.total || 0;
@@ -1727,11 +1627,12 @@
     }
 
     // ============================================================
-    // RENDER SKELETON
+    // RENDER SKELETON (untuk slider)
     // ============================================================
     function renderSkeleton(gridId, count = 12) {
       const grid = document.getElementById(gridId);
       if (!grid) return;
+      grid.className = 'skeleton-grid';
       grid.innerHTML = '';
       for (let i = 0; i < count; i++) {
         const div = document.createElement('div');
@@ -1748,15 +1649,16 @@
     }
 
     // ============================================================
-    // RENDER MANGA GRID
+    // RENDER MANGA SLIDER (horizontal scroll di mobile, grid di desktop)
     // ============================================================
-    function renderMangaGrid(gridId, items, showRank = false, cols = 6) {
+    function renderMangaSlider(gridId, items, showRank = false) {
       const grid = document.getElementById(gridId);
       if (!grid) return;
-      grid.className = `manga-grid cols-${cols}`;
+      grid.className = 'section-slider';
       grid.innerHTML = '';
       if (!items || items.length === 0) {
-        grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:var(--fg-secondary);padding:2rem 0;">No manga found.</p>`;
+        grid.innerHTML =
+          `<p style="grid-column:1/-1;text-align:center;color:var(--fg-secondary);padding:2rem 0;">No manga found.</p>`;
         return;
       }
       items.forEach((manga, idx) => {
@@ -1765,7 +1667,8 @@
         const status = manga.attributes.status || 'unknown';
         const rating = manga.attributes?.rating?.bayesianAverage || 0;
         const year = manga.attributes.year || '';
-        const coverSrc = cover || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
+        const coverSrc = cover ||
+          'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
 
         const card = document.createElement('div');
         card.className = 'manga-card';
@@ -1805,7 +1708,8 @@
       items.forEach(manga => {
         const title = getTitle(manga.attributes);
         const cover = getCoverUrl(manga);
-        const coverSrc = cover || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
+        const coverSrc = cover ||
+          'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
         const status = manga.attributes.status || 'unknown';
         const rating = manga.attributes?.rating?.bayesianAverage || 0;
         const latestChapter = manga.attributes?.latestUploadedChapter || 'N/A';
@@ -1892,7 +1796,8 @@
       items.slice(0, 5).forEach(manga => {
         const title = getTitle(manga.attributes);
         const cover = getCoverUrl(manga);
-        const coverSrc = cover || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
+        const coverSrc = cover ||
+          'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
         const div = document.createElement('div');
         div.className = 'item';
         div.innerHTML = `
@@ -1916,7 +1821,8 @@
       heroSlides.innerHTML = '';
       heroDots.innerHTML = '';
       if (!items || items.length === 0) {
-        heroSlides.innerHTML = `<div class="slide" style="background:var(--bg-card);"><div class="content"><h2>Welcome to Manga</h2><p>Loading popular manga...</p></div></div>`;
+        heroSlides.innerHTML =
+          `<div class="slide" style="background:var(--bg-card);"><div class="content"><h2>Welcome to Manga</h2><p>Loading popular manga...</p></div></div>`;
         return;
       }
 
@@ -2018,7 +1924,8 @@
         items.forEach(manga => {
           const title = getTitle(manga.attributes);
           const cover = getCoverUrl(manga);
-          const coverSrc = cover || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
+          const coverSrc = cover ||
+            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
           const div = document.createElement('div');
           div.className = 'result-item';
           div.innerHTML = `
@@ -2061,10 +1968,14 @@
       const items = await fetchMangaList({}, true);
       infiniteTrigger.classList.remove('loading');
       if (items && items.length > 0) {
-        renderMangaGrid('trendingGrid', state.mangaList, false, 6);
+        renderMangaSlider('trendingGrid', state.mangaList, false);
       }
       if (!state.hasMore) {
         infiniteTrigger.innerHTML = '<span>No more manga.</span>';
+        if (infiniteObserver) {
+          infiniteObserver.disconnect();
+          infiniteObserver = null;
+        }
       }
     }
 
@@ -2073,29 +1984,14 @@
     // ============================================================
     async function fetchOriginSections() {
       try {
-        // Manga (Japan)
-        const mangaData = await fetchMangaList({ 
-          originalLanguage: 'ja', 
-          limit: 8,
-          order: { latestUploadedChapter: 'desc' }
-        });
-        renderMangaGrid('mangaOriginGrid', mangaData, false, 4);
+        const mangaData = await fetchMangaList({ originalLanguage: 'ja', limit: 8, order: { latestUploadedChapter: 'desc' } });
+        renderMangaSlider('mangaOriginGrid', mangaData, false);
 
-        // Manhwa (Korea)
-        const manhwaData = await fetchMangaList({ 
-          originalLanguage: 'ko', 
-          limit: 8,
-          order: { latestUploadedChapter: 'desc' }
-        });
-        renderMangaGrid('manhwaOriginGrid', manhwaData, false, 4);
+        const manhwaData = await fetchMangaList({ originalLanguage: 'ko', limit: 8, order: { latestUploadedChapter: 'desc' } });
+        renderMangaSlider('manhwaOriginGrid', manhwaData, false);
 
-        // Manhua (China)
-        const manhuaData = await fetchMangaList({ 
-          originalLanguage: 'zh', 
-          limit: 8,
-          order: { latestUploadedChapter: 'desc' }
-        });
-        renderMangaGrid('manhuaOriginGrid', manhuaData, false, 4);
+        const manhuaData = await fetchMangaList({ originalLanguage: 'zh', limit: 8, order: { latestUploadedChapter: 'desc' } });
+        renderMangaSlider('manhuaOriginGrid', manhuaData, false);
       } catch (err) {
         console.error('fetchOriginSections error:', err);
         showToast('Gagal memuat section origin: ' + err.message, 'fa-exclamation-triangle');
@@ -2108,14 +2004,15 @@
     async function init() {
       console.log('🚀 Manga App Starting...');
 
-      // Skeleton
       renderSkeleton('trendingGrid', 12);
       renderSkeleton('mangaOriginGrid', 8);
       renderSkeleton('manhwaOriginGrid', 8);
       renderSkeleton('manhuaOriginGrid', 8);
+      renderSkeleton('popularGrid', 10);
+      renderSkeleton('completedGrid', 8);
+      renderSkeleton('ongoingGrid', 8);
 
       try {
-        // Fetch initial data
         const params = {
           limit: 24,
           offset: 0,
@@ -2131,7 +2028,6 @@
         state.offset = allItems.length;
         state.hasMore = allItems.length < state.total;
 
-        // Populate sections
         const shuffled = [...allItems].sort(() => Math.random() - 0.5);
         const trending = shuffled.slice(0, 12);
         const popular = shuffled.slice(0, 10);
@@ -2139,31 +2035,30 @@
         const ongoing = allItems.filter(m => m.attributes.status === 'ongoing').slice(0, 8);
         const latest = allItems.slice(0, 10);
 
-        // Hero slider (5 popular)
         const heroItems = allItems.slice(0, 5);
 
         renderHeroSlider(heroItems);
-        renderMangaGrid('trendingGrid', trending, false, 6);
+        renderMangaSlider('trendingGrid', trending, false);
         renderLatestList(latest);
-        renderMangaGrid('popularGrid', popular, true, 5);
-        renderMangaGrid('completedGrid', completed, false, 4);
-        renderMangaGrid('ongoingGrid', ongoing, false, 4);
+        renderMangaSlider('popularGrid', popular, true);
+        renderMangaSlider('completedGrid', completed, false);
+        renderMangaSlider('ongoingGrid', ongoing, false);
 
-        // Origin sections
         await fetchOriginSections();
 
-        // Genres
-        const genreNames = ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Romance', 'School', 'Slice of Life', 'Martial Arts', 'Magic', 'Supernatural', 'Isekai', 'Historical', 'Horror', 'Sci-Fi', 'Sports', 'Mecha', 'Psychological', 'Mystery'];
+        const genreNames = ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Romance', 'School', 'Slice of Life',
+          'Martial Arts', 'Magic', 'Supernatural', 'Isekai', 'Historical', 'Horror', 'Sci-Fi', 'Sports', 'Mecha',
+          'Psychological', 'Mystery'
+        ];
         renderGenreGrid(genreNames);
 
-        // Sidebar
         const randomItems = [...allItems].sort(() => Math.random() - 0.5);
-        renderSidebarWidget('topRatingList', allItems.sort((a, b) => (b.attributes?.rating?.bayesianAverage || 0) - (a.attributes?.rating?.bayesianAverage || 0)), 'Rating');
+        renderSidebarWidget('topRatingList', allItems.sort((a, b) => (b.attributes?.rating?.bayesianAverage || 0) - (a
+          .attributes?.rating?.bayesianAverage || 0)), 'Rating');
         renderSidebarWidget('mostViewedList', allItems, 'Views');
         renderSidebarWidget('newestList', allItems, 'New');
         renderSidebarWidget('randomList', randomItems, 'Random');
 
-        // Infinite scroll
         setupInfiniteScroll();
 
         console.log('✅ Initialization complete');
@@ -2177,7 +2072,6 @@
     // EVENT BINDINGS
     // ============================================================
 
-    // Theme toggle
     themeToggle.addEventListener('click', () => {
       document.body.classList.toggle('light-theme');
       const isLight = document.body.classList.contains('light-theme');
@@ -2186,19 +2080,16 @@
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
     });
 
-    // Load theme
     if (localStorage.getItem('theme') === 'light') {
       document.body.classList.add('light-theme');
       themeToggle.querySelector('i').className = 'fas fa-sun';
     }
 
-    // Hamburger
     hamburger.addEventListener('click', () => {
       hamburger.classList.toggle('active');
       mobileMenu.classList.toggle('open');
     });
 
-    // Close mobile menu on link click
     mobileMenu.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', () => {
         hamburger.classList.remove('active');
@@ -2206,7 +2097,6 @@
       });
     });
 
-    // Search
     searchToggle.addEventListener('click', () => {
       searchOverlay.classList.add('open');
       searchInput.focus();
@@ -2220,7 +2110,6 @@
     });
     searchInput.addEventListener('input', doSearch);
 
-    // Bookmark link
     document.querySelectorAll('#bookmarkLink, #bookmarkLinkMobile').forEach(el => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
@@ -2232,21 +2121,15 @@
       });
     });
 
-    // Navbar scroll effect
     window.addEventListener('scroll', () => {
       navbar.classList.toggle('scrolled', window.scrollY > 20);
     });
 
-    // Login button (dummy)
     loginBtn.addEventListener('click', () => {
       showToast('Login feature coming soon!', 'fa-info-circle');
     });
 
-    // ============================================================
-    // START APP
-    // ============================================================
     init();
-
     console.log('📚 Manga App Ready');
   </script>
 
