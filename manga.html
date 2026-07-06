@@ -195,7 +195,7 @@
     }
 
     /* ============================================================
-       NAVBAR
+       NAVBAR (sama dengan home)
        ============================================================ */
     .navbar {
       position: fixed;
@@ -909,220 +909,6 @@
     }
 
     /* ============================================================
-       DETAIL MANGA
-       ============================================================ */
-    .detail-page {
-      display: none;
-    }
-    .detail-page.open {
-      display: block;
-      animation: fadeIn 0.4s ease;
-    }
-    .detail-page .back {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.3rem 1rem;
-      border-radius: var(--radius-sm);
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      color: var(--fg-secondary);
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all var(--transition);
-      margin-bottom: 1rem;
-    }
-    .detail-page .back:hover {
-      border-color: var(--accent);
-      color: var(--fg-primary);
-    }
-
-    .detail-main {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-    .detail-main .cover-wrap {
-      flex: 0 0 220px;
-      max-width: 220px;
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-    }
-    .detail-main .cover-wrap img {
-      width: 100%;
-      display: block;
-    }
-    .detail-main .info-wrap {
-      flex: 1;
-      min-width: 240px;
-    }
-    .detail-main .info-wrap h2 {
-      font-size: 2rem;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 0.2rem;
-    }
-    .detail-main .info-wrap .alt-title {
-      font-size: 0.85rem;
-      color: var(--fg-secondary);
-      margin-bottom: 0.5rem;
-    }
-    .detail-main .info-wrap .detail-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem 1.5rem;
-      font-size: 0.8rem;
-      color: var(--fg-secondary);
-      margin-bottom: 0.5rem;
-    }
-    .detail-main .info-wrap .detail-meta strong {
-      color: var(--fg-primary);
-    }
-    .detail-main .info-wrap .desc {
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: var(--fg-secondary);
-      margin-top: 0.5rem;
-      max-height: 120px;
-      overflow-y: auto;
-    }
-    .detail-main .info-wrap .genre-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.6rem;
-    }
-    .detail-main .info-wrap .genre-tags .tag {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 0.1rem 0.7rem;
-      font-size: 0.65rem;
-      color: var(--fg-secondary);
-    }
-
-    .detail-chapters {
-      margin-top: 2rem;
-    }
-    .detail-chapters h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.8rem;
-    }
-    .detail-chapters .ch-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      max-height: 500px;
-      overflow-y: auto;
-    }
-    .detail-chapters .ch-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5rem 0.8rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      transition: all var(--transition);
-      cursor: pointer;
-    }
-    .detail-chapters .ch-item:hover {
-      border-color: var(--accent);
-      background: var(--bg-card-hover);
-    }
-    .detail-chapters .ch-item .ch-info {
-      display: flex;
-      gap: 0.8rem;
-      align-items: center;
-      font-size: 0.8rem;
-    }
-    .detail-chapters .ch-item .ch-info .ch-num {
-      font-weight: 600;
-    }
-    .detail-chapters .ch-item .ch-info .ch-meta {
-      color: var(--fg-secondary);
-      font-size: 0.7rem;
-    }
-    .detail-chapters .ch-item .ch-read {
-      padding: 0.2rem 0.8rem;
-      background: var(--accent);
-      border: none;
-      border-radius: var(--radius-sm);
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 600;
-      transition: all var(--transition);
-    }
-    .detail-chapters .ch-item .ch-read:hover {
-      background: var(--accent-hover);
-    }
-
-    /* ============================================================
-       READER
-       ============================================================ */
-    .reader-page {
-      display: none;
-      animation: fadeIn 0.4s ease;
-    }
-    .reader-page.open {
-      display: block;
-    }
-    .reader-nav {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.6rem;
-      padding: 0.8rem 0;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 1rem;
-    }
-    .reader-nav .reader-title {
-      font-weight: 700;
-      font-size: 1rem;
-    }
-    .reader-nav .reader-actions {
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-    }
-    .reader-nav .reader-actions button,
-    .reader-nav .reader-actions select {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 0.3rem 0.8rem;
-      font-size: 0.75rem;
-      color: var(--fg-primary);
-      transition: all var(--transition);
-      cursor: pointer;
-      font-family: var(--font);
-    }
-    .reader-nav .reader-actions button:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-    .reader-nav .reader-actions select {
-      min-width: 100px;
-    }
-
-    .reader-images {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .reader-images img {
-      max-width: 100%;
-      height: auto;
-      border-radius: var(--radius-sm);
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-    }
-
-    /* ============================================================
        ANIMATIONS
        ============================================================ */
     @keyframes fadeIn {
@@ -1188,6 +974,61 @@
         opacity: 1;
         transform: translateX(0);
       }
+    }
+
+    /* ============================================================
+       FOOTER (sama dengan home webmu)
+       ============================================================ */
+    .footer {
+      padding: 3rem 1.5rem 1.5rem;
+      border-top: 1px solid var(--border-color);
+      margin-top: 3rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 2rem;
+      max-width: 1000px;
+      margin: 0 auto 2rem;
+      text-align: left;
+    }
+
+    .footer-grid h4 {
+      font-size: 0.85rem;
+      color: var(--fg-primary);
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-grid p,
+    .footer-grid a {
+      font-size: 0.8rem;
+      color: var(--fg-secondary);
+      line-height: 1.8;
+    }
+
+    .footer-grid a {
+      display: block;
+      transition: color 0.2s;
+    }
+
+    .footer-grid a:hover {
+      color: var(--accent);
+    }
+
+    .footer-grid .brand-footer {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .footer-bottom {
+      max-width: 1000px;
+      margin: 0 auto;
+      border-top: 1px solid var(--border-color);
+      padding-top: 1.5rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--fg-muted);
     }
 
     /* ============================================================
@@ -1258,14 +1099,6 @@
         grid-template-columns: repeat(3, 1fr);
       }
 
-      .detail-main .cover-wrap {
-        flex: 0 0 140px;
-        max-width: 140px;
-      }
-      .detail-main .info-wrap h2 {
-        font-size: 1.4rem;
-      }
-
       .sidebar {
         grid-template-columns: 1fr;
       }
@@ -1277,6 +1110,16 @@
       }
       .latest-item .detail h4 {
         font-size: 0.8rem;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        text-align: center;
+      }
+
+      .footer-grid h4 {
+        text-align: center;
       }
     }
 
@@ -1303,12 +1146,6 @@
 
       .genre-grid {
         grid-template-columns: repeat(4, 1fr);
-      }
-
-      .detail-main .cover-wrap {
-        flex: 0 0 100%;
-        max-width: 180px;
-        margin: 0 auto;
       }
     }
 
@@ -1399,37 +1236,12 @@
         transform: rotate(360deg);
       }
     }
-
-    /* ============================================================
-       RIPPLE BUTTON
-       ============================================================ */
-    .ripple {
-      position: relative;
-      overflow: hidden;
-    }
-    .ripple::after {
-      content: '';
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      width: 100px;
-      height: 100px;
-      transform: scale(0);
-      animation: rippleAnim 0.6s ease-out;
-      pointer-events: none;
-    }
-    @keyframes rippleAnim {
-      to {
-        transform: scale(4);
-        opacity: 0;
-      }
-    }
   </style>
 </head>
 <body>
 
   <!-- ============================================================
-  NAVBAR
+  NAVBAR (sama dengan home)
   ============================================================ -->
   <nav class="navbar" id="navbar">
     <div class="navbar-inner">
@@ -1515,9 +1327,7 @@
             🔥 Trending Today
             <span class="accent-line"></span>
           </div>
-          <div class="manga-grid cols-6" id="trendingGrid">
-            <!-- Skeleton akan diisi JS -->
-          </div>
+          <div class="manga-grid cols-6" id="trendingGrid"></div>
         </section>
 
         <!-- SECTION 2: LATEST UPDATE -->
@@ -1556,7 +1366,49 @@
           <div class="manga-grid cols-4" id="ongoingGrid"></div>
         </section>
 
-        <!-- SECTION 6: GENRE -->
+        <!-- SECTION 6: MANGA (Japan) -->
+        <section id="manga-origin" style="margin-top: 2.5rem;">
+          <div class="section-title">
+            <i class="fas fa-flag" style="color:var(--accent);"></i> 🇯🇵 Manga Terbaru
+            <span class="accent-line"></span>
+          </div>
+          <div class="manga-grid cols-4" id="mangaOriginGrid"></div>
+          <div style="text-align:right; margin-top:0.5rem;">
+            <a href="browse.html?origin=ja" class="view-all" style="font-size:0.8rem; color:var(--fg-secondary); transition:color var(--transition);">
+              Lihat Lainnya <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </section>
+
+        <!-- SECTION 7: MANHWA (Korea) -->
+        <section id="manhwa-origin" style="margin-top: 2.5rem;">
+          <div class="section-title">
+            <i class="fas fa-flag" style="color:var(--accent);"></i> 🇰🇷 Manhwa Terbaru
+            <span class="accent-line"></span>
+          </div>
+          <div class="manga-grid cols-4" id="manhwaOriginGrid"></div>
+          <div style="text-align:right; margin-top:0.5rem;">
+            <a href="browse.html?origin=ko" class="view-all" style="font-size:0.8rem; color:var(--fg-secondary); transition:color var(--transition);">
+              Lihat Lainnya <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </section>
+
+        <!-- SECTION 8: MANHUA (China) -->
+        <section id="manhua-origin" style="margin-top: 2.5rem;">
+          <div class="section-title">
+            <i class="fas fa-flag" style="color:var(--accent);"></i> 🇨🇳 Manhua Terbaru
+            <span class="accent-line"></span>
+          </div>
+          <div class="manga-grid cols-4" id="manhuaOriginGrid"></div>
+          <div style="text-align:right; margin-top:0.5rem;">
+            <a href="browse.html?origin=zh" class="view-all" style="font-size:0.8rem; color:var(--fg-secondary); transition:color var(--transition);">
+              Lihat Lainnya <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </section>
+
+        <!-- SECTION 9: GENRE -->
         <section id="genres" style="margin-top: 2.5rem;">
           <div class="section-title">
             🏷️ Genre
@@ -1610,35 +1462,45 @@
   </div>
 
   <!-- ============================================================
-  DETAIL PAGE (hidden by default)
-  ============================================================ -->
-  <div class="container detail-page" id="detailPage">
-    <button class="back" id="detailBack"><i class="fas fa-arrow-left"></i> Back</button>
-    <div class="detail-main" id="detailMain"></div>
-    <div class="detail-chapters">
-      <h3>Chapters</h3>
-      <div class="ch-list" id="detailChapterList"></div>
-    </div>
-  </div>
-
-  <!-- ============================================================
-  READER PAGE (hidden by default)
-  ============================================================ -->
-  <div class="container reader-page" id="readerPage">
-    <div class="reader-nav">
-      <span class="reader-title" id="readerTitle">Reading...</span>
-      <div class="reader-actions">
-        <select id="readerChapterSelect"></select>
-        <button id="readerBack"><i class="fas fa-arrow-left"></i> Back</button>
-      </div>
-    </div>
-    <div class="reader-images" id="readerImages"></div>
-  </div>
-
-  <!-- ============================================================
   TOAST CONTAINER
   ============================================================ -->
   <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ============================================================
+  FOOTER (sama dengan home webmu)
+  ============================================================ -->
+  <footer class="footer" aria-label="Footer">
+    <div class="footer-grid">
+      <div>
+        <h4 class="brand-footer">Akino Store</h4>
+        <p>Jasa digital & game terpercaya sejak 2022. Solusi untuk kebutuhan game, sosial media, dan design Anda.</p>
+      </div>
+      <div>
+        <h4>Layanan</h4>
+        <a href="CarParkingMultiplayer.html">Car Parking</a>
+        <a href="SosialMedia.html">Sosial Media</a>
+        <a href="designedit.html">Design / Edit</a>
+      </div>
+      <div>
+        <h4>Tentang</h4>
+        <a href="about.html">About Us</a>
+        <a href="https://wa.me/6289687163314" target="_blank">Contact</a>
+        <a href="stockmobil.html">Stock Mobil</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="privacy.html">Kebijakan Privasi</a>
+        <a href="terms.html">Syarat &amp; Ketentuan</a>
+      </div>
+      <div>
+        <h4>Follow</h4>
+        <a href="https://www.tiktok.com/@akinolaset_" target="_blank">TikTok</a>
+        <a href="https://www.instagram.com/akinostore_" target="_blank">Instagram</a>
+        <a href="https://youtube.com/@akinolaset" target="_blank">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2022 Akino Store. All Rights Reserved.</div>
+  </footer>
 
   <!-- ============================================================
   SCRIPTS
@@ -1655,30 +1517,18 @@
     // ============================================================
     const state = {
       mangaList: [],
-      trending: [],
-      popular: [],
-      latest: [],
-      completed: [],
-      ongoing: [],
       total: 0,
       offset: 0,
       limit: 24,
-      currentManga: null,
-      currentChapters: [],
-      currentChapterIndex: 0,
       isFetching: false,
       hasMore: true,
       bookmarks: JSON.parse(localStorage.getItem('mangaBookmarks') || '[]'),
-      history: JSON.parse(localStorage.getItem('mangaHistory') || '[]'),
-      searchResults: [],
     };
 
     // ============================================================
     // DOM REFS
     // ============================================================
     const $ = (id) => document.getElementById(id);
-    const $$ = (sel) => document.querySelectorAll(sel);
-
     const heroSlides = $('heroSlides');
     const heroDots = $('heroDots');
     const trendingGrid = $('trendingGrid');
@@ -1686,21 +1536,15 @@
     const popularGrid = $('popularGrid');
     const completedGrid = $('completedGrid');
     const ongoingGrid = $('ongoingGrid');
+    const mangaOriginGrid = $('mangaOriginGrid');
+    const manhwaOriginGrid = $('manhwaOriginGrid');
+    const manhuaOriginGrid = $('manhuaOriginGrid');
     const genreGrid = $('genreGrid');
     const topRatingList = $('topRatingList');
     const mostViewedList = $('mostViewedList');
     const newestList = $('newestList');
     const randomList = $('randomList');
     const infiniteTrigger = $('infiniteTrigger');
-    const detailPage = $('detailPage');
-    const detailMain = $('detailMain');
-    const detailChapterList = $('detailChapterList');
-    const detailBack = $('detailBack');
-    const readerPage = $('readerPage');
-    const readerTitle = $('readerTitle');
-    const readerImages = $('readerImages');
-    const readerChapterSelect = $('readerChapterSelect');
-    const readerBack = $('readerBack');
     const searchOverlay = $('searchOverlay');
     const searchInput = $('searchInput');
     const searchResults = $('searchResults');
@@ -1772,10 +1616,6 @@
       return formatDate(dateStr);
     }
 
-    function getProxyUrl(originalUrl) {
-      return `${WORKER_URL}/proxy-image?url=${encodeURIComponent(originalUrl)}`;
-    }
-
     function showToast(message, icon = 'fa-check-circle') {
       const toast = document.createElement('div');
       toast.className = 'toast';
@@ -1835,22 +1675,34 @@
     }
 
     // ============================================================
-    // FETCH MANGA LIST (General)
+    // FETCH MANGA LIST (dengan konversi originalLanguage)
     // ============================================================
     async function fetchMangaList(params = {}, append = false) {
       if (state.isFetching) return;
       state.isFetching = true;
 
       try {
+        const finalParams = { ...params };
+        // Konversi originalLanguage ke array
+        if (finalParams.originalLanguage) {
+          finalParams['originalLanguage[]'] = [finalParams.originalLanguage];
+          delete finalParams.originalLanguage;
+        }
+
         const defaultParams = {
           limit: state.limit,
           offset: state.offset,
           'availableTranslatedLanguage[]': ['id'],
           'contentRating[]': ['safe', 'suggestive', 'erotica'],
           'includes[]': ['cover_art', 'artist', 'author'],
-          order: { latestUploadedChapter: 'desc' },
         };
-        const merged = { ...defaultParams, ...params };
+        // Hanya tambahkan order jika tidak ada di params
+        if (!finalParams.order) {
+          defaultParams.order = { latestUploadedChapter: 'desc' };
+        }
+
+        const merged = { ...defaultParams, ...finalParams };
+        console.log('📦 Params:', merged);
         const data = await apiFetch('/manga', merged);
         const items = data.data || [];
         state.total = data.total || 0;
@@ -1896,7 +1748,7 @@
     }
 
     // ============================================================
-    // RENDER MANGA GRID (reusable)
+    // RENDER MANGA GRID
     // ============================================================
     function renderMangaGrid(gridId, items, showRank = false, cols = 6) {
       const grid = document.getElementById(gridId);
@@ -1932,9 +1784,11 @@
         `;
         card.querySelector('.read-btn').addEventListener('click', (e) => {
           e.stopPropagation();
-          openDetail(manga.id);
+          window.location.href = `detail.html?id=${manga.id}`;
         });
-        card.addEventListener('click', () => openDetail(manga.id));
+        card.addEventListener('click', () => {
+          window.location.href = `detail.html?id=${manga.id}`;
+        });
         grid.appendChild(card);
       });
     }
@@ -1957,7 +1811,6 @@
         const latestChapter = manga.attributes?.latestUploadedChapter || 'N/A';
         const updatedAt = manga.attributes?.updatedAt || manga.attributes?.createdAt;
 
-        // Ambil chapter terbaru (dari relasi tidak tersedia, pakai dummy)
         const chapters = ['Chapter 245', 'Chapter 244', 'Chapter 243'];
 
         const item = document.createElement('div');
@@ -1979,7 +1832,9 @@
             <div class="update-time">${updatedAt ? timeAgo(updatedAt) : 'Recently'}</div>
           </div>
         `;
-        item.addEventListener('click', () => openDetail(manga.id));
+        item.addEventListener('click', () => {
+          window.location.href = `detail.html?id=${manga.id}`;
+        });
         latestList.appendChild(item);
       });
     }
@@ -2017,9 +1872,7 @@
         const icon = icons[name.toLowerCase()] || 'fa-tag';
         div.innerHTML = `<i class="fas ${icon}"></i><span>${name}</span>`;
         div.addEventListener('click', () => {
-          searchInput.value = name;
-          doSearch();
-          searchOverlay.classList.add('open');
+          window.location.href = `browse.html?genre=${encodeURIComponent(name)}`;
         });
         genreGrid.appendChild(div);
       });
@@ -2049,7 +1902,9 @@
             <div class="sub">${label || manga.attributes.status || ''}</div>
           </div>
         `;
-        div.addEventListener('click', () => openDetail(manga.id));
+        div.addEventListener('click', () => {
+          window.location.href = `detail.html?id=${manga.id}`;
+        });
         el.appendChild(div);
       });
     }
@@ -2098,7 +1953,7 @@
         `;
         slide.querySelector('.btn-read').addEventListener('click', (e) => {
           e.stopPropagation();
-          openDetail(manga.id);
+          window.location.href = `detail.html?id=${manga.id}`;
         });
         slide.querySelector('.btn-bookmark').addEventListener('click', (e) => {
           e.stopPropagation();
@@ -2107,7 +1962,6 @@
         });
         heroSlides.appendChild(slide);
 
-        // Dots
         const dot = document.createElement('span');
         dot.className = idx === 0 ? 'active' : '';
         dot.dataset.index = idx;
@@ -2176,7 +2030,7 @@
           `;
           div.addEventListener('click', () => {
             searchOverlay.classList.remove('open');
-            openDetail(manga.id);
+            window.location.href = `detail.html?id=${manga.id}`;
           });
           searchResults.appendChild(div);
         });
@@ -2187,178 +2041,7 @@
     }
 
     // ============================================================
-    // DETAIL
-    // ============================================================
-    async function openDetail(mangaId) {
-      try {
-        const data = await apiFetch(`/manga/${mangaId}`, {
-          'includes[]': ['cover_art', 'artist', 'author']
-        });
-        state.currentManga = data.data;
-        const feed = await apiFetch(`/manga/${mangaId}/feed`, {
-          'translatedLanguage[]': ['id'],
-          order: { chapter: 'desc' },
-          limit: 100,
-          'includes[]': ['scanlation_group'],
-        });
-        state.currentChapters = feed.data || [];
-        renderDetail();
-        // Simpan history
-        if (!state.history.includes(mangaId)) {
-          state.history.push(mangaId);
-          if (state.history.length > 50) state.history.shift();
-          localStorage.setItem('mangaHistory', JSON.stringify(state.history));
-        }
-        // Tampilkan detail
-        document.getElementById('mainContent').style.display = 'none';
-        detailPage.classList.add('open');
-        readerPage.classList.remove('open');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } catch (err) {
-        console.error('openDetail error:', err);
-        showToast('Failed to load detail: ' + err.message, 'fa-exclamation-triangle');
-      }
-    }
-
-    function renderDetail() {
-      const m = state.currentManga;
-      if (!m) return;
-      const attrs = m.attributes;
-      const title = getTitle(attrs);
-      const altTitles = attrs.altTitles?.map(t => t.en || t.id || '').filter(Boolean).join(', ') || '';
-      const desc = attrs.description?.en || attrs.description?.id || 'No description.';
-      const status = attrs.status || 'unknown';
-      const year = attrs.year || '';
-      const rating = attrs.rating?.bayesianAverage || 0;
-      const genres = (m.attributes.tags || []).filter(t => t.attributes?.group === 'genre');
-      const coverUrl = getCoverUrl(m);
-      const coverSrc = coverUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
-      const isBookmarked = state.bookmarks.includes(m.id);
-
-      detailMain.innerHTML = `
-        <div class="cover-wrap">
-          <img src="${coverSrc}" alt="${title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect width=%22200%22 height=%22300%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2214%22%3ENo%20Cover%3C/text%3E%3C/svg%3E'" />
-        </div>
-        <div class="info-wrap">
-          <h2>${title}</h2>
-          ${altTitles ? `<div class="alt-title">${altTitles}</div>` : ''}
-          <div class="detail-meta">
-            <span><strong>Status:</strong> ${getStatusLabel(status)}</span>
-            ${year ? `<span><strong>Year:</strong> ${year}</span>` : ''}
-            ${rating ? `<span><strong>Rating:</strong> ⭐ ${rating.toFixed(1)}</span>` : ''}
-            <span><strong>Bookmarks:</strong> ${state.bookmarks.length}</span>
-          </div>
-          <div class="genre-tags">
-            ${genres.map(g => `<span class="tag">${g.attributes.name.en || g.attributes.name.id || '?'}</span>`).join('')}
-          </div>
-          <div class="desc">${desc}</div>
-          <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
-            <button class="btn-read" style="padding:0.4rem 1.5rem;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;font-weight:600;font-size:0.85rem;" id="detailBookmarkBtn">
-              <i class="fas ${isBookmarked ? 'fa-bookmark' : 'fa-bookmark'}"></i> ${isBookmarked ? 'Saved' : 'Bookmark'}
-            </button>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('detailBookmarkBtn')?.addEventListener('click', () => {
-        toggleBookmark(m.id);
-        renderDetail();
-      });
-
-      // Chapters
-      const chapters = state.currentChapters;
-      detailChapterList.innerHTML = '';
-      if (!chapters.length) {
-        detailChapterList.innerHTML = '<p style="color:var(--fg-secondary);padding:0.5rem 0;">No chapters available in Indonesian.</p>';
-        return;
-      }
-      chapters.forEach((ch, idx) => {
-        const chAttrs = ch.attributes;
-        const chNum = chAttrs.chapter || '?';
-        const chTitle = chAttrs.title || `Chapter ${chNum}`;
-        const uploaded = chAttrs.publishAt || chAttrs.createdAt;
-        const group = ch.relationships.find(r => r.type === 'scanlation_group')?.attributes?.name || 'Unknown';
-        const div = document.createElement('div');
-        div.className = 'ch-item';
-        div.innerHTML = `
-          <div class="ch-info">
-            <span class="ch-num">${chTitle}</span>
-            <span class="ch-meta">${group} • ${formatDate(uploaded)}</span>
-          </div>
-          <button class="ch-read" data-index="${idx}">Read</button>
-        `;
-        div.querySelector('.ch-read').addEventListener('click', (e) => {
-          e.stopPropagation();
-          openReader(idx);
-        });
-        detailChapterList.appendChild(div);
-      });
-    }
-
-    // ============================================================
-    // READER
-    // ============================================================
-    async function openReader(chapterIndex) {
-      state.currentChapterIndex = chapterIndex;
-      const chapter = state.currentChapters[chapterIndex];
-      if (!chapter) {
-        showToast('Chapter not found.', 'fa-exclamation-triangle');
-        return;
-      }
-
-      try {
-        const serverData = await apiFetch(`/at-home/server/${chapter.id}`);
-        const baseUrl = serverData.baseUrl;
-        const chapterHash = serverData.chapter.hash;
-        const pages = serverData.chapter.data || [];
-
-        if (!pages.length) {
-          readerImages.innerHTML = '<p style="color:var(--fg-secondary);">This chapter has no pages.</p>';
-        } else {
-          const imageUrls = pages.map(p => `${baseUrl}/data/${chapterHash}/${p}`);
-          readerImages.innerHTML = '';
-          imageUrls.forEach(url => {
-            const img = document.createElement('img');
-            img.src = url;
-            img.alt = 'Page';
-            img.crossOrigin = 'anonymous';
-            img.onerror = function() {
-              this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22%3E%3Crect width=%22400%22 height=%22600%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2220%22%3EGagal%20load%3C/text%3E%3C/svg%3E';
-            };
-            readerImages.appendChild(img);
-          });
-        }
-
-        const title = chapter.attributes.title || `Chapter ${chapter.attributes.chapter || '?'}`;
-        readerTitle.textContent = `Reading: ${title}`;
-
-        // Update chapter select
-        const allChapters = state.currentChapters;
-        const options = allChapters.map((ch, i) => {
-          const label = ch.attributes.title || `Chapter ${ch.attributes.chapter || i+1}`;
-          return `<option value="${i}" ${i === chapterIndex ? 'selected' : ''}>${label}</option>`;
-        }).join('');
-        readerChapterSelect.innerHTML = options;
-        readerChapterSelect.onchange = (e) => {
-          const idx = parseInt(e.target.value);
-          if (!isNaN(idx) && idx !== state.currentChapterIndex) {
-            openReader(idx);
-          }
-        };
-
-        // Tampilkan reader
-        document.getElementById('mainContent').style.display = 'none';
-        detailPage.classList.remove('open');
-        readerPage.classList.add('open');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } catch (err) {
-        console.error('openReader error:', err);
-        showToast('Failed to load chapter: ' + err.message, 'fa-exclamation-triangle');
-      }
-    }
-
-    // ============================================================
-    // INFINITE SCROLL
+    // INFINITE SCROLL (untuk trending)
     // ============================================================
     let infiniteObserver = null;
 
@@ -2378,12 +2061,44 @@
       const items = await fetchMangaList({}, true);
       infiniteTrigger.classList.remove('loading');
       if (items && items.length > 0) {
-        // Append to trending grid (or we can append to a dedicated grid)
-        // For simplicity, we re-render trending with all items
         renderMangaGrid('trendingGrid', state.mangaList, false, 6);
       }
       if (!state.hasMore) {
         infiniteTrigger.innerHTML = '<span>No more manga.</span>';
+      }
+    }
+
+    // ============================================================
+    // FETCH ORIGIN SECTIONS
+    // ============================================================
+    async function fetchOriginSections() {
+      try {
+        // Manga (Japan)
+        const mangaData = await fetchMangaList({ 
+          originalLanguage: 'ja', 
+          limit: 8,
+          order: { latestUploadedChapter: 'desc' }
+        });
+        renderMangaGrid('mangaOriginGrid', mangaData, false, 4);
+
+        // Manhwa (Korea)
+        const manhwaData = await fetchMangaList({ 
+          originalLanguage: 'ko', 
+          limit: 8,
+          order: { latestUploadedChapter: 'desc' }
+        });
+        renderMangaGrid('manhwaOriginGrid', manhwaData, false, 4);
+
+        // Manhua (China)
+        const manhuaData = await fetchMangaList({ 
+          originalLanguage: 'zh', 
+          limit: 8,
+          order: { latestUploadedChapter: 'desc' }
+        });
+        renderMangaGrid('manhuaOriginGrid', manhuaData, false, 4);
+      } catch (err) {
+        console.error('fetchOriginSections error:', err);
+        showToast('Gagal memuat section origin: ' + err.message, 'fa-exclamation-triangle');
       }
     }
 
@@ -2395,56 +2110,67 @@
 
       // Skeleton
       renderSkeleton('trendingGrid', 12);
+      renderSkeleton('mangaOriginGrid', 8);
+      renderSkeleton('manhwaOriginGrid', 8);
+      renderSkeleton('manhuaOriginGrid', 8);
 
-      // Fetch initial data
-      const params = {
-        limit: 24,
-        offset: 0,
-        'availableTranslatedLanguage[]': ['id'],
-        'contentRating[]': ['safe', 'suggestive', 'erotica'],
-        'includes[]': ['cover_art', 'artist', 'author'],
-        order: { latestUploadedChapter: 'desc' },
-      };
-      const data = await apiFetch('/manga', params);
-      const allItems = data.data || [];
-      state.total = data.total || 0;
-      state.mangaList = allItems;
-      state.offset = allItems.length;
-      state.hasMore = allItems.length < state.total;
+      try {
+        // Fetch initial data
+        const params = {
+          limit: 24,
+          offset: 0,
+          'availableTranslatedLanguage[]': ['id'],
+          'contentRating[]': ['safe', 'suggestive', 'erotica'],
+          'includes[]': ['cover_art', 'artist', 'author'],
+          order: { latestUploadedChapter: 'desc' },
+        };
+        const data = await apiFetch('/manga', params);
+        const allItems = data.data || [];
+        state.total = data.total || 0;
+        state.mangaList = allItems;
+        state.offset = allItems.length;
+        state.hasMore = allItems.length < state.total;
 
-      // Populate sections
-      const shuffled = [...allItems].sort(() => Math.random() - 0.5);
-      const trending = shuffled.slice(0, 12);
-      const popular = shuffled.slice(0, 10);
-      const completed = allItems.filter(m => m.attributes.status === 'completed').slice(0, 8);
-      const ongoing = allItems.filter(m => m.attributes.status === 'ongoing').slice(0, 8);
-      const latest = allItems.slice(0, 10);
+        // Populate sections
+        const shuffled = [...allItems].sort(() => Math.random() - 0.5);
+        const trending = shuffled.slice(0, 12);
+        const popular = shuffled.slice(0, 10);
+        const completed = allItems.filter(m => m.attributes.status === 'completed').slice(0, 8);
+        const ongoing = allItems.filter(m => m.attributes.status === 'ongoing').slice(0, 8);
+        const latest = allItems.slice(0, 10);
 
-      // Hero slider (5 popular)
-      const heroItems = allItems.slice(0, 5);
+        // Hero slider (5 popular)
+        const heroItems = allItems.slice(0, 5);
 
-      renderHeroSlider(heroItems);
-      renderMangaGrid('trendingGrid', trending, false, 6);
-      renderLatestList(latest);
-      renderMangaGrid('popularGrid', popular, true, 5);
-      renderMangaGrid('completedGrid', completed, false, 4);
-      renderMangaGrid('ongoingGrid', ongoing, false, 4);
+        renderHeroSlider(heroItems);
+        renderMangaGrid('trendingGrid', trending, false, 6);
+        renderLatestList(latest);
+        renderMangaGrid('popularGrid', popular, true, 5);
+        renderMangaGrid('completedGrid', completed, false, 4);
+        renderMangaGrid('ongoingGrid', ongoing, false, 4);
 
-      // Genres (hardcoded list)
-      const genreNames = ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Romance', 'School', 'Slice of Life', 'Martial Arts', 'Magic', 'Supernatural', 'Isekai', 'Historical', 'Horror', 'Sci-Fi', 'Sports', 'Mecha', 'Psychological', 'Mystery'];
-      renderGenreGrid(genreNames);
+        // Origin sections
+        await fetchOriginSections();
 
-      // Sidebar
-      const randomItems = [...allItems].sort(() => Math.random() - 0.5);
-      renderSidebarWidget('topRatingList', allItems.sort((a, b) => (b.attributes?.rating?.bayesianAverage || 0) - (a.attributes?.rating?.bayesianAverage || 0)), 'Rating');
-      renderSidebarWidget('mostViewedList', allItems, 'Views');
-      renderSidebarWidget('newestList', allItems, 'New');
-      renderSidebarWidget('randomList', randomItems, 'Random');
+        // Genres
+        const genreNames = ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Romance', 'School', 'Slice of Life', 'Martial Arts', 'Magic', 'Supernatural', 'Isekai', 'Historical', 'Horror', 'Sci-Fi', 'Sports', 'Mecha', 'Psychological', 'Mystery'];
+        renderGenreGrid(genreNames);
 
-      // Infinite scroll
-      setupInfiniteScroll();
+        // Sidebar
+        const randomItems = [...allItems].sort(() => Math.random() - 0.5);
+        renderSidebarWidget('topRatingList', allItems.sort((a, b) => (b.attributes?.rating?.bayesianAverage || 0) - (a.attributes?.rating?.bayesianAverage || 0)), 'Rating');
+        renderSidebarWidget('mostViewedList', allItems, 'Views');
+        renderSidebarWidget('newestList', allItems, 'New');
+        renderSidebarWidget('randomList', randomItems, 'Random');
 
-      console.log('✅ Initialization complete');
+        // Infinite scroll
+        setupInfiniteScroll();
+
+        console.log('✅ Initialization complete');
+      } catch (err) {
+        console.error('Init error:', err);
+        showToast('Error loading data: ' + err.message, 'fa-exclamation-triangle');
+      }
     }
 
     // ============================================================
@@ -2494,20 +2220,6 @@
     });
     searchInput.addEventListener('input', doSearch);
 
-    // Detail back
-    detailBack.addEventListener('click', () => {
-      detailPage.classList.remove('open');
-      document.getElementById('mainContent').style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // Reader back
-    readerBack.addEventListener('click', () => {
-      readerPage.classList.remove('open');
-      detailPage.classList.add('open');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
     // Bookmark link
     document.querySelectorAll('#bookmarkLink, #bookmarkLinkMobile').forEach(el => {
       el.addEventListener('click', (e) => {
@@ -2516,8 +2228,7 @@
           showToast('No bookmarks yet.', 'fa-info-circle');
           return;
         }
-        // Buka detail pertama dari bookmark
-        openDetail(state.bookmarks[0]);
+        window.location.href = `detail.html?id=${state.bookmarks[0]}`;
       });
     });
 
@@ -2538,5 +2249,6 @@
 
     console.log('📚 Manga App Ready');
   </script>
+
 </body>
 </html>
