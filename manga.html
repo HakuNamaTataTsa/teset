@@ -2,935 +2,2541 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Baca Manga – Akino Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Manga – Akino Store</title>
+  <meta name="description" content="Baca manga, manhwa, dan manhua terjemahan Indonesia." />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
   <style>
-    /* ===== ROOT (sama seperti sebelumnya, tidak berubah) ===== */
+    /* ============================================================
+       ROOT VARIABLES & DARK THEME
+       ============================================================ */
     :root {
-      --bg: #07070d;
-      --bg-card: rgba(255,255,255,0.04);
-      --bg-card-hover: rgba(255,255,255,0.08);
-      --fg: #f0f0f5;
-      --muted: #7a7a90;
-      --accent: #FFDD57;
-      --accent-dim: rgba(255,221,87,0.15);
-      --border: rgba(255,255,255,0.07);
-      --radius: 16px;
-      --radius-sm: 10px;
-      --font-display: 'Space Grotesk', sans-serif;
-      --font-body: 'DM Sans', sans-serif;
-      --shadow-card: 0 8px 32px rgba(0,0,0,0.3);
-      --nav-bg: rgba(7,7,13,0.6);
-      --nav-scrolled: rgba(7,7,13,0.92);
-      --transition: 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+      --bg-primary: #0f0f0f;
+      --bg-secondary: #1a1a1a;
+      --bg-card: #1f1f1f;
+      --bg-card-hover: #2a2a2a;
+      --bg-glass: rgba(31, 31, 31, 0.7);
+      --bg-glass-light: rgba(31, 31, 31, 0.4);
+      --fg-primary: #f0f0f0;
+      --fg-secondary: #a0a0a0;
+      --fg-muted: #6b6b6b;
+      --accent: #3B82F6;
+      --accent-hover: #2563eb;
+      --accent-dim: rgba(59, 130, 246, 0.15);
+      --border-color: rgba(255, 255, 255, 0.06);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --radius-sm: 8px;
+      --font: 'Inter', sans-serif;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --navbar-height: 68px;
     }
+
+    /* Light Theme */
     body.light-theme {
-      --bg: #f5f5fa;
-      --bg-card: rgba(0,0,0,0.04);
-      --bg-card-hover: rgba(0,0,0,0.08);
-      --fg: #1a1a24;
-      --muted: #5a5a70;
-      --border: rgba(0,0,0,0.08);
-      --shadow-card: 0 8px 32px rgba(0,0,0,0.08);
-      --nav-bg: rgba(245,245,250,0.7);
-      --nav-scrolled: rgba(245,245,250,0.95);
+      --bg-primary: #f5f5f8;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f0f0f5;
+      --bg-glass: rgba(255, 255, 255, 0.7);
+      --bg-glass-light: rgba(255, 255, 255, 0.4);
+      --fg-primary: #121212;
+      --fg-secondary: #555555;
+      --fg-muted: #888888;
+      --border-color: rgba(0, 0, 0, 0.06);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html { scroll-behavior:smooth; }
+
+    /* ============================================================
+       RESET & BASE
+       ============================================================ */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: var(--font-body);
-      background: var(--bg);
-      color: var(--fg);
-      padding-top:70px;
-      min-height:100vh;
+      font-family: var(--font);
+      background: var(--bg-primary);
+      color: var(--fg-primary);
+      transition: background var(--transition), color var(--transition);
+      padding-top: var(--navbar-height);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    a { text-decoration:none; color:inherit; }
 
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    button {
+      cursor: pointer;
+      font-family: var(--font);
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    /* ============================================================
+       UTILITY
+       ============================================================ */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title .accent-line {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(to right, var(--accent), transparent);
+      margin-left: 0.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .badge-ongoing {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+    .badge-completed {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+    .badge-hiatus {
+      background: rgba(234, 179, 8, 0.2);
+      color: #eab308;
+    }
+    .badge-rating {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent);
+    }
+
+    .rating-star {
+      color: #f59e0b;
+      font-size: 0.7rem;
+    }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius-sm);
+    }
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    /* Glassmorphism */
+    .glass {
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+    }
+    .glass-light {
+      background: var(--bg-glass-light);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+    }
+
+    /* ============================================================
+       NAVBAR
+       ============================================================ */
     .navbar {
-      position:fixed; top:0; left:0; right:0; z-index:100;
-      display:flex; justify-content:space-between; align-items:center;
-      padding:0.8rem 2rem;
-      background:var(--nav-bg);
-      backdrop-filter:blur(20px);
-      border-bottom:1px solid var(--border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      height: var(--navbar-height);
+      transition: background var(--transition), box-shadow var(--transition);
     }
-    .navbar.scrolled { background:var(--nav-scrolled); }
-    .nav-brand {
-      font-family:var(--font-display);
-      font-size:1.3rem; font-weight:700;
-      color:var(--accent);
-      display:flex; align-items:center; gap:0.4rem;
+    .navbar.scrolled {
+      background: var(--bg-glass);
+      box-shadow: var(--shadow);
     }
-    .nav-actions { display:flex; align-items:center; gap:0.5rem; }
-    .theme-toggle {
-      background:var(--bg-card); border:1px solid var(--border);
-      color:var(--muted); width:36px; height:36px;
-      border-radius:var(--radius-sm); cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      font-size:0.9rem;
-    }
-    .theme-toggle:hover { color:var(--accent); border-color:var(--accent); background:var(--accent-dim); }
-    .menu-toggle {
-      display:none; background:var(--bg-card); border:1px solid var(--border);
-      color:var(--fg); font-size:1.2rem; cursor:pointer;
-      width:40px; height:40px; border-radius:var(--radius-sm);
-      align-items:center; justify-content:center;
-    }
-    .nav-links {
-      list-style:none; display:flex; gap:0.2rem; align-items:center;
-    }
-    .nav-links a {
-      color:var(--muted); padding:0.4rem 0.9rem;
-      border-radius:var(--radius-sm);
-      font-size:0.85rem; font-weight:500;
-    }
-    .nav-links a:hover, .nav-links a.active { color:var(--fg); background:var(--bg-card); }
-    .nav-links a.active { color:var(--accent); background:var(--accent-dim); }
-    .dropdown { position:relative; }
-    .dropdown-menu {
-      display:none; position:absolute; top:calc(100%+6px); left:50%;
-      transform:translateX(-50%);
-      background:rgba(15,15,25,0.96); backdrop-filter:blur(20px);
-      border:1px solid var(--border); border-radius:12px;
-      min-width:220px; padding:0.4rem;
-      box-shadow:0 24px 64px rgba(0,0,0,0.5);
-    }
-    .dropdown:hover .dropdown-menu { display:block; }
-    .dropdown-menu a {
-      display:block; padding:0.5rem 0.9rem; border-radius:8px;
-      font-size:0.82rem; color:var(--muted);
-    }
-    .dropdown-menu a:hover { background:var(--accent-dim); color:var(--accent); }
 
-    .manga-container { max-width:1300px; margin:1rem auto 2rem; padding:0 1.5rem; }
-    .manga-header {
-      display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
-      gap:1rem; margin-bottom:1.5rem;
+    .navbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      gap: 1rem;
     }
-    .manga-header h1 { font-family:var(--font-display); font-size:1.8rem; font-weight:700; }
-    .manga-header h1 i { color:var(--accent); margin-right:0.4rem; }
-    .manga-controls {
-      display:flex; flex-wrap:wrap; align-items:center; gap:0.6rem;
-      width:100%; max-width:700px;
-    }
-    .manga-controls .search-box {
-      flex:1; min-width:160px;
-      display:flex; background:var(--bg-card); border:1px solid var(--border);
-      border-radius:var(--radius-sm); padding:0.3rem 0.6rem;
-    }
-    .manga-controls .search-box:focus-within { border-color:var(--accent); }
-    .manga-controls .search-box input {
-      background:transparent; border:none; padding:0.5rem 0.3rem;
-      font-size:0.9rem; color:var(--fg); width:100%; outline:none;
-      font-family:var(--font-body);
-    }
-    .manga-controls .search-box input::placeholder { color:var(--muted); }
-    .manga-controls .search-box button {
-      background:transparent; border:none; color:var(--muted);
-      padding:0 0.3rem; cursor:pointer; font-size:0.9rem;
-    }
-    .manga-controls .search-box button:hover { color:var(--accent); }
-    .manga-controls select, .manga-controls .filter-btn {
-      background:var(--bg-card); border:1px solid var(--border);
-      color:var(--fg); padding:0.5rem 0.8rem;
-      border-radius:var(--radius-sm);
-      font-family:var(--font-body); font-size:0.8rem;
-      cursor:pointer; outline:none; min-width:100px;
-    }
-    .manga-controls select:hover, .manga-controls .filter-btn:hover {
-      border-color:var(--accent); background:var(--accent-dim);
-    }
-    .manga-controls select option { background:var(--bg); color:var(--fg); }
 
-    .filter-drawer {
-      display:none; background:var(--bg-card); border:1px solid var(--border);
-      border-radius:var(--radius); padding:1rem 1.2rem;
-      margin-bottom:1.5rem; flex-wrap:wrap; gap:0.6rem; align-items:center;
+    /* Logo */
+    .navbar .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--fg-primary);
+      flex-shrink: 0;
     }
-    .filter-drawer.open { display:flex; }
-    .filter-drawer .filter-group {
-      display:flex; flex-wrap:wrap; align-items:center; gap:0.3rem 0.6rem;
+    .navbar .logo i {
+      color: var(--accent);
+      font-size: 1.1rem;
     }
-    .filter-drawer .filter-group label {
-      font-size:0.75rem; color:var(--muted); font-weight:600;
-      text-transform:uppercase; letter-spacing:0.5px; margin-right:0.2rem;
+    .navbar .logo span {
+      color: var(--accent);
     }
-    .filter-drawer .genre-tag {
-      background:var(--bg); border:1px solid var(--border);
-      border-radius:20px; padding:0.2rem 0.8rem;
-      font-size:0.7rem; cursor:pointer; transition:all 0.2s;
-      color:var(--muted); user-select:none;
-    }
-    .filter-drawer .genre-tag:hover { border-color:var(--accent); color:var(--fg); }
-    .filter-drawer .genre-tag.active {
-      background:var(--accent-dim); border-color:var(--accent); color:var(--accent);
-    }
-    .filter-drawer .filter-actions {
-      display:flex; gap:0.4rem; margin-left:auto;
-    }
-    .filter-drawer .filter-actions button {
-      background:var(--bg-card); border:1px solid var(--border);
-      border-radius:var(--radius-sm); padding:0.3rem 0.9rem;
-      font-size:0.7rem; color:var(--muted); cursor:pointer;
-      font-family:var(--font-body);
-    }
-    .filter-drawer .filter-actions button:hover { border-color:var(--accent); color:var(--fg); }
-    .filter-drawer .filter-actions button.apply-filter {
-      background:var(--accent); color:#0a0a0f; border-color:var(--accent);
-    }
-    .filter-drawer .filter-actions button.apply-filter:hover { background:#ffd43b; }
 
+    /* Menu tengah */
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      list-style: none;
+      flex: 1;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .nav-menu a {
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--fg-secondary);
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .nav-menu a:hover,
+    .nav-menu a.active {
+      color: var(--fg-primary);
+      background: var(--bg-card);
+    }
+    .nav-menu a.active {
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* Kanan: Search, Theme, Login */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .nav-actions .search-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      font-size: 0.8rem;
+      color: var(--fg-secondary);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .nav-actions .search-toggle:hover {
+      border-color: var(--accent);
+      color: var(--fg-primary);
+    }
+    .nav-actions .search-toggle i {
+      font-size: 0.8rem;
+    }
+
+    .nav-actions .theme-btn,
+    .nav-actions .login-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--fg-secondary);
+      transition: all var(--transition);
+      font-size: 0.9rem;
+    }
+    .nav-actions .theme-btn:hover,
+    .nav-actions .login-btn:hover {
+      border-color: var(--accent);
+      color: var(--fg-primary);
+      background: var(--accent-dim);
+    }
+    .nav-actions .login-btn {
+      width: auto;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-sm);
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+    }
+    .nav-actions .login-btn:hover {
+      background: var(--accent-hover);
+      color: #fff;
+    }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--fg-primary);
+      border-radius: 2px;
+      transition: all var(--transition);
+    }
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(4px, 4px);
+    }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(4px, -4px);
+    }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: var(--navbar-height);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      padding: 1.5rem;
+      overflow-y: auto;
+      z-index: 999;
+      border-top: 1px solid var(--border-color);
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .mobile-menu.open {
+      display: flex;
+    }
+    .mobile-menu a {
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--fg-secondary);
+      transition: all var(--transition);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .mobile-menu a:hover,
+    .mobile-menu a.active {
+      color: var(--fg-primary);
+      background: var(--bg-card);
+    }
+    .mobile-menu a.active {
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* ============================================================
+       SEARCH OVERLAY
+       ============================================================ */
+    .search-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 100px;
+    }
+    .search-overlay.open {
+      display: flex;
+    }
+    .search-overlay .search-box {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+    .search-overlay .search-box input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--fg-primary);
+      font-size: 1rem;
+      outline: none;
+      border: 1px solid var(--border-color);
+      transition: border var(--transition);
+    }
+    .search-overlay .search-box input:focus {
+      border-color: var(--accent);
+    }
+    .search-overlay .search-box .search-results {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .search-overlay .search-box .search-results .result-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition);
+      cursor: pointer;
+    }
+    .search-overlay .search-box .search-results .result-item:hover {
+      background: var(--bg-card);
+    }
+    .search-overlay .search-box .search-results .result-item img {
+      width: 40px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+    }
+    .search-overlay .search-box .search-results .result-item .info h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .search-overlay .search-box .search-results .result-item .info span {
+      font-size: 0.7rem;
+      color: var(--fg-secondary);
+    }
+    .search-overlay .close-search {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      font-size: 2rem;
+      color: var(--fg-secondary);
+      cursor: pointer;
+      transition: color var(--transition);
+    }
+    .search-overlay .close-search:hover {
+      color: var(--fg-primary);
+    }
+
+    /* ============================================================
+       HERO SLIDER
+       ============================================================ */
+    .hero-slider {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 2rem;
+      background: var(--bg-secondary);
+    }
+    .hero-slider .slides {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .hero-slider .slide {
+      flex: 0 0 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 2rem 3rem;
+      background-size: cover;
+      background-position: center;
+    }
+    .hero-slider .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 70%);
+      z-index: 1;
+    }
+    .hero-slider .slide .content {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      color: #fff;
+    }
+    .hero-slider .slide .content .badge {
+      background: var(--accent);
+      color: #fff;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+    .hero-slider .slide .content h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+    .hero-slider .slide .content .sinopsis {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      line-height: 1.6;
+      margin-bottom: 0.8rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .hero-slider .slide .content .meta {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      opacity: 0.9;
+      margin-bottom: 1rem;
+    }
+    .hero-slider .slide .content .actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .hero-slider .slide .content .actions .btn-read {
+      padding: 0.5rem 1.5rem;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all var(--transition);
+    }
+    .hero-slider .slide .content .actions .btn-read:hover {
+      background: var(--accent-hover);
+      transform: scale(1.03);
+    }
+    .hero-slider .slide .content .actions .btn-bookmark {
+      padding: 0.5rem 1.2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-weight: 500;
+      font-size: 0.85rem;
+      transition: all var(--transition);
+    }
+    .hero-slider .slide .content .actions .btn-bookmark:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .hero-slider .dots {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 5;
+    }
+    .hero-slider .dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .hero-slider .dots span.active {
+      background: var(--accent);
+      width: 24px;
+      border-radius: 5px;
+    }
+
+    /* ============================================================
+       MANGA GRID
+       ============================================================ */
     .manga-grid {
-      display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));
-      gap:1.2rem; margin-bottom:2rem;
+      display: grid;
+      gap: 1.2rem;
     }
-    .manga-item {
-      background:var(--bg-card); border:1px solid var(--border);
-      border-radius:var(--radius); overflow:hidden;
-      cursor:pointer;
+    .manga-grid.cols-6 {
+      grid-template-columns: repeat(6, 1fr);
     }
-    .manga-item:hover {
-      transform:translateY(-6px); border-color:var(--accent);
-      box-shadow:var(--shadow-card); background:var(--bg-card-hover);
+    .manga-grid.cols-5 {
+      grid-template-columns: repeat(5, 1fr);
     }
-    .manga-item .cover {
-      width:100%; aspect-ratio:2/3;
-      background:var(--bg); object-fit:cover; display:block;
+    .manga-grid.cols-4 {
+      grid-template-columns: repeat(4, 1fr);
     }
-    .manga-item .manga-info { padding:0.6rem 0.7rem 0.8rem; }
-    .manga-item .manga-info h3 {
-      font-family:var(--font-display);
-      font-size:0.85rem; font-weight:600; line-height:1.3;
-      margin-bottom:0.2rem;
-      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    .manga-grid.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
     }
-    .manga-item .manga-info .meta {
-      display:flex; flex-wrap:wrap; gap:0.3rem 0.6rem;
-      font-size:0.65rem; color:var(--muted);
+    .manga-grid.cols-2 {
+      grid-template-columns: repeat(2, 1fr);
     }
-    .manga-item .manga-info .meta .status-badge {
-      background:var(--accent-dim); color:var(--accent);
-      padding:0.05rem 0.5rem; border-radius:12px;
-      font-size:0.6rem; font-weight:600;
-    }
-    .manga-item .manga-info .meta .rating { color:var(--accent); }
 
-    .pagination {
-      display:flex; justify-content:center; align-items:center;
-      gap:0.5rem; flex-wrap:wrap; padding:0.5rem 0 1.5rem;
+    .manga-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: all var(--transition);
+      border: 1px solid var(--border-color);
+      position: relative;
     }
-    .pagination button {
-      background:var(--bg-card); border:1px solid var(--border);
-      border-radius:var(--radius-sm); color:var(--fg);
-      padding:0.4rem 1rem; font-size:0.8rem; cursor:pointer;
-      font-family:var(--font-body); min-width:44px;
+    .manga-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+      box-shadow: var(--shadow);
+      background: var(--bg-card-hover);
     }
-    .pagination button:hover:not(:disabled) {
-      border-color:var(--accent); color:var(--accent); background:var(--accent-dim);
+    .manga-card .cover {
+      width: 100%;
+      aspect-ratio: 2/3;
+      object-fit: cover;
+      background: var(--bg-secondary);
+      transition: transform 0.4s ease;
     }
-    .pagination button:disabled { opacity:0.3; cursor:not-allowed; }
-    .pagination .page-info { font-size:0.8rem; color:var(--muted); padding:0 0.4rem; }
+    .manga-card:hover .cover {
+      transform: scale(1.03);
+    }
+    .manga-card .info {
+      padding: 0.6rem 0.7rem 0.8rem;
+    }
+    .manga-card .info h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 0.2rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .manga-card .info .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 0.6rem;
+      font-size: 0.65rem;
+      color: var(--fg-secondary);
+      margin-top: 0.2rem;
+    }
+    .manga-card .info .meta .badge {
+      font-size: 0.55rem;
+    }
+    .manga-card .rank {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.8rem;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3);
+    }
 
-    .detail-view { display:none; }
-    .detail-view.open { display:block; }
-    .detail-back {
-      display:inline-flex; align-items:center; gap:0.4rem;
-      background:var(--bg-card); border:1px solid var(--border);
-      border-radius:var(--radius-sm); padding:0.3rem 1rem;
-      font-size:0.8rem; color:var(--muted); cursor:pointer;
-      font-family:var(--font-body); margin-bottom:1rem;
+    .manga-card .read-btn {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.5rem;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all var(--transition);
+      border: none;
+      cursor: pointer;
     }
-    .detail-back:hover { border-color:var(--accent); color:var(--accent); }
+    .manga-card:hover .read-btn {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ============================================================
+       LATEST UPDATE LIST
+       ============================================================ */
+    .latest-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .latest-item {
+      display: flex;
+      gap: 1rem;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 0.8rem;
+      border: 1px solid var(--border-color);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .latest-item:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+    }
+    .latest-item .thumb {
+      flex: 0 0 80px;
+      width: 80px;
+      height: 112px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--bg-secondary);
+    }
+    .latest-item .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .latest-item .detail {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .latest-item .detail h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+    .latest-item .detail .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 0.8rem;
+      font-size: 0.7rem;
+      color: var(--fg-secondary);
+    }
+    .latest-item .detail .chapters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.3rem;
+    }
+    .latest-item .detail .chapters span {
+      background: var(--bg-card-hover);
+      padding: 0.1rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.65rem;
+      color: var(--fg-secondary);
+      border: 1px solid var(--border-color);
+    }
+    .latest-item .detail .update-time {
+      font-size: 0.65rem;
+      color: var(--fg-muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ============================================================
+       GENRE GRID
+       ============================================================ */
+    .genre-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 0.8rem;
+    }
+    .genre-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1rem 0.5rem;
+      text-align: center;
+      transition: all var(--transition);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .genre-item:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      transform: translateY(-3px);
+    }
+    .genre-item i {
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+    .genre-item span {
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       SIDEBAR
+       ============================================================ */
+    .layout-two-col {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 2rem;
+    }
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .sidebar .widget {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      border: 1px solid var(--border-color);
+    }
+    .sidebar .widget h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .sidebar .widget h4 i {
+      color: var(--accent);
+    }
+    .sidebar .widget .item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border-color);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .sidebar .widget .item:last-child {
+      border-bottom: none;
+    }
+    .sidebar .widget .item:hover {
+      color: var(--accent);
+    }
+    .sidebar .widget .item img {
+      width: 32px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+    }
+    .sidebar .widget .item .info .title {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .sidebar .widget .item .info .sub {
+      font-size: 0.65rem;
+      color: var(--fg-secondary);
+    }
+
+    /* ============================================================
+       DETAIL MANGA
+       ============================================================ */
+    .detail-page {
+      display: none;
+    }
+    .detail-page.open {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+    .detail-page .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 1rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--fg-secondary);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-bottom: 1rem;
+    }
+    .detail-page .back:hover {
+      border-color: var(--accent);
+      color: var(--fg-primary);
+    }
+
     .detail-main {
-      display:flex; flex-wrap:wrap; gap:1.5rem; margin-bottom:1.5rem;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
     }
-    .detail-cover { flex:0 0 200px; max-width:200px; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); }
-    .detail-cover img { width:100%; display:block; }
-    .detail-info { flex:1; min-width:220px; }
-    .detail-info h2 { font-family:var(--font-display); font-size:1.8rem; font-weight:700; }
-    .detail-info .alt-titles { font-size:0.8rem; color:var(--muted); }
-    .detail-info .detail-meta { display:flex; flex-wrap:wrap; gap:0.8rem 1.5rem; font-size:0.8rem; color:var(--muted); }
-    .detail-info .detail-meta strong { color:var(--fg); }
-    .detail-info .description { font-size:0.9rem; line-height:1.7; color:var(--muted); max-height:120px; overflow-y:auto; }
-    .detail-info .genre-list { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.6rem; }
-    .detail-info .genre-list .genre-tag { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:0.1rem 0.7rem; font-size:0.65rem; color:var(--muted); }
-
-    .chapters-section { margin-top:1rem; }
-    .chapters-section h3 { font-family:var(--font-display); font-size:1.1rem; font-weight:600; margin-bottom:0.5rem; }
-    .chapter-list { display:flex; flex-direction:column; gap:0.3rem; max-height:500px; overflow-y:auto; }
-    .chapter-item {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:0.5rem 0.8rem; background:var(--bg-card); border:1px solid var(--border);
-      border-radius:var(--radius-sm);
+    .detail-main .cover-wrap {
+      flex: 0 0 220px;
+      max-width: 220px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
     }
-    .chapter-item:hover { border-color:var(--accent); background:var(--bg-card-hover); }
-    .chapter-item .ch-num { font-size:0.85rem; font-weight:500; }
-    .chapter-item .ch-meta { font-size:0.7rem; color:var(--muted); display:flex; align-items:center; gap:0.6rem; }
-    .chapter-item .ch-meta .lang { background:var(--accent-dim); color:var(--accent); padding:0.05rem 0.5rem; border-radius:12px; font-size:0.6rem; font-weight:600; }
-    .chapter-item .read-btn { background:var(--accent); color:#0a0a0f; border:none; border-radius:var(--radius-sm); padding:0.2rem 0.8rem; font-size:0.7rem; font-weight:600; cursor:pointer; font-family:var(--font-body); }
+    .detail-main .cover-wrap img {
+      width: 100%;
+      display: block;
+    }
+    .detail-main .info-wrap {
+      flex: 1;
+      min-width: 240px;
+    }
+    .detail-main .info-wrap h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 0.2rem;
+    }
+    .detail-main .info-wrap .alt-title {
+      font-size: 0.85rem;
+      color: var(--fg-secondary);
+      margin-bottom: 0.5rem;
+    }
+    .detail-main .info-wrap .detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem 1.5rem;
+      font-size: 0.8rem;
+      color: var(--fg-secondary);
+      margin-bottom: 0.5rem;
+    }
+    .detail-main .info-wrap .detail-meta strong {
+      color: var(--fg-primary);
+    }
+    .detail-main .info-wrap .desc {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--fg-secondary);
+      margin-top: 0.5rem;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .detail-main .info-wrap .genre-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+    }
+    .detail-main .info-wrap .genre-tags .tag {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 0.1rem 0.7rem;
+      font-size: 0.65rem;
+      color: var(--fg-secondary);
+    }
 
-    .reader-view { display:none; }
-    .reader-view.open { display:block; }
+    .detail-chapters {
+      margin-top: 2rem;
+    }
+    .detail-chapters h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+    .detail-chapters .ch-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .detail-chapters .ch-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.8rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .detail-chapters .ch-item:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+    }
+    .detail-chapters .ch-item .ch-info {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+    .detail-chapters .ch-item .ch-info .ch-num {
+      font-weight: 600;
+    }
+    .detail-chapters .ch-item .ch-info .ch-meta {
+      color: var(--fg-secondary);
+      font-size: 0.7rem;
+    }
+    .detail-chapters .ch-item .ch-read {
+      padding: 0.2rem 0.8rem;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      transition: all var(--transition);
+    }
+    .detail-chapters .ch-item .ch-read:hover {
+      background: var(--accent-hover);
+    }
+
+    /* ============================================================
+       READER
+       ============================================================ */
+    .reader-page {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .reader-page.open {
+      display: block;
+    }
     .reader-nav {
-      display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
-      gap:0.6rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1rem;
     }
-    .reader-nav .reader-title { font-family:var(--font-display); font-size:1rem; font-weight:600; }
-    .reader-nav .reader-actions { display:flex; gap:0.4rem; flex-wrap:wrap; }
-    .reader-nav .reader-actions button, .reader-nav .reader-actions select {
-      background:var(--bg-card); border:1px solid var(--border);
-      border-radius:var(--radius-sm); color:var(--fg);
-      padding:0.3rem 0.8rem; font-size:0.75rem; cursor:pointer;
-      font-family:var(--font-body);
+    .reader-nav .reader-title {
+      font-weight: 700;
+      font-size: 1rem;
     }
-    .reader-nav .reader-actions button:hover { border-color:var(--accent); color:var(--accent); }
-    .reader-nav .reader-actions select { min-width:100px; }
-    .reader-images { display:flex; flex-direction:column; align-items:center; gap:0.4rem; }
-    .reader-images img { max-width:100%; height:auto; border-radius:var(--radius-sm); background:var(--bg-card); border:1px solid var(--border); }
+    .reader-nav .reader-actions {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .reader-nav .reader-actions button,
+    .reader-nav .reader-actions select {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.8rem;
+      font-size: 0.75rem;
+      color: var(--fg-primary);
+      transition: all var(--transition);
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .reader-nav .reader-actions button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .reader-nav .reader-actions select {
+      min-width: 100px;
+    }
 
-    .loading-overlay { display:none; text-align:center; padding:2rem 0; color:var(--muted); }
-    .loading-overlay.show { display:block; }
-    .loading-overlay i { font-size:2rem; margin-bottom:0.5rem; color:var(--accent); }
+    .reader-images {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .reader-images img {
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+    }
 
-    .error-message { text-align:center; padding:2rem 1rem; color:var(--muted); background:var(--bg-card); border-radius:var(--radius); border:1px solid var(--border); }
-    .error-message i { font-size:2rem; display:block; margin-bottom:0.5rem; color:#ff6b6b; }
-
-    .footer { padding:3rem 1.5rem 1.5rem; border-top:1px solid var(--border); margin-top:2rem; }
-    .footer-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:2rem; max-width:1000px; margin:0 auto 2rem; }
-    .footer-grid h4 { font-family:var(--font-display); font-size:0.85rem; color:var(--fg); margin-bottom:0.8rem; }
-    .footer-grid p, .footer-grid a { font-size:0.8rem; color:var(--muted); line-height:1.8; }
-    .footer-grid a { display:block; }
-    .footer-grid a:hover { color:var(--accent); }
-    .footer-grid .brand-footer { font-weight:600; color:var(--accent); }
-    .footer-bottom { max-width:1000px; margin:0 auto; border-top:1px solid var(--border); padding-top:1.5rem; text-align:center; font-size:0.7rem; color:var(--muted); }
-
-    @media (max-width:768px) {
-      .navbar { padding:0.6rem 1rem; }
-      .menu-toggle { display:flex; }
-      .nav-links {
-        display:none; position:absolute; top:100%; left:0; right:0;
-        flex-direction:column; background:rgba(7,7,13,0.97); backdrop-filter:blur(24px);
-        border-bottom:1px solid var(--border); padding:0.8rem; gap:0.1rem;
+    /* ============================================================
+       ANIMATIONS
+       ============================================================ */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
       }
-      .nav-links.active { display:flex; }
-      .nav-links a { padding:0.5rem 0.8rem; width:100%; }
-      .dropdown-menu {
-        position:static; transform:none; box-shadow:none;
-        background:rgba(255,255,255,0.03); border:none; min-width:auto;
-        padding:0.2rem 0 0.2rem 1rem;
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
-      .dropdown:hover .dropdown-menu { display:none; }
-      .dropdown.active .dropdown-menu { display:block !important; }
-      .manga-container { padding:0 0.8rem; }
-      .manga-header h1 { font-size:1.4rem; }
-      .manga-controls .search-box { min-width:120px; }
-      .manga-controls select, .manga-controls .filter-btn { min-width:80px; font-size:0.7rem; padding:0.4rem 0.5rem; }
-      .manga-grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.8rem; }
-      .detail-cover { flex:0 0 140px; max-width:140px; }
-      .detail-info h2 { font-size:1.4rem; }
-      .filter-drawer { padding:0.6rem 0.8rem; }
-      .filter-drawer .filter-actions { margin-left:0; width:100%; justify-content:flex-end; }
-      .footer-grid { grid-template-columns:1fr 1fr; gap:1.5rem; text-align:center; }
     }
-    @media (max-width:480px) {
-      .manga-grid { grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:0.6rem; }
-      .manga-item .manga-info h3 { font-size:0.75rem; }
-      .detail-cover { flex:0 0 120px; max-width:120px; }
-      .reader-nav { flex-direction:column; align-items:stretch; }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-slide-up {
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    /* ============================================================
+       TOAST NOTIFICATION
+       ============================================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .toast {
+      padding: 0.8rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      animation: slideInToast 0.3s ease;
+      font-size: 0.85rem;
+    }
+    .toast i {
+      color: var(--accent);
+    }
+    @keyframes slideInToast {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1200px) {
+      .manga-grid.cols-6 {
+        grid-template-columns: repeat(5, 1fr);
+      }
+      .layout-two-col {
+        grid-template-columns: 1fr 260px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .manga-grid.cols-6 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .manga-grid.cols-5 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .layout-two-col {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --navbar-height: 60px;
+      }
+
+      .nav-menu {
+        display: none;
+      }
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-actions .search-toggle span {
+        display: none;
+      }
+      .nav-actions .login-btn span {
+        display: none;
+      }
+
+      .hero-slider {
+        height: 320px;
+      }
+      .hero-slider .slide {
+        padding: 1.5rem;
+      }
+      .hero-slider .slide .content h2 {
+        font-size: 1.5rem;
+      }
+      .hero-slider .slide .content .sinopsis {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 2;
+      }
+
+      .manga-grid.cols-6,
+      .manga-grid.cols-5,
+      .manga-grid.cols-4 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .detail-main .cover-wrap {
+        flex: 0 0 140px;
+        max-width: 140px;
+      }
+      .detail-main .info-wrap h2 {
+        font-size: 1.4rem;
+      }
+
+      .sidebar {
+        grid-template-columns: 1fr;
+      }
+
+      .latest-item .thumb {
+        flex: 0 0 60px;
+        width: 60px;
+        height: 84px;
+      }
+      .latest-item .detail h4 {
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .manga-grid.cols-6,
+      .manga-grid.cols-5,
+      .manga-grid.cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .hero-slider {
+        height: 260px;
+      }
+      .hero-slider .slide .content h2 {
+        font-size: 1.2rem;
+      }
+      .hero-slider .slide .content .meta {
+        font-size: 0.65rem;
+      }
+      .hero-slider .slide .content .actions .btn-read,
+      .hero-slider .slide .content .actions .btn-bookmark {
+        font-size: 0.7rem;
+        padding: 0.3rem 1rem;
+      }
+
+      .genre-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .detail-main .cover-wrap {
+        flex: 0 0 100%;
+        max-width: 180px;
+        margin: 0 auto;
+      }
+    }
+
+    /* ============================================================
+       SKELETON PLACEHOLDER
+       ============================================================ */
+    .skeleton-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 1.2rem;
+    }
+    .skeleton-grid .skeleton-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    .skeleton-grid .skeleton-card .skeleton-img {
+      aspect-ratio: 2/3;
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    .skeleton-grid .skeleton-card .skeleton-text {
+      padding: 0.6rem 0.7rem 0.8rem;
+    }
+    .skeleton-grid .skeleton-card .skeleton-text .line {
+      height: 12px;
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+      margin-bottom: 0.3rem;
+    }
+    .skeleton-grid .skeleton-card .skeleton-text .line.short {
+      width: 60%;
+    }
+
+    @media (max-width: 1200px) {
+      .skeleton-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+    @media (max-width: 1024px) {
+      .skeleton-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    @media (max-width: 768px) {
+      .skeleton-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 480px) {
+      .skeleton-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* ============================================================
+       INFINITE SCROLL TRIGGER
+       ============================================================ */
+    .infinite-trigger {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg-secondary);
+      font-size: 0.8rem;
+    }
+    .infinite-trigger .spinner {
+      display: none;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border-color);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .infinite-trigger.loading .spinner {
+      display: block;
+    }
+    .infinite-trigger.loading span {
+      display: none;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ============================================================
+       RIPPLE BUTTON
+       ============================================================ */
+    .ripple {
+      position: relative;
+      overflow: hidden;
+    }
+    .ripple::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      width: 100px;
+      height: 100px;
+      transform: scale(0);
+      animation: rippleAnim 0.6s ease-out;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- ===== NAVBAR ===== -->
+  <!-- ============================================================
+  NAVBAR
+  ============================================================ -->
   <nav class="navbar" id="navbar">
-    <a href="index.html" class="nav-brand"><i class="fas fa-store"></i> Akino Store</a>
-    <div class="nav-actions">
-      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+    <div class="navbar-inner">
+      <!-- Logo -->
+      <a href="index.html" class="logo">
+        <i class="fas fa-store"></i>
+        Akino<span>Store</span>
+      </a>
+
+      <!-- Menu Tengah -->
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="#hero" class="active">Home</a></li>
+        <li><a href="#popular">Popular</a></li>
+        <li><a href="#latest">Latest</a></li>
+        <li><a href="#genres">Genres</a></li>
+        <li><a href="#completed">Completed</a></li>
+        <li><a href="#ongoing">Ongoing</a></li>
+        <li><a href="#" id="bookmarkLink">Bookmark</a></li>
+      </ul>
+
+      <!-- Kanan -->
+      <div class="nav-actions">
+        <button class="search-toggle" id="searchToggle">
+          <i class="fas fa-search"></i>
+          <span>Search...</span>
+        </button>
+        <button class="theme-btn" id="themeToggle" title="Toggle theme">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="login-btn" id="loginBtn">
+          <i class="fas fa-user"></i>
+          <span>Login</span>
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li class="dropdown" id="dropdownService">
-        <a href="#" id="dropdownToggle">Service <i class="fas fa-chevron-down" style="font-size:0.5rem;margin-left:4px;"></i></a>
-        <ul class="dropdown-menu">
-          <li><a href="CarParkingMultiplayer.html">Car Parking</a></li>
-          <li><a href="SosialMedia.html">Sosial Media</a></li>
-          <li><a href="designedit.html">Design / Edit</a></li>
-        </ul>
-      </li>
-      <li><a href="manga.html" class="active">Manga</a></li>
-      <li><a href="https://wa.me/6289687163314" target="_blank">Contact</a></li>
-    </ul>
   </nav>
 
-  <!-- ===== MANGA CONTAINER ===== -->
-  <div class="manga-container" id="app">
-    <div class="manga-header">
-      <h1><i class="fas fa-book-open"></i> Baca Manga</h1>
-      <div class="manga-controls">
-        <div class="search-box">
-          <input type="text" id="searchInput" placeholder="Cari manga..." />
-          <button id="searchBtn"><i class="fas fa-search"></i></button>
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#hero" class="active">Home</a>
+    <a href="#popular">Popular</a>
+    <a href="#latest">Latest</a>
+    <a href="#genres">Genres</a>
+    <a href="#completed">Completed</a>
+    <a href="#ongoing">Ongoing</a>
+    <a href="#" id="bookmarkLinkMobile">Bookmark</a>
+  </div>
+
+  <!-- ============================================================
+  SEARCH OVERLAY
+  ============================================================ -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Cari manga, manhwa, manhua..." autofocus />
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <span class="close-search" id="closeSearch">&times;</span>
+  </div>
+
+  <!-- ============================================================
+  MAIN CONTENT
+  ============================================================ -->
+  <div class="container" id="mainContent">
+
+    <!-- HERO SLIDER -->
+    <section class="hero-slider" id="hero">
+      <div class="slides" id="heroSlides"></div>
+      <div class="dots" id="heroDots"></div>
+    </section>
+
+    <!-- LAYOUT 2 KOLOM -->
+    <div class="layout-two-col">
+
+      <!-- KIRI: CONTENT -->
+      <div class="main-col">
+
+        <!-- SECTION 1: TRENDING TODAY -->
+        <section id="trending">
+          <div class="section-title">
+            🔥 Trending Today
+            <span class="accent-line"></span>
+          </div>
+          <div class="manga-grid cols-6" id="trendingGrid">
+            <!-- Skeleton akan diisi JS -->
+          </div>
+        </section>
+
+        <!-- SECTION 2: LATEST UPDATE -->
+        <section id="latest" style="margin-top: 2.5rem;">
+          <div class="section-title">
+            📰 Latest Update
+            <span class="accent-line"></span>
+          </div>
+          <div class="latest-list" id="latestList"></div>
+        </section>
+
+        <!-- SECTION 3: POPULAR THIS WEEK -->
+        <section id="popular" style="margin-top: 2.5rem;">
+          <div class="section-title">
+            ⭐ Popular This Week
+            <span class="accent-line"></span>
+          </div>
+          <div class="manga-grid cols-5" id="popularGrid"></div>
+        </section>
+
+        <!-- SECTION 4: COMPLETED -->
+        <section id="completed" style="margin-top: 2.5rem;">
+          <div class="section-title">
+            ✅ Completed Manga
+            <span class="accent-line"></span>
+          </div>
+          <div class="manga-grid cols-4" id="completedGrid"></div>
+        </section>
+
+        <!-- SECTION 5: ONGOING -->
+        <section id="ongoing" style="margin-top: 2.5rem;">
+          <div class="section-title">
+            🔄 Ongoing Manga
+            <span class="accent-line"></span>
+          </div>
+          <div class="manga-grid cols-4" id="ongoingGrid"></div>
+        </section>
+
+        <!-- SECTION 6: GENRE -->
+        <section id="genres" style="margin-top: 2.5rem;">
+          <div class="section-title">
+            🏷️ Genre
+            <span class="accent-line"></span>
+          </div>
+          <div class="genre-grid" id="genreGrid"></div>
+        </section>
+
+        <!-- Infinite Scroll Trigger -->
+        <div class="infinite-trigger" id="infiniteTrigger">
+          <div class="spinner"></div>
+          <span>Load more...</span>
         </div>
-        <select id="sortSelect">
-          <option value="latestUploadedChapter">Terbaru</option>
-          <option value="followedCount">Populer</option>
-          <option value="rating">Rating</option>
-        </select>
-        <button class="filter-btn" id="filterToggle"><i class="fas fa-sliders-h"></i> Filter</button>
-      </div>
-    </div>
 
-    <div class="filter-drawer" id="filterDrawer">
-      <div class="filter-group">
-        <label>Genre</label>
-        <div id="genreTags" style="display:flex;flex-wrap:wrap;gap:0.3rem;"></div>
       </div>
-      <div class="filter-group">
-        <label>Status</label>
-        <select id="statusFilter">
-          <option value="">Semua</option>
-          <option value="ongoing">Ongoing</option>
-          <option value="completed">Completed</option>
-          <option value="hiatus">Hiatus</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-      </div>
-      <div class="filter-actions">
-        <button id="resetFilter">Reset</button>
-        <button class="apply-filter" id="applyFilter">Terapkan</button>
-      </div>
-    </div>
 
-    <div class="loading-overlay" id="loadingOverlay">
-      <i class="fas fa-spinner fa-spin"></i>
-      <p>Memuat manga...</p>
-    </div>
-
-    <div id="listView">
-      <div class="manga-grid" id="mangaGrid"></div>
-      <div class="pagination" id="pagination"></div>
-    </div>
-
-    <div class="detail-view" id="detailView">
-      <button class="detail-back" id="detailBack"><i class="fas fa-arrow-left"></i> Kembali</button>
-      <div class="detail-main" id="detailMain"></div>
-      <div class="chapters-section">
-        <h3>Daftar Chapter <span style="font-size:0.7rem;font-weight:400;color:var(--muted);">(Bahasa Indonesia)</span></h3>
-        <div class="chapter-list" id="chapterList"></div>
-      </div>
-    </div>
-
-    <div class="reader-view" id="readerView">
-      <div class="reader-nav">
-        <span class="reader-title" id="readerTitle">Membaca Chapter</span>
-        <div class="reader-actions">
-          <select id="chapterSelect" style="min-width:120px;"></select>
-          <button id="readerBack"><i class="fas fa-arrow-left"></i> Kembali</button>
+      <!-- KANAN: SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <!-- Top Rating -->
+        <div class="widget">
+          <h4><i class="fas fa-star"></i> Top Rating</h4>
+          <div id="topRatingList"></div>
         </div>
-      </div>
-      <div class="reader-images" id="readerImages"></div>
+
+        <!-- Most Viewed -->
+        <div class="widget">
+          <h4><i class="fas fa-eye"></i> Most Viewed</h4>
+          <div id="mostViewedList"></div>
+        </div>
+
+        <!-- Newest -->
+        <div class="widget">
+          <h4><i class="fas fa-clock"></i> Newest</h4>
+          <div id="newestList"></div>
+        </div>
+
+        <!-- Random -->
+        <div class="widget">
+          <h4><i class="fas fa-random"></i> Random</h4>
+          <div id="randomList"></div>
+        </div>
+
+        <!-- Ad Placeholder -->
+        <div class="widget" style="text-align:center; padding:2rem 1rem; background:var(--bg-card); border:1px dashed var(--border-color);">
+          <i class="fas fa-ad" style="font-size:2rem; color:var(--fg-muted);"></i>
+          <p style="font-size:0.7rem; color:var(--fg-muted); margin-top:0.5rem;">Advertisement</p>
+        </div>
+      </aside>
+
     </div>
   </div>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="footer">
-    <div class="footer-grid">
-      <div><h4 class="brand-footer">Akino Store</h4><p>Jasa digital & game terpercaya sejak 2022.</p></div>
-      <div><h4>Layanan</h4><a href="CarParkingMultiplayer.html">Car Parking</a><a href="SosialMedia.html">Sosial Media</a><a href="designedit.html">Design / Edit</a></div>
-      <div><h4>Tentang</h4><a href="about.html">About Us</a><a href="https://wa.me/6289687163314" target="_blank">Contact</a></div>
-      <div><h4>Legal</h4><a href="privacy.html">Kebijakan Privasi</a><a href="terms.html">Syarat &amp; Ketentuan</a></div>
-      <div><h4>Follow</h4><a href="https://www.tiktok.com/@akinolaset_" target="_blank">TikTok</a><a href="https://www.instagram.com/akinostore_" target="_blank">Instagram</a><a href="https://youtube.com/@akinolaset" target="_blank">YouTube</a></div>
+  <!-- ============================================================
+  DETAIL PAGE (hidden by default)
+  ============================================================ -->
+  <div class="container detail-page" id="detailPage">
+    <button class="back" id="detailBack"><i class="fas fa-arrow-left"></i> Back</button>
+    <div class="detail-main" id="detailMain"></div>
+    <div class="detail-chapters">
+      <h3>Chapters</h3>
+      <div class="ch-list" id="detailChapterList"></div>
     </div>
-    <div class="footer-bottom">&copy; 2022 Akino Store. All Rights Reserved.</div>
-  </footer>
+  </div>
 
-  <!-- ========================================================== -->
-  <!-- ===== SCRIPT ===== -->
-  <!-- ========================================================== -->
+  <!-- ============================================================
+  READER PAGE (hidden by default)
+  ============================================================ -->
+  <div class="container reader-page" id="readerPage">
+    <div class="reader-nav">
+      <span class="reader-title" id="readerTitle">Reading...</span>
+      <div class="reader-actions">
+        <select id="readerChapterSelect"></select>
+        <button id="readerBack"><i class="fas fa-arrow-left"></i> Back</button>
+      </div>
+    </div>
+    <div class="reader-images" id="readerImages"></div>
+  </div>
+
+  <!-- ============================================================
+  TOAST CONTAINER
+  ============================================================ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ============================================================
+  SCRIPTS
+  ============================================================ -->
   <script>
-    // ─── NAVBAR & THEME ───
-    (function() {
-      const navbar = document.getElementById('navbar');
-      window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 40); });
-      const menuToggle = document.getElementById('menuToggle');
-      const navLinks = document.getElementById('navLinks');
-      menuToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        const icon = menuToggle.querySelector('i');
-        icon.className = navLinks.classList.contains('active') ? 'fas fa-xmark' : 'fas fa-bars';
-      });
-      const dropdownService = document.getElementById('dropdownService');
-      const dropdownToggle = document.getElementById('dropdownToggle');
-      dropdownToggle.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) { e.preventDefault(); dropdownService.classList.toggle('active'); }
-      });
-      navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          if (window.innerWidth <= 768) {
-            navLinks.classList.remove('active');
-            menuToggle.querySelector('i').className = 'fas fa-bars';
-          }
-        });
-      });
-      const themeToggle = document.getElementById('themeToggle');
-      const themeIcon = themeToggle.querySelector('i');
-      const currentTheme = localStorage.getItem('theme') || 'dark';
-      if (currentTheme === 'light') { document.body.classList.add('light-theme'); themeIcon.className = 'fas fa-sun'; }
-      themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light-theme');
-        const isLight = document.body.classList.contains('light-theme');
-        themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      });
-    })();
+    // ============================================================
+    // CONFIG
+    // ============================================================
+    const WORKER_URL = 'https://manga-scrapper.akinostore.workers.dev';
+    const COVER_BASE = 'https://uploads.mangadex.org/covers';
 
-    // ─── MANGA APP ───
-    (function mangaApp() {
-      console.log('🚀 Manga App started');
+    // ============================================================
+    // STATE
+    // ============================================================
+    const state = {
+      mangaList: [],
+      trending: [],
+      popular: [],
+      latest: [],
+      completed: [],
+      ongoing: [],
+      total: 0,
+      offset: 0,
+      limit: 24,
+      currentManga: null,
+      currentChapters: [],
+      currentChapterIndex: 0,
+      isFetching: false,
+      hasMore: true,
+      bookmarks: JSON.parse(localStorage.getItem('mangaBookmarks') || '[]'),
+      history: JSON.parse(localStorage.getItem('mangaHistory') || '[]'),
+      searchResults: [],
+    };
 
-      const WORKER_URL = 'https://manga-scrapper.akinostore.workers.dev';
+    // ============================================================
+    // DOM REFS
+    // ============================================================
+    const $ = (id) => document.getElementById(id);
+    const $$ = (sel) => document.querySelectorAll(sel);
 
-      let state = {
-        view: 'list',
-        mangaList: [],
-        total: 0,
-        limit: 24,
-        offset: 0,
-        currentManga: null,
-        currentChapters: [],
-        currentChapterIndex: 0,
-        filters: { title: '', genres: [], status: '', sort: 'latestUploadedChapter' },
-        allGenres: [],
-        selectedGenres: [],
-        loading: false,
-        error: null,
+    const heroSlides = $('heroSlides');
+    const heroDots = $('heroDots');
+    const trendingGrid = $('trendingGrid');
+    const latestList = $('latestList');
+    const popularGrid = $('popularGrid');
+    const completedGrid = $('completedGrid');
+    const ongoingGrid = $('ongoingGrid');
+    const genreGrid = $('genreGrid');
+    const topRatingList = $('topRatingList');
+    const mostViewedList = $('mostViewedList');
+    const newestList = $('newestList');
+    const randomList = $('randomList');
+    const infiniteTrigger = $('infiniteTrigger');
+    const detailPage = $('detailPage');
+    const detailMain = $('detailMain');
+    const detailChapterList = $('detailChapterList');
+    const detailBack = $('detailBack');
+    const readerPage = $('readerPage');
+    const readerTitle = $('readerTitle');
+    const readerImages = $('readerImages');
+    const readerChapterSelect = $('readerChapterSelect');
+    const readerBack = $('readerBack');
+    const searchOverlay = $('searchOverlay');
+    const searchInput = $('searchInput');
+    const searchResults = $('searchResults');
+    const searchToggle = $('searchToggle');
+    const closeSearch = $('closeSearch');
+    const themeToggle = $('themeToggle');
+    const loginBtn = $('loginBtn');
+    const hamburger = $('hamburger');
+    const mobileMenu = $('mobileMenu');
+    const navbar = $('navbar');
+    const toastContainer = $('toastContainer');
+
+    let heroInterval = null;
+    let heroIndex = 0;
+
+    // ============================================================
+    // UTILITY FUNCTIONS
+    // ============================================================
+    function getTitle(attrs) {
+      if (!attrs || !attrs.title) return 'Untitled';
+      const t = attrs.title;
+      return t.en || t.id || t.ja || t['en-jp'] || t['ja-ro'] || Object.values(t)[0] || 'Untitled';
+    }
+
+    function getCoverUrl(manga) {
+      if (!manga || !manga.relationships) return null;
+      const coverRel = manga.relationships.find(r => r.type === 'cover_art');
+      if (!coverRel || !coverRel.attributes) return null;
+      const fileName = coverRel.attributes.fileName;
+      if (!fileName) return null;
+      return `${WORKER_URL}/proxy-image?url=${encodeURIComponent(`${COVER_BASE}/${manga.id}/${fileName}`)}`;
+    }
+
+    function getStatusBadge(status) {
+      const map = {
+        'ongoing': 'badge-ongoing',
+        'completed': 'badge-completed',
+        'hiatus': 'badge-hiatus',
+        'cancelled': 'badge-hiatus',
       };
+      return map[status] || '';
+    }
 
-      // DOM refs
-      const $ = (id) => document.getElementById(id);
-      const mangaGrid = $('mangaGrid');
-      const pagination = $('pagination');
-      const loadingOverlay = $('loadingOverlay');
-      const searchInput = $('searchInput');
-      const searchBtn = $('searchBtn');
-      const sortSelect = $('sortSelect');
-      const filterToggle = $('filterToggle');
-      const filterDrawer = $('filterDrawer');
-      const genreTags = $('genreTags');
-      const statusFilter = $('statusFilter');
-      const resetFilter = $('resetFilter');
-      const applyFilter = $('applyFilter');
-      const detailView = $('detailView');
-      const detailMain = $('detailMain');
-      const chapterList = $('chapterList');
-      const detailBack = $('detailBack');
-      const readerView = $('readerView');
-      const readerTitle = $('readerTitle');
-      const readerImages = $('readerImages');
-      const readerBack = $('readerBack');
-      const chapterSelect = $('chapterSelect');
-      const listView = $('listView');
+    function getStatusLabel(status) {
+      const map = {
+        'ongoing': 'Ongoing',
+        'completed': 'Completed',
+        'hiatus': 'Hiatus',
+        'cancelled': 'Cancelled',
+      };
+      return map[status] || status || 'Unknown';
+    }
 
-      // ─── GET TITLE ───
-      function getTitle(attrs) {
-        if (!attrs || !attrs.title) return 'Untitled';
-        const t = attrs.title;
-        return t.en || t.id || t.ja || t['en-jp'] || t['ja-ro'] || Object.values(t)[0] || 'Untitled';
+    function formatDate(dateStr) {
+      if (!dateStr) return 'Unknown';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function timeAgo(dateStr) {
+      if (!dateStr) return 'Unknown';
+      const now = new Date();
+      const past = new Date(dateStr);
+      const diff = Math.floor((now - past) / 1000);
+      if (diff < 60) return `${diff}s ago`;
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+      return formatDate(dateStr);
+    }
+
+    function getProxyUrl(originalUrl) {
+      return `${WORKER_URL}/proxy-image?url=${encodeURIComponent(originalUrl)}`;
+    }
+
+    function showToast(message, icon = 'fa-check-circle') {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+      toastContainer.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(50px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function toggleBookmark(mangaId) {
+      const idx = state.bookmarks.indexOf(mangaId);
+      if (idx > -1) {
+        state.bookmarks.splice(idx, 1);
+        showToast('Removed from bookmarks', 'fa-bookmark');
+      } else {
+        state.bookmarks.push(mangaId);
+        showToast('Added to bookmarks', 'fa-bookmark');
       }
+      localStorage.setItem('mangaBookmarks', JSON.stringify(state.bookmarks));
+    }
 
-      // ─── GET COVER URL (via Worker proxy) ───
-      function getCoverUrl(manga) {
-        if (!manga || !manga.relationships) return null;
-        const coverRel = manga.relationships.find(r => r.type === 'cover_art');
-        if (!coverRel || !coverRel.attributes) return null;
-        const fileName = coverRel.attributes.fileName;
-        if (!fileName) return null;
-        const originalUrl = `https://uploads.mangadex.org/covers/${manga.id}/${fileName}`;
-        // Lewatkan melalui Worker proxy
-        return `${WORKER_URL}/proxy-image?url=${encodeURIComponent(originalUrl)}`;
-      }
+    function isBookmarked(mangaId) {
+      return state.bookmarks.includes(mangaId);
+    }
 
-      // ─── API FETCH ───
-      async function apiFetch(endpoint, params = {}) {
-        const url = new URL(WORKER_URL + endpoint);
-        Object.keys(params).forEach(key => {
-          if (Array.isArray(params[key])) {
-            params[key].forEach(v => url.searchParams.append(key, v));
-          } else if (typeof params[key] === 'object' && params[key] !== null) {
-            if (key === 'order') {
-              const orderObj = params[key];
-              Object.keys(orderObj).forEach(orderKey => {
-                url.searchParams.append(`order[${orderKey}]`, orderObj[orderKey]);
-              });
-            } else {
-              url.searchParams.append(key, JSON.stringify(params[key]));
-            }
-          } else if (params[key] !== undefined && params[key] !== '') {
-            url.searchParams.append(key, params[key]);
+    // ============================================================
+    // API HELPERS
+    // ============================================================
+    async function apiFetch(endpoint, params = {}) {
+      const url = new URL(WORKER_URL + endpoint);
+      Object.keys(params).forEach(key => {
+        if (Array.isArray(params[key])) {
+          params[key].forEach(v => url.searchParams.append(key, v));
+        } else if (typeof params[key] === 'object' && params[key] !== null) {
+          if (key === 'order') {
+            const orderObj = params[key];
+            Object.keys(orderObj).forEach(orderKey => {
+              url.searchParams.append(`order[${orderKey}]`, orderObj[orderKey]);
+            });
+          } else {
+            url.searchParams.append(key, JSON.stringify(params[key]));
           }
-        });
-        console.log('📡 Fetching:', url.toString());
-        const resp = await fetch(url);
-        if (!resp.ok) {
-          const text = await resp.text();
-          console.error('❌ API error:', resp.status, text);
-          throw new Error(`HTTP ${resp.status}: ${text.substring(0, 200)}`);
+        } else if (params[key] !== undefined && params[key] !== '') {
+          url.searchParams.append(key, params[key]);
         }
-        const json = await resp.json();
-        console.log('✅ API response OK');
-        return json;
+      });
+      console.log('📡 Fetching:', url.toString());
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        const text = await resp.text();
+        throw new Error(`HTTP ${resp.status}: ${text.substring(0, 150)}`);
       }
+      return resp.json();
+    }
 
-      // ─── FETCH MANGA LIST ───
-      async function fetchMangaList() {
-        console.log('🔄 fetchMangaList called');
-        if (state.loading) return;
-        state.loading = true;
-        state.error = null;
-        showLoading(true);
-        try {
-          const params = {
-            limit: state.limit,
-            offset: state.offset,
-            'availableTranslatedLanguage[]': ['id'],
-            'contentRating[]': ['safe', 'suggestive', 'erotica'],
-            'includes[]': ['cover_art', 'artist', 'author'],
-            order: { [state.filters.sort]: 'desc' },
-          };
-          if (state.filters.title) params.title = state.filters.title;
-          if (state.filters.status) params.status = state.filters.status;
-          if (state.selectedGenres.length) {
-            params['includedTags[]'] = state.selectedGenres;
-          }
+    // ============================================================
+    // FETCH MANGA LIST (General)
+    // ============================================================
+    async function fetchMangaList(params = {}, append = false) {
+      if (state.isFetching) return;
+      state.isFetching = true;
 
-          const data = await apiFetch('/manga', params);
-          console.log('📦 Manga data:', data);
-          state.mangaList = data.data || [];
-          state.total = data.total || 0;
-          renderMangaGrid();
-          renderPagination();
-        } catch (err) {
-          console.error('❌ fetchMangaList error:', err);
-          state.error = err.message || 'Gagal memuat manga.';
-          renderError(state.error);
+      try {
+        const defaultParams = {
+          limit: state.limit,
+          offset: state.offset,
+          'availableTranslatedLanguage[]': ['id'],
+          'contentRating[]': ['safe', 'suggestive', 'erotica'],
+          'includes[]': ['cover_art', 'artist', 'author'],
+          order: { latestUploadedChapter: 'desc' },
+        };
+        const merged = { ...defaultParams, ...params };
+        const data = await apiFetch('/manga', merged);
+        const items = data.data || [];
+        state.total = data.total || 0;
+
+        if (append) {
+          state.mangaList = [...state.mangaList, ...items];
+        } else {
+          state.mangaList = items;
         }
-        state.loading = false;
-        showLoading(false);
+
+        state.hasMore = state.mangaList.length < state.total;
+        state.offset += state.limit;
+
+        return items;
+      } catch (err) {
+        console.error('fetchMangaList error:', err);
+        showToast('Failed to load manga: ' + err.message, 'fa-exclamation-triangle');
+        return [];
+      } finally {
+        state.isFetching = false;
       }
+    }
 
-      // ─── RENDER MANGA GRID ───
-      function renderMangaGrid() {
-        console.log('🖼️ renderMangaGrid called, total items:', state.mangaList.length);
-        mangaGrid.innerHTML = '';
-        if (!state.mangaList.length) {
-          mangaGrid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:2rem 0;">Tidak ada manga ditemukan.</p>`;
-          return;
-        }
-        state.mangaList.forEach(manga => {
-          const item = document.createElement('div');
-          item.className = 'manga-item';
-          const title = getTitle(manga.attributes);
-          const coverUrl = getCoverUrl(manga);
-          const finalCover = coverUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
-          console.log('🖼️ Cover URL (via proxy) for', title, ':', coverUrl);
-          const status = manga.attributes.status || 'unknown';
-          const rating = manga.attributes?.rating?.bayesianAverage || 0;
-          const year = manga.attributes.year || '';
-
-          item.innerHTML = `
-            <img class="cover" src="${finalCover}" alt="${title}" crossorigin="anonymous" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect width=%22200%22 height=%22300%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2214%22%3EGagal%20load%3C/text%3E%3C/svg%3E'" />
-            <div class="manga-info">
-              <h3>${title}</h3>
-              <div class="meta">
-                <span class="status-badge">${status}</span>
-                ${year ? `<span><i class="far fa-calendar-alt"></i> ${year}</span>` : ''}
-                ${rating ? `<span class="rating"><i class="fas fa-star"></i> ${rating.toFixed(1)}</span>` : ''}
-              </div>
-            </div>
-          `;
-          item.addEventListener('click', () => openDetail(manga.id));
-          mangaGrid.appendChild(item);
-        });
-      }
-
-      // ─── RENDER PAGINATION ───
-      function renderPagination() {
-        const totalPages = Math.ceil(state.total / state.limit);
-        const currentPage = Math.floor(state.offset / state.limit) + 1;
-        pagination.innerHTML = `
-          <button ${state.offset === 0 ? 'disabled' : ''} id="prevPage"><i class="fas fa-chevron-left"></i></button>
-          <span class="page-info">${currentPage} / ${totalPages || 1}</span>
-          <button ${state.offset + state.limit >= state.total ? 'disabled' : ''} id="nextPage"><i class="fas fa-chevron-right"></i></button>
-        `;
-        document.getElementById('prevPage')?.addEventListener('click', () => {
-          if (state.offset > 0) { state.offset -= state.limit; fetchMangaList(); }
-        });
-        document.getElementById('nextPage')?.addEventListener('click', () => {
-          if (state.offset + state.limit < state.total) { state.offset += state.limit; fetchMangaList(); }
-        });
-      }
-
-      // ─── RENDER ERROR ───
-      function renderError(msg) {
-        mangaGrid.innerHTML = `
-          <div class="error-message" style="grid-column:1/-1;">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>${msg}</p>
-            <p style="font-size:0.8rem;margin-top:0.5rem;">Cek console (F12) untuk detail error.</p>
+    // ============================================================
+    // RENDER SKELETON
+    // ============================================================
+    function renderSkeleton(gridId, count = 12) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      grid.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const div = document.createElement('div');
+        div.className = 'skeleton-card';
+        div.innerHTML = `
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text">
+            <div class="line"></div>
+            <div class="line short"></div>
           </div>
         `;
-        pagination.innerHTML = '';
+        grid.appendChild(div);
+      }
+    }
+
+    // ============================================================
+    // RENDER MANGA GRID (reusable)
+    // ============================================================
+    function renderMangaGrid(gridId, items, showRank = false, cols = 6) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      grid.className = `manga-grid cols-${cols}`;
+      grid.innerHTML = '';
+      if (!items || items.length === 0) {
+        grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:var(--fg-secondary);padding:2rem 0;">No manga found.</p>`;
+        return;
+      }
+      items.forEach((manga, idx) => {
+        const title = getTitle(manga.attributes);
+        const cover = getCoverUrl(manga);
+        const status = manga.attributes.status || 'unknown';
+        const rating = manga.attributes?.rating?.bayesianAverage || 0;
+        const year = manga.attributes.year || '';
+        const coverSrc = cover || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
+
+        const card = document.createElement('div');
+        card.className = 'manga-card';
+        card.innerHTML = `
+          ${showRank && idx < 3 ? `<div class="rank">#${idx+1}</div>` : ''}
+          <img class="cover" src="${coverSrc}" alt="${title}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect width=%22200%22 height=%22300%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2214%22%3ENo%20Cover%3C/text%3E%3C/svg%3E'" />
+          <div class="info">
+            <h4>${title}</h4>
+            <div class="meta">
+              <span class="badge ${getStatusBadge(status)}">${getStatusLabel(status)}</span>
+              ${rating ? `<span class="badge badge-rating"><i class="fas fa-star rating-star"></i> ${rating.toFixed(1)}</span>` : ''}
+              ${year ? `<span>${year}</span>` : ''}
+            </div>
+          </div>
+          <button class="read-btn" data-id="${manga.id}">Read Now</button>
+        `;
+        card.querySelector('.read-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          openDetail(manga.id);
+        });
+        card.addEventListener('click', () => openDetail(manga.id));
+        grid.appendChild(card);
+      });
+    }
+
+    // ============================================================
+    // RENDER LATEST LIST
+    // ============================================================
+    function renderLatestList(items) {
+      latestList.innerHTML = '';
+      if (!items || items.length === 0) {
+        latestList.innerHTML = `<p style="color:var(--fg-secondary);padding:1rem 0;">No latest updates.</p>`;
+        return;
+      }
+      items.forEach(manga => {
+        const title = getTitle(manga.attributes);
+        const cover = getCoverUrl(manga);
+        const coverSrc = cover || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
+        const status = manga.attributes.status || 'unknown';
+        const rating = manga.attributes?.rating?.bayesianAverage || 0;
+        const latestChapter = manga.attributes?.latestUploadedChapter || 'N/A';
+        const updatedAt = manga.attributes?.updatedAt || manga.attributes?.createdAt;
+
+        // Ambil chapter terbaru (dari relasi tidak tersedia, pakai dummy)
+        const chapters = ['Chapter 245', 'Chapter 244', 'Chapter 243'];
+
+        const item = document.createElement('div');
+        item.className = 'latest-item';
+        item.innerHTML = `
+          <div class="thumb">
+            <img src="${coverSrc}" alt="${title}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect width=%22200%22 height=%22300%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2214%22%3ENo%20Cover%3C/text%3E%3C/svg%3E'" />
+          </div>
+          <div class="detail">
+            <h4>${title}</h4>
+            <div class="meta">
+              <span class="badge ${getStatusBadge(status)}">${getStatusLabel(status)}</span>
+              ${rating ? `<span><i class="fas fa-star rating-star"></i> ${rating.toFixed(1)}</span>` : ''}
+              <span>Chapter ${latestChapter}</span>
+            </div>
+            <div class="chapters">
+              ${chapters.map(ch => `<span>${ch}</span>`).join('')}
+            </div>
+            <div class="update-time">${updatedAt ? timeAgo(updatedAt) : 'Recently'}</div>
+          </div>
+        `;
+        item.addEventListener('click', () => openDetail(manga.id));
+        latestList.appendChild(item);
+      });
+    }
+
+    // ============================================================
+    // RENDER GENRE GRID
+    // ============================================================
+    function renderGenreGrid(genres) {
+      genreGrid.innerHTML = '';
+      const icons = {
+        'action': 'fa-fist-raised',
+        'adventure': 'fa-compass',
+        'comedy': 'fa-laugh',
+        'drama': 'fa-theater-masks',
+        'fantasy': 'fa-hat-wizard',
+        'romance': 'fa-heart',
+        'school': 'fa-school',
+        'slice of life': 'fa-coffee',
+        'martial arts': 'fa-fist-raised',
+        'magic': 'fa-magic',
+        'supernatural': 'fa-ghost',
+        'isekai': 'fa-globe',
+        'historical': 'fa-landmark',
+        'horror': 'fa-skull',
+        'sci-fi': 'fa-rocket',
+        'sports': 'fa-basketball-ball',
+        'mecha': 'fa-robot',
+        'psychological': 'fa-brain',
+        'mystery': 'fa-search',
+      };
+      const genreList = genres.length ? genres : Object.keys(icons);
+      genreList.forEach(name => {
+        const div = document.createElement('div');
+        div.className = 'genre-item';
+        const icon = icons[name.toLowerCase()] || 'fa-tag';
+        div.innerHTML = `<i class="fas ${icon}"></i><span>${name}</span>`;
+        div.addEventListener('click', () => {
+          searchInput.value = name;
+          doSearch();
+          searchOverlay.classList.add('open');
+        });
+        genreGrid.appendChild(div);
+      });
+    }
+
+    // ============================================================
+    // RENDER SIDEBAR WIDGETS
+    // ============================================================
+    function renderSidebarWidget(widgetId, items, label = '') {
+      const el = document.getElementById(widgetId);
+      if (!el) return;
+      el.innerHTML = '';
+      if (!items || items.length === 0) {
+        el.innerHTML = `<p style="font-size:0.7rem;color:var(--fg-secondary);">No data</p>`;
+        return;
+      }
+      items.slice(0, 5).forEach(manga => {
+        const title = getTitle(manga.attributes);
+        const cover = getCoverUrl(manga);
+        const coverSrc = cover || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <img src="${coverSrc}" alt="${title}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect width=%22200%22 height=%22300%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2214%22%3ENo%20Cover%3C/text%3E%3C/svg%3E'" />
+          <div class="info">
+            <div class="title">${title}</div>
+            <div class="sub">${label || manga.attributes.status || ''}</div>
+          </div>
+        `;
+        div.addEventListener('click', () => openDetail(manga.id));
+        el.appendChild(div);
+      });
+    }
+
+    // ============================================================
+    // HERO SLIDER
+    // ============================================================
+    function renderHeroSlider(items) {
+      heroSlides.innerHTML = '';
+      heroDots.innerHTML = '';
+      if (!items || items.length === 0) {
+        heroSlides.innerHTML = `<div class="slide" style="background:var(--bg-card);"><div class="content"><h2>Welcome to Manga</h2><p>Loading popular manga...</p></div></div>`;
+        return;
       }
 
-      // ─── OPEN DETAIL ───
-      async function openDetail(mangaId) {
-        showLoading(true);
-        try {
-          const data = await apiFetch(`/manga/${mangaId}`, {
-            'includes[]': ['cover_art', 'artist', 'author']
-          });
-          state.currentManga = data.data;
-          const feed = await apiFetch(`/manga/${mangaId}/feed`, {
-            'translatedLanguage[]': ['id'],
-            order: { chapter: 'desc' },
-            limit: 100,
-            'includes[]': ['scanlation_group'],
-          });
-          state.currentChapters = feed.data || [];
-          renderDetail();
-          switchView('detail');
-        } catch (err) {
-          console.error('❌ openDetail error:', err);
-          alert('Gagal memuat detail manga: ' + err.message);
+      const slides = items.slice(0, 5);
+      slides.forEach((manga, idx) => {
+        const title = getTitle(manga.attributes);
+        const cover = getCoverUrl(manga);
+        const desc = manga.attributes?.description?.en || manga.attributes?.description?.id || 'No description.';
+        const status = manga.attributes.status || 'unknown';
+        const rating = manga.attributes?.rating?.bayesianAverage || 0;
+        const genreTags = (manga.attributes.tags || []).filter(t => t.attributes?.group === 'genre').slice(0, 3);
+
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        if (cover) {
+          slide.style.backgroundImage = `url(${cover})`;
+        } else {
+          slide.style.background = 'var(--bg-card)';
         }
-        showLoading(false);
-      }
-
-      // ─── RENDER DETAIL ───
-      function renderDetail() {
-        const m = state.currentManga;
-        if (!m) return;
-        const attrs = m.attributes;
-        const title = getTitle(attrs);
-        const altTitles = attrs.altTitles?.map(t => t.en || t.id || '').filter(Boolean).join(', ') || '';
-        const description = attrs.description?.en || attrs.description?.id || 'Tidak ada sinopsis.';
-        const status = attrs.status || 'unknown';
-        const year = attrs.year || '';
-        const rating = attrs.rating?.bayesianAverage || 0;
-        const genres = (m.attributes.tags || []).filter(t => t.attributes?.group === 'genre');
-        const coverUrl = getCoverUrl(m);
-        const finalCover = coverUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
-
-        detailMain.innerHTML = `
-          <div class="detail-cover"><img src="${finalCover}" alt="${title}" crossorigin="anonymous" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect width=%22200%22 height=%22300%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2214%22%3EGagal%20load%3C/text%3E%3C/svg%3E'" /></div>
-          <div class="detail-info">
+        slide.innerHTML = `
+          <div class="content">
+            <span class="badge">${getStatusLabel(status)}</span>
             <h2>${title}</h2>
-            ${altTitles ? `<div class="alt-titles">${altTitles}</div>` : ''}
-            <div class="detail-meta">
-              <span><strong>Status:</strong> ${status}</span>
-              ${year ? `<span><strong>Tahun:</strong> ${year}</span>` : ''}
-              ${rating ? `<span><strong>Rating:</strong> ⭐ ${rating.toFixed(1)}</span>` : ''}
+            <div class="sinopsis">${desc}</div>
+            <div class="meta">
+              ${genreTags.map(g => `<span>${g.attributes.name.en || '?'}</span>`).join('')}
+              ${rating ? `<span><i class="fas fa-star rating-star"></i> ${rating.toFixed(1)}</span>` : ''}
             </div>
-            <div class="genre-list">
-              ${genres.map(g => `<span class="genre-tag">${g.attributes.name.en || g.attributes.name.id || '?'}</span>`).join('')}
+            <div class="actions">
+              <button class="btn-read" data-id="${manga.id}">Read Now</button>
+              <button class="btn-bookmark" data-id="${manga.id}"><i class="fas ${isBookmarked(manga.id) ? 'fa-bookmark' : 'fa-bookmark'}" style="margin-right:4px;"></i> ${isBookmarked(manga.id) ? 'Saved' : 'Bookmark'}</button>
             </div>
-            <div class="description">${description}</div>
           </div>
         `;
+        slide.querySelector('.btn-read').addEventListener('click', (e) => {
+          e.stopPropagation();
+          openDetail(manga.id);
+        });
+        slide.querySelector('.btn-bookmark').addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleBookmark(manga.id);
+          renderHeroSlider(items);
+        });
+        heroSlides.appendChild(slide);
 
-        const chapters = state.currentChapters;
-        chapterList.innerHTML = '';
-        if (!chapters.length) {
-          chapterList.innerHTML = `<p style="color:var(--muted);padding:0.5rem 0;">Belum ada chapter Bahasa Indonesia.</p>`;
+        // Dots
+        const dot = document.createElement('span');
+        dot.className = idx === 0 ? 'active' : '';
+        dot.dataset.index = idx;
+        dot.addEventListener('click', () => goToSlide(idx));
+        heroDots.appendChild(dot);
+      });
+
+      heroIndex = 0;
+      startHeroAutoSlide();
+    }
+
+    function goToSlide(idx) {
+      heroIndex = idx;
+      const slides = heroSlides.children;
+      const dots = heroDots.children;
+      const total = slides.length;
+      if (total === 0) return;
+      heroSlides.style.transform = `translateX(-${idx * 100}%)`;
+      Array.from(dots).forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+
+    function startHeroAutoSlide() {
+      if (heroInterval) clearInterval(heroInterval);
+      heroInterval = setInterval(() => {
+        const total = heroSlides.children.length;
+        if (total === 0) return;
+        const next = (heroIndex + 1) % total;
+        goToSlide(next);
+      }, 5000);
+    }
+
+    // ============================================================
+    // SEARCH
+    // ============================================================
+    async function doSearch() {
+      const query = searchInput.value.trim();
+      if (!query) {
+        searchResults.innerHTML = '<p style="color:var(--fg-secondary);font-size:0.8rem;">Type to search...</p>';
+        return;
+      }
+      try {
+        const data = await apiFetch('/manga', {
+          title: query,
+          limit: 10,
+          'availableTranslatedLanguage[]': ['id'],
+          'includes[]': ['cover_art'],
+        });
+        const items = data.data || [];
+        searchResults.innerHTML = '';
+        if (items.length === 0) {
+          searchResults.innerHTML = '<p style="color:var(--fg-secondary);font-size:0.8rem;">No results found.</p>';
           return;
         }
-        chapters.forEach((ch, idx) => {
-          const chAttrs = ch.attributes;
-          const chNum = chAttrs.chapter || '?';
-          const chTitle = chAttrs.title || `Chapter ${chNum}`;
-          const uploaded = new Date(chAttrs.publishAt || chAttrs.createdAt).toLocaleDateString('id-ID');
-          const group = ch.relationships.find(r => r.type === 'scanlation_group')?.attributes?.name || 'Unknown';
+        items.forEach(manga => {
+          const title = getTitle(manga.attributes);
+          const cover = getCoverUrl(manga);
+          const coverSrc = cover || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
           const div = document.createElement('div');
-          div.className = 'chapter-item';
+          div.className = 'result-item';
           div.innerHTML = `
-            <span class="ch-num">${chTitle}</span>
-            <div class="ch-meta">
-              <span class="lang">ID</span>
-              <span><i class="far fa-calendar-alt"></i> ${uploaded}</span>
-              <span><i class="fas fa-users"></i> ${group}</span>
-              <button class="read-btn" data-index="${idx}">Baca</button>
+            <img src="${coverSrc}" alt="${title}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect width=%22200%22 height=%22300%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2214%22%3ENo%20Cover%3C/text%3E%3C/svg%3E'" />
+            <div class="info">
+              <h4>${title}</h4>
+              <span>${getStatusLabel(manga.attributes.status)}</span>
             </div>
           `;
-          div.querySelector('.read-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            const index = parseInt(e.target.dataset.index);
-            openReader(index);
+          div.addEventListener('click', () => {
+            searchOverlay.classList.remove('open');
+            openDetail(manga.id);
           });
-          chapterList.appendChild(div);
+          searchResults.appendChild(div);
         });
+      } catch (err) {
+        console.error(err);
+        searchResults.innerHTML = '<p style="color:var(--fg-secondary);font-size:0.8rem;">Search failed.</p>';
+      }
+    }
+
+    // ============================================================
+    // DETAIL
+    // ============================================================
+    async function openDetail(mangaId) {
+      try {
+        const data = await apiFetch(`/manga/${mangaId}`, {
+          'includes[]': ['cover_art', 'artist', 'author']
+        });
+        state.currentManga = data.data;
+        const feed = await apiFetch(`/manga/${mangaId}/feed`, {
+          'translatedLanguage[]': ['id'],
+          order: { chapter: 'desc' },
+          limit: 100,
+          'includes[]': ['scanlation_group'],
+        });
+        state.currentChapters = feed.data || [];
+        renderDetail();
+        // Simpan history
+        if (!state.history.includes(mangaId)) {
+          state.history.push(mangaId);
+          if (state.history.length > 50) state.history.shift();
+          localStorage.setItem('mangaHistory', JSON.stringify(state.history));
+        }
+        // Tampilkan detail
+        document.getElementById('mainContent').style.display = 'none';
+        detailPage.classList.add('open');
+        readerPage.classList.remove('open');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('openDetail error:', err);
+        showToast('Failed to load detail: ' + err.message, 'fa-exclamation-triangle');
+      }
+    }
+
+    function renderDetail() {
+      const m = state.currentManga;
+      if (!m) return;
+      const attrs = m.attributes;
+      const title = getTitle(attrs);
+      const altTitles = attrs.altTitles?.map(t => t.en || t.id || '').filter(Boolean).join(', ') || '';
+      const desc = attrs.description?.en || attrs.description?.id || 'No description.';
+      const status = attrs.status || 'unknown';
+      const year = attrs.year || '';
+      const rating = attrs.rating?.bayesianAverage || 0;
+      const genres = (m.attributes.tags || []).filter(t => t.attributes?.group === 'genre');
+      const coverUrl = getCoverUrl(m);
+      const coverSrc = coverUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23555" font-size="14"%3ENo%20Cover%3C/text%3E%3C/svg%3E';
+      const isBookmarked = state.bookmarks.includes(m.id);
+
+      detailMain.innerHTML = `
+        <div class="cover-wrap">
+          <img src="${coverSrc}" alt="${title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect width=%22200%22 height=%22300%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2214%22%3ENo%20Cover%3C/text%3E%3C/svg%3E'" />
+        </div>
+        <div class="info-wrap">
+          <h2>${title}</h2>
+          ${altTitles ? `<div class="alt-title">${altTitles}</div>` : ''}
+          <div class="detail-meta">
+            <span><strong>Status:</strong> ${getStatusLabel(status)}</span>
+            ${year ? `<span><strong>Year:</strong> ${year}</span>` : ''}
+            ${rating ? `<span><strong>Rating:</strong> ⭐ ${rating.toFixed(1)}</span>` : ''}
+            <span><strong>Bookmarks:</strong> ${state.bookmarks.length}</span>
+          </div>
+          <div class="genre-tags">
+            ${genres.map(g => `<span class="tag">${g.attributes.name.en || g.attributes.name.id || '?'}</span>`).join('')}
+          </div>
+          <div class="desc">${desc}</div>
+          <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+            <button class="btn-read" style="padding:0.4rem 1.5rem;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;font-weight:600;font-size:0.85rem;" id="detailBookmarkBtn">
+              <i class="fas ${isBookmarked ? 'fa-bookmark' : 'fa-bookmark'}"></i> ${isBookmarked ? 'Saved' : 'Bookmark'}
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('detailBookmarkBtn')?.addEventListener('click', () => {
+        toggleBookmark(m.id);
+        renderDetail();
+      });
+
+      // Chapters
+      const chapters = state.currentChapters;
+      detailChapterList.innerHTML = '';
+      if (!chapters.length) {
+        detailChapterList.innerHTML = '<p style="color:var(--fg-secondary);padding:0.5rem 0;">No chapters available in Indonesian.</p>';
+        return;
+      }
+      chapters.forEach((ch, idx) => {
+        const chAttrs = ch.attributes;
+        const chNum = chAttrs.chapter || '?';
+        const chTitle = chAttrs.title || `Chapter ${chNum}`;
+        const uploaded = chAttrs.publishAt || chAttrs.createdAt;
+        const group = ch.relationships.find(r => r.type === 'scanlation_group')?.attributes?.name || 'Unknown';
+        const div = document.createElement('div');
+        div.className = 'ch-item';
+        div.innerHTML = `
+          <div class="ch-info">
+            <span class="ch-num">${chTitle}</span>
+            <span class="ch-meta">${group} • ${formatDate(uploaded)}</span>
+          </div>
+          <button class="ch-read" data-index="${idx}">Read</button>
+        `;
+        div.querySelector('.ch-read').addEventListener('click', (e) => {
+          e.stopPropagation();
+          openReader(idx);
+        });
+        detailChapterList.appendChild(div);
+      });
+    }
+
+    // ============================================================
+    // READER
+    // ============================================================
+    async function openReader(chapterIndex) {
+      state.currentChapterIndex = chapterIndex;
+      const chapter = state.currentChapters[chapterIndex];
+      if (!chapter) {
+        showToast('Chapter not found.', 'fa-exclamation-triangle');
+        return;
       }
 
-      // ─── OPEN READER ───
-      async function openReader(chapterIndex) {
-        state.currentChapterIndex = chapterIndex;
-        const chapter = state.currentChapters[chapterIndex];
-        if (!chapter) {
-          alert('Chapter tidak ditemukan.');
-          return;
-        }
-        showLoading(true);
-        try {
-          const serverData = await apiFetch(`/at-home/server/${chapter.id}`);
-          const baseUrl = serverData.baseUrl;
-          const chapterHash = serverData.chapter.hash;
-          const pages = serverData.chapter.data || [];
+      try {
+        const serverData = await apiFetch(`/at-home/server/${chapter.id}`);
+        const baseUrl = serverData.baseUrl;
+        const chapterHash = serverData.chapter.hash;
+        const pages = serverData.chapter.data || [];
 
-          if (!pages.length) {
-            readerImages.innerHTML = `<p style="color:var(--muted);">Chapter ini tidak memiliki halaman.</p>`;
-            const title = chapter.attributes.title || `Chapter ${chapter.attributes.chapter || '?'}`;
-            readerTitle.textContent = `Membaca: ${title}`;
-            switchView('reader');
-            showLoading(false);
-            return;
-          }
-
+        if (!pages.length) {
+          readerImages.innerHTML = '<p style="color:var(--fg-secondary);">This chapter has no pages.</p>';
+        } else {
           const imageUrls = pages.map(p => `${baseUrl}/data/${chapterHash}/${p}`);
-
-          const allChapters = state.currentChapters;
-          const options = allChapters.map((ch, i) => {
-            const label = ch.attributes.title || `Chapter ${ch.attributes.chapter || i+1}`;
-            return `<option value="${i}" ${i === chapterIndex ? 'selected' : ''}>${label}</option>`;
-          }).join('');
-          chapterSelect.innerHTML = options;
-          chapterSelect.onchange = (e) => {
-            const idx = parseInt(e.target.value);
-            if (!isNaN(idx) && idx !== state.currentChapterIndex) {
-              openReader(idx);
-            }
-          };
-
           readerImages.innerHTML = '';
           imageUrls.forEach(url => {
             const img = document.createElement('img');
             img.src = url;
-            img.alt = 'Halaman';
+            img.alt = 'Page';
             img.crossOrigin = 'anonymous';
             img.onerror = function() {
               this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22%3E%3Crect width=%22400%22 height=%22600%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2220%22%3EGagal%20load%3C/text%3E%3C/svg%3E';
             };
             readerImages.appendChild(img);
           });
-
-          const title = chapter.attributes.title || `Chapter ${chapter.attributes.chapter || '?'}`;
-          readerTitle.textContent = `Membaca: ${title}`;
-
-          switchView('reader');
-        } catch (err) {
-          console.error('❌ openReader error:', err);
-          alert('Gagal memuat chapter: ' + err.message);
         }
-        showLoading(false);
-      }
 
-      // ─── SWITCH VIEW ───
-      function switchView(view) {
-        state.view = view;
-        listView.style.display = view === 'list' ? 'block' : 'none';
-        detailView.classList.toggle('open', view === 'detail');
-        readerView.classList.toggle('open', view === 'reader');
-        if (view === 'list') window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+        const title = chapter.attributes.title || `Chapter ${chapter.attributes.chapter || '?'}`;
+        readerTitle.textContent = `Reading: ${title}`;
 
-      // ─── LOADING ───
-      function showLoading(show) {
-        loadingOverlay.classList.toggle('show', show);
-      }
+        // Update chapter select
+        const allChapters = state.currentChapters;
+        const options = allChapters.map((ch, i) => {
+          const label = ch.attributes.title || `Chapter ${ch.attributes.chapter || i+1}`;
+          return `<option value="${i}" ${i === chapterIndex ? 'selected' : ''}>${label}</option>`;
+        }).join('');
+        readerChapterSelect.innerHTML = options;
+        readerChapterSelect.onchange = (e) => {
+          const idx = parseInt(e.target.value);
+          if (!isNaN(idx) && idx !== state.currentChapterIndex) {
+            openReader(idx);
+          }
+        };
 
-      // ─── FETCH GENRES ───
-      async function fetchGenres() {
-        try {
-          const data = await apiFetch('/manga/tag');
-          state.allGenres = data.data || [];
-          renderGenreTags();
-        } catch (err) {
-          console.error('❌ fetchGenres error:', err);
+        // Tampilkan reader
+        document.getElementById('mainContent').style.display = 'none';
+        detailPage.classList.remove('open');
+        readerPage.classList.add('open');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('openReader error:', err);
+        showToast('Failed to load chapter: ' + err.message, 'fa-exclamation-triangle');
+      }
+    }
+
+    // ============================================================
+    // INFINITE SCROLL
+    // ============================================================
+    let infiniteObserver = null;
+
+    function setupInfiniteScroll() {
+      if (infiniteObserver) infiniteObserver.disconnect();
+      infiniteObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && state.hasMore && !state.isFetching) {
+          loadMoreManga();
         }
+      }, { threshold: 0.1 });
+      infiniteObserver.observe(infiniteTrigger);
+    }
+
+    async function loadMoreManga() {
+      if (state.isFetching || !state.hasMore) return;
+      infiniteTrigger.classList.add('loading');
+      const items = await fetchMangaList({}, true);
+      infiniteTrigger.classList.remove('loading');
+      if (items && items.length > 0) {
+        // Append to trending grid (or we can append to a dedicated grid)
+        // For simplicity, we re-render trending with all items
+        renderMangaGrid('trendingGrid', state.mangaList, false, 6);
       }
-
-      function renderGenreTags() {
-        genreTags.innerHTML = '';
-        state.allGenres.forEach(tag => {
-          const span = document.createElement('span');
-          span.className = 'genre-tag';
-          span.dataset.id = tag.id;
-          span.textContent = tag.attributes.name.en || tag.attributes.name.id || '?';
-          if (state.selectedGenres.includes(tag.id)) span.classList.add('active');
-          span.addEventListener('click', () => {
-            span.classList.toggle('active');
-            const id = span.dataset.id;
-            if (span.classList.contains('active')) {
-              if (!state.selectedGenres.includes(id)) state.selectedGenres.push(id);
-            } else {
-              state.selectedGenres = state.selectedGenres.filter(g => g !== id);
-            }
-          });
-          genreTags.appendChild(span);
-        });
+      if (!state.hasMore) {
+        infiniteTrigger.innerHTML = '<span>No more manga.</span>';
       }
+    }
 
-      // ─── EVENT BINDING ───
-      function doSearch() {
-        state.filters.title = searchInput.value.trim();
-        state.offset = 0;
-        fetchMangaList();
-      }
-      searchBtn.addEventListener('click', doSearch);
-      searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+    // ============================================================
+    // INIT
+    // ============================================================
+    async function init() {
+      console.log('🚀 Manga App Starting...');
 
-      sortSelect.addEventListener('change', () => {
-        state.filters.sort = sortSelect.value;
-        state.offset = 0;
-        fetchMangaList();
+      // Skeleton
+      renderSkeleton('trendingGrid', 12);
+
+      // Fetch initial data
+      const params = {
+        limit: 24,
+        offset: 0,
+        'availableTranslatedLanguage[]': ['id'],
+        'contentRating[]': ['safe', 'suggestive', 'erotica'],
+        'includes[]': ['cover_art', 'artist', 'author'],
+        order: { latestUploadedChapter: 'desc' },
+      };
+      const data = await apiFetch('/manga', params);
+      const allItems = data.data || [];
+      state.total = data.total || 0;
+      state.mangaList = allItems;
+      state.offset = allItems.length;
+      state.hasMore = allItems.length < state.total;
+
+      // Populate sections
+      const shuffled = [...allItems].sort(() => Math.random() - 0.5);
+      const trending = shuffled.slice(0, 12);
+      const popular = shuffled.slice(0, 10);
+      const completed = allItems.filter(m => m.attributes.status === 'completed').slice(0, 8);
+      const ongoing = allItems.filter(m => m.attributes.status === 'ongoing').slice(0, 8);
+      const latest = allItems.slice(0, 10);
+
+      // Hero slider (5 popular)
+      const heroItems = allItems.slice(0, 5);
+
+      renderHeroSlider(heroItems);
+      renderMangaGrid('trendingGrid', trending, false, 6);
+      renderLatestList(latest);
+      renderMangaGrid('popularGrid', popular, true, 5);
+      renderMangaGrid('completedGrid', completed, false, 4);
+      renderMangaGrid('ongoingGrid', ongoing, false, 4);
+
+      // Genres (hardcoded list)
+      const genreNames = ['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Romance', 'School', 'Slice of Life', 'Martial Arts', 'Magic', 'Supernatural', 'Isekai', 'Historical', 'Horror', 'Sci-Fi', 'Sports', 'Mecha', 'Psychological', 'Mystery'];
+      renderGenreGrid(genreNames);
+
+      // Sidebar
+      const randomItems = [...allItems].sort(() => Math.random() - 0.5);
+      renderSidebarWidget('topRatingList', allItems.sort((a, b) => (b.attributes?.rating?.bayesianAverage || 0) - (a.attributes?.rating?.bayesianAverage || 0)), 'Rating');
+      renderSidebarWidget('mostViewedList', allItems, 'Views');
+      renderSidebarWidget('newestList', allItems, 'New');
+      renderSidebarWidget('randomList', randomItems, 'Random');
+
+      // Infinite scroll
+      setupInfiniteScroll();
+
+      console.log('✅ Initialization complete');
+    }
+
+    // ============================================================
+    // EVENT BINDINGS
+    // ============================================================
+
+    // Theme toggle
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-theme');
+      const isLight = document.body.classList.contains('light-theme');
+      const icon = themeToggle.querySelector('i');
+      icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    });
+
+    // Load theme
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-theme');
+      themeToggle.querySelector('i').className = 'fas fa-sun';
+    }
+
+    // Hamburger
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      mobileMenu.classList.toggle('open');
+    });
+
+    // Close mobile menu on link click
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('open');
       });
+    });
 
-      filterToggle.addEventListener('click', () => {
-        filterDrawer.classList.toggle('open');
+    // Search
+    searchToggle.addEventListener('click', () => {
+      searchOverlay.classList.add('open');
+      searchInput.focus();
+      doSearch();
+    });
+    closeSearch.addEventListener('click', () => {
+      searchOverlay.classList.remove('open');
+    });
+    searchOverlay.addEventListener('click', (e) => {
+      if (e.target === searchOverlay) searchOverlay.classList.remove('open');
+    });
+    searchInput.addEventListener('input', doSearch);
+
+    // Detail back
+    detailBack.addEventListener('click', () => {
+      detailPage.classList.remove('open');
+      document.getElementById('mainContent').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Reader back
+    readerBack.addEventListener('click', () => {
+      readerPage.classList.remove('open');
+      detailPage.classList.add('open');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Bookmark link
+    document.querySelectorAll('#bookmarkLink, #bookmarkLinkMobile').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (state.bookmarks.length === 0) {
+          showToast('No bookmarks yet.', 'fa-info-circle');
+          return;
+        }
+        // Buka detail pertama dari bookmark
+        openDetail(state.bookmarks[0]);
       });
+    });
 
-      applyFilter.addEventListener('click', () => {
-        state.filters.status = statusFilter.value;
-        state.offset = 0;
-        fetchMangaList();
-        filterDrawer.classList.remove('open');
-      });
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    });
 
-      resetFilter.addEventListener('click', () => {
-        state.selectedGenres = [];
-        state.filters.status = '';
-        statusFilter.value = '';
-        renderGenreTags();
-        state.offset = 0;
-        fetchMangaList();
-        filterDrawer.classList.remove('open');
-      });
+    // Login button (dummy)
+    loginBtn.addEventListener('click', () => {
+      showToast('Login feature coming soon!', 'fa-info-circle');
+    });
 
-      detailBack.addEventListener('click', () => { switchView('list'); });
-      readerBack.addEventListener('click', () => { switchView('detail'); });
+    // ============================================================
+    // START APP
+    // ============================================================
+    init();
 
-      // ─── INIT ───
-      async function init() {
-        console.log('🔄 Initializing...');
-        await fetchGenres();
-        await fetchMangaList();
-        console.log('✅ Initialization complete');
-      }
-
-      init();
-    })();
+    console.log('📚 Manga App Ready');
   </script>
 </body>
 </html>
