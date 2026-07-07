@@ -1057,9 +1057,7 @@
     let isFullView = false;
     let currentLang = null;
     let currentChapterNum = 0;
-    let preloadedImage = null;
-    let preloadController = null;
-    let preloadTimeout = null;
+    let preloadedImage = null; // Image object untuk preload
 
     // ================================================================
     // UTILITY
@@ -1086,11 +1084,6 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
-    }
-
-    function getUserDisplayName(user) {
-      if (!user) return 'User';
-      return user.displayName || user.email || 'User';
     }
 
     // ================================================================
@@ -1477,64 +1470,28 @@
     }
 
     // ================================================================
-    // ⭐ PRELOAD GAMBAR (dengan cache)
+    // ⭐ PRELOAD GAMBAR (sederhana, tanpa fetch)
     // ================================================================
     function preloadNextImage() {
       const nextIndex = currentPageIndex + 1;
       if (nextIndex >= pageUrls.length) return;
+      // Jika sudah ada preload untuk halaman yang sama, skip
       if (preloadedImage && preloadedImage._index === nextIndex) return;
 
-      if (preloadController) {
-        preloadController.abort();
-        preloadController = null;
-      }
-      if (preloadTimeout) {
-        clearTimeout(preloadTimeout);
-        preloadTimeout = null;
-      }
-
-      preloadTimeout = setTimeout(() => {
-        preloadController = new AbortController();
-        const url = pageUrls[nextIndex];
-
-        fetch(url, {
-          signal: preloadController.signal,
-          priority: 'low',
-          cache: 'force-cache',
-        })
-        .then(res => {
-          if (!res.ok) throw new Error('Gagal preload');
-          return res.blob();
-        })
-        .then(blob => {
-          const objectURL = URL.createObjectURL(blob);
-          preloadedImage = new Image();
-          preloadedImage._index = nextIndex;
-          preloadedImage._url = objectURL;
-          preloadedImage.onload = () => {
-            console.log('✅ Preload halaman', nextIndex + 1, 'selesai');
-            preloadController = null;
-            preloadTimeout = null;
-          };
-          preloadedImage.onerror = () => {
-            console.warn('⚠️ Gagal preload halaman', nextIndex + 1);
-            URL.revokeObjectURL(objectURL);
-            preloadedImage = null;
-            preloadController = null;
-            preloadTimeout = null;
-          };
-          preloadedImage.src = objectURL;
-        })
-        .catch(err => {
-          if (err.name === 'AbortError') {
-            console.log('⏹️ Preload dibatalkan');
-          } else {
-            console.warn('⚠️ Gagal preload:', err.message);
-          }
-          preloadController = null;
-          preloadTimeout = null;
-        });
-      }, 200);
+      const img = new Image();
+      img._index = nextIndex;
+      img.onload = () => {
+        console.log('✅ Preload halaman', nextIndex + 1, 'selesai');
+        // simpan gambar yang sudah di-preload
+        preloadedImage = img;
+      };
+      img.onerror = () => {
+        console.warn('⚠️ Gagal preload halaman', nextIndex + 1);
+        preloadedImage = null;
+      };
+      img.src = pageUrls[nextIndex];
+      // simpan referensi, tapi jika sudah ada gambar lain, timpa
+      preloadedImage = img;
     }
 
     // ================================================================
@@ -1737,11 +1694,6 @@
       const newIndex = currentPageIndex + direction;
       if (newIndex < 0 || newIndex >= pageUrls.length) return;
       currentPageIndex = newIndex;
-      preloadedImage = null;
-      if (preloadController) {
-        preloadController.abort();
-        preloadController = null;
-      }
 
       if (currentMode === 'page') {
         const wrapper = readerImages.querySelector('.page-wrapper');
@@ -1751,11 +1703,17 @@
         const info = readerImages.querySelector('.page-info');
         const nextBtn = readerImages.querySelector('.page-footer .next-chapter-btn');
 
-        if (img) {
+        // Cek apakah gambar sudah di-preload
+        if (preloadedImage && preloadedImage._index === currentPageIndex) {
+          img.src = preloadedImage.src;
+          if (spinner) spinner.style.display = 'none';
+          // Preload halaman berikutnya
+          setTimeout(() => preloadNextImage(), 100);
+        } else {
           img.src = pageUrls[currentPageIndex] || '';
           if (spinner) spinner.style.display = 'flex';
-          setTimeout(() => preloadNextImage(), 100);
         }
+
         if (info) info.textContent = `${currentPageIndex + 1} / ${pageUrls.length}`;
         const isLast = (currentPageIndex === pageUrls.length - 1);
         if (nextBtn) {
