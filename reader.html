@@ -1006,6 +1006,7 @@
     let currentPageIndex = 0;
     let isFullView = false;
     let currentLang = null;
+    let currentChapterNum = 0;
 
     // ================================================================
     // UTILITY
@@ -1393,29 +1394,41 @@
     }
 
     // ================================================================
-    // FUNGSI NAVIGASI CHAPTER (dengan bahasa yang sama)
+    // ⭐ FUNGSI NAVIGASI CHAPTER (berdasarkan nomor chapter)
     // ================================================================
     function findNextChapter(currentId, lang) {
-      // Cari chapter saat ini berdasarkan id
-      const currentIdx = allChapters.findIndex(c => c.id === currentId);
-      if (currentIdx === -1) return null;
+      // Cari chapter saat ini
+      const current = allChapters.find(c => c.id === currentId);
+      if (!current) return null;
 
-      // Cari chapter berikutnya dengan bahasa yang sama (mulai dari indeks+1)
-      for (let i = currentIdx + 1; i < allChapters.length; i++) {
-        if (allChapters[i].lang === lang) {
-          return allChapters[i];
-        }
+      // Ambil nomor chapter saat ini
+      const currentNum = parseFloat(current.chapter) || 0;
+
+      // Cari semua chapter dengan bahasa yang sama dan nomor > currentNum
+      let candidates = allChapters.filter(c => c.lang === lang && (parseFloat(c.chapter) || 0) > currentNum);
+
+      // Jika tidak ada dengan bahasa yang sama, cari semua chapter (bahasa apapun) dengan nomor > currentNum
+      if (candidates.length === 0) {
+        candidates = allChapters.filter(c => (parseFloat(c.chapter) || 0) > currentNum);
       }
-      return null; // tidak ada
+
+      if (candidates.length === 0) return null;
+
+      // Urutkan ascending dan ambil yang terkecil (next chapter terdekat)
+      candidates.sort((a, b) => (parseFloat(a.chapter) || 0) - (parseFloat(b.chapter) || 0));
+      return candidates[0];
     }
 
     function goToNextChapter() {
-      if (!currentChapterId || !currentLang) return;
+      if (!currentChapterId || !currentLang) {
+        showToast('Tidak ada data chapter.', 'fa-info-circle');
+        return;
+      }
       const next = findNextChapter(currentChapterId, currentLang);
       if (next) {
         goToChapter(next.id);
       } else {
-        showToast('Tidak ada chapter berikutnya dengan bahasa yang sama.', 'fa-info-circle');
+        showToast('Tidak ada chapter berikutnya.', 'fa-info-circle');
       }
     }
 
@@ -1463,7 +1476,8 @@
         nextBtn.className = 'next-chapter-btn';
         nextBtn.innerHTML = 'Chapter Selanjutnya <i class="fas fa-arrow-right"></i>';
         if (nextChapter) {
-          nextBtn.addEventListener('click', () => goToChapter(nextChapter.id));
+          nextBtn.addEventListener('click', () => goToNextChapter());
+          nextBtn.disabled = false;
         } else {
           nextBtn.disabled = true;
           nextBtn.innerHTML = 'Tidak ada chapter selanjutnya';
@@ -1503,7 +1517,8 @@
         nextBtn.className = 'next-chapter-btn';
         nextBtn.innerHTML = 'Chapter Selanjutnya <i class="fas fa-arrow-right"></i>';
         if (nextChapter) {
-          nextBtn.addEventListener('click', () => goToChapter(nextChapter.id));
+          nextBtn.addEventListener('click', () => goToNextChapter());
+          nextBtn.disabled = false;
         } else {
           nextBtn.disabled = true;
           nextBtn.innerHTML = 'Tidak ada chapter selanjutnya';
@@ -1524,7 +1539,18 @@
       const nextBtn = footer.querySelector('.next-chapter-btn');
       if (info) info.textContent = `${currentPageIndex + 1} / ${pageUrls.length}`;
       const isLast = (currentPageIndex === pageUrls.length - 1);
-      if (nextBtn) nextBtn.style.display = isLast ? 'inline-flex' : 'none';
+      if (nextBtn) {
+        const nextChapter = findNextChapter(currentChapterId, currentLang);
+        if (nextChapter) {
+          nextBtn.disabled = false;
+          nextBtn.innerHTML = 'Chapter Selanjutnya <i class="fas fa-arrow-right"></i>';
+          nextBtn.style.display = isLast ? 'inline-flex' : 'none';
+        } else {
+          nextBtn.disabled = true;
+          nextBtn.innerHTML = 'Tidak ada chapter selanjutnya';
+          nextBtn.style.display = isLast ? 'inline-flex' : 'none';
+        }
+      }
     }
 
     function goPage(direction) {
@@ -1576,15 +1602,20 @@
           const title = chapterData.title || `Chapter ${chapterData.chapter}`;
           readerTitle.textContent = `${title} (${langLabel})`;
           currentLang = chapterData.lang;
+          currentChapterNum = parseFloat(chapterData.chapter) || 0;
         } else {
           readerTitle.textContent = `Chapter`;
           currentLang = null;
+          currentChapterNum = 0;
         }
 
         loadingSpinner.style.display = 'none';
         readerContent.style.display = 'block';
 
         if (currentMangaId && currentChapterId) await renderComments();
+
+        // force update footer after load
+        setTimeout(() => updatePageFooter(), 100);
 
       } catch (err) {
         console.error('loadChapter error:', err);
@@ -1687,8 +1718,9 @@
           nextChapterBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             closeFullView();
-            goToChapter(nextChapter.id);
+            goToNextChapter();
           });
+          nextChapterBtn.disabled = false;
         } else {
           nextChapterBtn.disabled = true;
           nextChapterBtn.textContent = 'Tidak ada chapter selanjutnya';
@@ -1705,6 +1737,15 @@
           if (!btn) return;
           const isLast = (currentPageIndex === totalPages - 1);
           btn.style.display = isLast ? 'inline-flex' : 'none';
+          // update status
+          const nextChap = findNextChapter(currentChapterId, currentLang);
+          if (nextChap) {
+            btn.disabled = false;
+            btn.innerHTML = 'Chapter Selanjutnya <i class="fas fa-arrow-right"></i>';
+          } else {
+            btn.disabled = true;
+            btn.textContent = 'Tidak ada chapter selanjutnya';
+          }
         }
         updateFullViewNextBtn(content, pageUrls.length);
 
@@ -1731,8 +1772,9 @@
           nextChapterBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             closeFullView();
-            goToChapter(nextChapter.id);
+            goToNextChapter();
           });
+          nextChapterBtn.disabled = false;
         } else {
           nextChapterBtn.disabled = true;
           nextChapterBtn.textContent = 'Tidak ada chapter selanjutnya';
@@ -1851,7 +1893,7 @@
         currentMangaId = null;
       }
 
-      // 🔥 URUTKAN CHAPTER SECARA ASCENDING (dari chapter kecil ke besar)
+      // Urutkan chapter ascending (dari kecil ke besar)
       allChapters.sort((a, b) => {
         const numA = parseFloat(a.chapter) || 0;
         const numB = parseFloat(b.chapter) || 0;
