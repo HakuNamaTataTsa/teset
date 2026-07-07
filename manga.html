@@ -151,6 +151,37 @@
     }
     .nav-actions .auth-btn i { font-size:0.7rem; }
 
+    /* 🔥 TOMBOL TOGGLE 18+ */
+    .mature-toggle-btn {
+      padding:0.3rem 0.8rem;
+      border-radius:var(--radius-sm);
+      font-size:0.7rem;
+      font-weight:600;
+      background:var(--bg-card);
+      border:1px solid var(--border-color);
+      color:var(--fg-secondary);
+      transition:all var(--transition);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:0.3rem;
+    }
+    .mature-toggle-btn:hover {
+      border-color:var(--accent);
+      color:var(--fg-primary);
+    }
+    .mature-toggle-btn.active {
+      background:rgba(239,68,68,0.15);
+      border-color:#ef4444;
+      color:#ef4444;
+    }
+    .mature-toggle-btn:disabled {
+      opacity:0.4;
+      cursor:not-allowed;
+      transform:none !important;
+    }
+    .mature-toggle-btn i { font-size:0.65rem; }
+
     .hamburger {
       display:none; flex-direction:column; gap:4px;
       background:none; border:none; padding:4px; cursor:pointer;
@@ -997,6 +1028,10 @@
       <div class="nav-actions">
         <button class="search-toggle" id="searchToggle"><i class="fas fa-search"></i><span>Search</span></button>
         <button class="theme-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+        <!-- 🔥 TOMBOL TOGGLE 18+ -->
+        <button class="mature-toggle-btn" id="matureToggleBtn" onclick="toggleMature()" disabled>
+          <i class="fas fa-lock"></i> <span id="matureToggleLabel">18+ Disembunyikan</span>
+        </button>
         <a href="login.html" class="auth-btn" id="authBtn">
           <i class="fas fa-user"></i> <span id="authText">Login</span>
         </a>
@@ -1241,8 +1276,10 @@
     let currentUserBookmarks = [];
     let heroInterval = null;
     let heroIndex = 0;
-    // Untuk menyimpan target manga yang akan dibuka setelah konfirmasi 18+
     let pendingMangaId = null;
+
+    // 🔥 18+ STATE - DEFAULT OFF (disembunyikan)
+    let showMature = false;
 
     const $ = id => document.getElementById(id);
     const heroSlides = $('heroSlides');
@@ -1278,6 +1315,10 @@
     const modalCancelBtn = $('modalCancelBtn');
     const modalLoginMsg = $('modalLoginMsg');
 
+    // 🔥 ELEMEN TOGGLE 18+
+    const matureToggleBtn = $('matureToggleBtn');
+    const matureToggleLabel = $('matureToggleLabel');
+
     // ============================================================
     // FIREBASE AUTH & BOOKMARK
     // ============================================================
@@ -1290,14 +1331,35 @@
           const userData = await getUserProfile(user.uid);
           currentUserBookmarks = userData?.bookmarks || [];
         } catch (e) { currentUserBookmarks = []; }
+
+        // 🔥 USER LOGIN - aktifkan tombol toggle 18+
+        matureToggleBtn.disabled = false;
+        matureToggleBtn.title = 'Klik untuk menampilkan atau menyembunyikan konten 18+';
+        if (!showMature) {
+          matureToggleBtn.classList.remove('active');
+          matureToggleLabel.textContent = '18+ Disembunyikan';
+        }
+        // Reload data jika perlu
+        if (state.mangaList.length === 0) {
+          init();
+        }
+
       } else {
         authText.textContent = 'Login';
         authBtn.href = 'login.html';
         authBtn.querySelector('i').className = 'fas fa-user';
         currentUserBookmarks = [];
-      }
-      if (state.mangaList.length > 0) {
-        renderHeroSlider(state.mangaList.slice(0, 5));
+
+        // 🔥 USER LOGOUT - nonaktifkan toggle, set 18+ OFF
+        showMature = false;
+        matureToggleBtn.disabled = true;
+        matureToggleBtn.classList.remove('active');
+        matureToggleLabel.textContent = '18+ Disembunyikan';
+        // Reload data (sembunyikan 18+)
+        state.mangaList = [];
+        state.offset = 0;
+        state.hasMore = true;
+        init();
       }
     });
 
@@ -1418,19 +1480,11 @@
     // 18+ CONTENT HANDLING
     // ============================================================
     function isMatureContent(contentRating) {
-      // contentRating bisa: 'safe', 'suggestive', 'erotica', 'pornographic'
       return contentRating === 'erotica' || contentRating === 'pornographic';
     }
 
     function getContentRating(manga) {
       return manga?.attributes?.contentRating || 'safe';
-    }
-
-    function getMatureBadgeHtml(contentRating) {
-      if (isMatureContent(contentRating)) {
-        return `<span class="badge badge-18plus"><i class="fas fa-lock" style="font-size:0.4rem;margin-right:0.1rem;"></i> 18+</span>`;
-      }
-      return '';
     }
 
     function is18plusConfirmed(mangaId) {
@@ -1443,14 +1497,33 @@
       sessionStorage.setItem(key, 'true');
     }
 
-    function clear18plusConfirmation(mangaId) {
-      const key = `confirmed18plus_${mangaId}`;
-      sessionStorage.removeItem(key);
-    }
-
     function redirectToLogin() {
       const currentUrl = encodeURIComponent(window.location.href);
       window.location.href = `login.html?return=${currentUrl}`;
+    }
+
+    // 🔥 TOGGLE 18+ (hanya jika login)
+    function toggleMature() {
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        showToast('Silakan login terlebih dahulu untuk mengakses konten 18+!', 'fa-exclamation-circle');
+        setTimeout(() => window.location.href = 'login.html', 1500);
+        return;
+      }
+      showMature = !showMature;
+      // Update UI toggle
+      if (showMature) {
+        matureToggleBtn.classList.add('active');
+        matureToggleLabel.textContent = '18+ Ditampilkan';
+      } else {
+        matureToggleBtn.classList.remove('active');
+        matureToggleLabel.textContent = '18+ Disembunyikan';
+      }
+      // Reset dan reload data
+      state.mangaList = [];
+      state.offset = 0;
+      state.hasMore = true;
+      init();
     }
 
     // ============================================================
@@ -1487,10 +1560,15 @@
         limit: 24,
         offset: 0,
         'availableTranslatedLanguage[]': ['id'],
-        'contentRating[]': ['safe', 'suggestive', 'erotica', 'pornographic'],
         'includes[]': ['cover_art', 'artist', 'author'],
         order: { latestUploadedChapter: 'desc' }
       };
+      // 🔥 Tentukan contentRating berdasarkan showMature
+      if (showMature) {
+        defaultParams['contentRating[]'] = ['safe', 'suggestive', 'erotica', 'pornographic'];
+      } else {
+        defaultParams['contentRating[]'] = ['safe', 'suggestive'];
+      }
       const finalParams = { ...defaultParams, ...params };
       if (finalParams.originalLanguage) {
         finalParams['originalLanguage[]'] = [finalParams.originalLanguage];
@@ -1518,8 +1596,11 @@
         if (!finalParams['availableTranslatedLanguage[]']) {
           finalParams['availableTranslatedLanguage[]'] = ['id'];
         }
-        if (!finalParams['contentRating[]']) {
+        // 🔥 Tentukan contentRating berdasarkan showMature
+        if (showMature) {
           finalParams['contentRating[]'] = ['safe', 'suggestive', 'erotica', 'pornographic'];
+        } else {
+          finalParams['contentRating[]'] = ['safe', 'suggestive'];
         }
         if (!finalParams['includes[]']) {
           finalParams['includes[]'] = ['cover_art', 'artist', 'author'];
@@ -1567,7 +1648,6 @@
       }
     }
 
-    // FIX: Menambahkan parameter 'append'
     function renderMangaGrid(gridId, items, showRank = false, append = false) {
       const grid = document.getElementById(gridId);
       if (!grid) return;
@@ -1617,9 +1697,7 @@
           <button class="read-btn" data-id="${manga.id}">Baca</button>
         `;
         
-        // Click handler dengan 18+ check
         card.addEventListener('click', function(e) {
-          // Cegah jika klik tombol read
           if (e.target.classList.contains('read-btn')) return;
           const id = this.dataset.mangaId;
           const isMature = this.dataset.isMature === 'true';
@@ -1653,9 +1731,7 @@
     function handleMatureClick(mangaId) {
       const user = firebase.auth().currentUser;
       
-      // Cek login
       if (!user) {
-        // Tampilkan modal dengan pesan login
         modalLoginMsg.style.display = 'block';
         modalConfirmBtn.style.display = 'none';
         modal18plus.classList.add('active');
@@ -1663,13 +1739,11 @@
         return;
       }
       
-      // Cek apakah sudah dikonfirmasi untuk manga ini
       if (is18plusConfirmed(mangaId)) {
         window.location.href = `detail.html?id=${mangaId}`;
         return;
       }
       
-      // Tampilkan modal konfirmasi 18+
       modalLoginMsg.style.display = 'none';
       modalConfirmBtn.style.display = 'block';
       pendingMangaId = mangaId;
@@ -1686,16 +1760,13 @@
       }
       const user = firebase.auth().currentUser;
       if (!user) {
-        // Redirect ke login
         redirectToLogin();
         return;
       }
-      // Simpan konfirmasi
       set18plusConfirmed(pendingMangaId);
       const targetId = pendingMangaId;
       pendingMangaId = null;
       modal18plus.classList.remove('active');
-      // Navigasi ke detail
       window.location.href = `detail.html?id=${targetId}`;
     });
 
@@ -1706,7 +1777,6 @@
       modalConfirmBtn.style.display = 'block';
     });
 
-    // Tutup modal jika klik di luar
     modal18plus.addEventListener('click', function(e) {
       if (e.target === this) {
         pendingMangaId = null;
@@ -1917,13 +1987,18 @@
         return;
       }
       try {
-        const data = await apiFetch('/manga', {
+        const params = {
           title: query,
           limit: 10,
           'availableTranslatedLanguage[]': ['id'],
-          'contentRating[]': ['safe', 'suggestive', 'erotica', 'pornographic'],
           'includes[]': ['cover_art'],
-        });
+        };
+        if (showMature) {
+          params['contentRating[]'] = ['safe', 'suggestive', 'erotica', 'pornographic'];
+        } else {
+          params['contentRating[]'] = ['safe', 'suggestive'];
+        }
+        const data = await apiFetch('/manga', params);
         const items = data.data || [];
         searchResults.innerHTML = '';
         if (items.length === 0) {
@@ -2013,7 +2088,7 @@
     // INIT
     // ============================================================
     async function init() {
-      console.log('🚀 Manga App Starting...');
+      console.log('🚀 Manga App Starting... (18+ =', showMature ? 'ON' : 'OFF', ')');
       renderSkeleton('trendingGrid', 12);
       renderSkeleton('mangaOriginGrid', 8);
       renderSkeleton('manhwaOriginGrid', 8);
@@ -2027,10 +2102,14 @@
           limit: 24,
           offset: 0,
           'availableTranslatedLanguage[]': ['id'],
-          'contentRating[]': ['safe', 'suggestive', 'erotica', 'pornographic'],
           'includes[]': ['cover_art', 'artist', 'author'],
           order: { latestUploadedChapter: 'desc' },
         };
+        if (showMature) {
+          initialParams['contentRating[]'] = ['safe', 'suggestive', 'erotica', 'pornographic'];
+        } else {
+          initialParams['contentRating[]'] = ['safe', 'suggestive'];
+        }
         const initialData = await apiFetch('/manga', initialParams);
         const allItems = initialData.data || [];
         state.total = initialData.total || 0;
@@ -2126,8 +2205,12 @@
       navbar.classList.toggle('scrolled', window.scrollY > 20);
     });
 
+    // 🔥 Inisialisasi toggle button (default disabled)
+    matureToggleBtn.disabled = true;
+    matureToggleLabel.textContent = '18+ Disembunyikan';
+
     init();
-    console.log('📚 Manga App Ready with 18+ Content Protection');
+    console.log('📚 Manga App Ready with 18+ Toggle (default OFF)');
   </script>
 </body>
 </html>
