@@ -1030,7 +1030,7 @@
         <button class="theme-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
         <!-- 🔥 TOMBOL TOGGLE 18+ -->
         <button class="mature-toggle-btn" id="matureToggleBtn" onclick="toggleMature()" disabled>
-          <i class="fas fa-lock"></i> <span id="matureToggleLabel">18+</span>
+          <i class="fas fa-lock"></i> <span id="matureToggleLabel">18+ </span>
         </button>
         <a href="login.html" class="auth-btn" id="authBtn">
           <i class="fas fa-user"></i> <span id="authText">Login</span>
@@ -1267,7 +1267,7 @@
     const state = {
       mangaList: [],
       total: 0,
-      set: 0,
+      offset: 0,
       limit: 24,
       isFetching: false,
       hasMore: true,
@@ -1278,7 +1278,7 @@
     let heroIndex = 0;
     let pendingMangaId = null;
 
-    // 🔥 18+ STATE - DEFAULT  ()
+    // 🔥 18+ STATE - DEFAULT OFF ()
     let showMature = false;
 
     const $ = id => document.getElementById(id);
@@ -1350,14 +1350,14 @@
         authBtn.querySelector('i').className = 'fas fa-user';
         currentUserBookmarks = [];
 
-        // 🔥 USER LOGOUT - nonaktifkan toggle, set 18+ 
+        // 🔥 USER LOGOUT - nonaktifkan toggle, set 18+ OFF
         showMature = false;
         matureToggleBtn.disabled = true;
         matureToggleBtn.classList.remove('active');
         matureToggleLabel.textContent = '18+ ';
         // Reload data (sembunyikan 18+)
         state.mangaList = [];
-        state.set = 0;
+        state.offset = 0;
         state.hasMore = true;
         init();
       }
@@ -1514,14 +1514,14 @@
       // Update UI toggle
       if (showMature) {
         matureToggleBtn.classList.add('active');
-        matureToggleLabel.textContent = '18+';
+        matureToggleLabel.textContent = '18+ ';
       } else {
         matureToggleBtn.classList.remove('active');
-        matureToggleLabel.textContent = '18+';
+        matureToggleLabel.textContent = '18+ ';
       }
       // Reset dan reload data
       state.mangaList = [];
-      state.set = 0;
+      state.offset = 0;
       state.hasMore = true;
       init();
     }
@@ -1558,7 +1558,7 @@
     async function fetchMangaData(params = {}) {
       const defaultParams = {
         limit: 24,
-        set: 0,
+        offset: 0,
         'availableTranslatedLanguage[]': ['id'],
         'includes[]': ['cover_art', 'artist', 'author'],
         order: { latestUploadedChapter: 'desc' }
@@ -1585,7 +1585,7 @@
       if (state.isFetching) return;
       state.isFetching = true;
       try {
-        const finalParams = { ...params, set: state.set, limit: state.limit };
+        const finalParams = { ...params, offset: state.offset, limit: state.limit };
         if (finalParams.originalLanguage) {
           finalParams['originalLanguage[]'] = [finalParams.originalLanguage];
           delete finalParams.originalLanguage;
@@ -1615,7 +1615,7 @@
           state.mangaList = items;
         }
         state.hasMore = state.mangaList.length < state.total;
-        state.set += items.length;
+        state.offset += items.length;
         return items;
       } catch (err) {
         console.error('fetchMangaList error:', err);
@@ -1838,7 +1838,7 @@
       genreGrid.innerHTML = '';
       const icons = {
         'action':'fa-fist-raised','adventure':'fa-compass','comedy':'fa-laugh','drama':'fa-theater-masks',
-        'fantasy':'fa-hat-wizard','romance':'fa-heart','school':'fa-school','slice of life':'fa-cee',
+        'fantasy':'fa-hat-wizard','romance':'fa-heart','school':'fa-school','slice of life':'fa-coffee',
         'martial arts':'fa-fist-raised','magic':'fa-magic','supernatural':'fa-ghost','isekai':'fa-globe',
         'historical':'fa-landmark','horror':'fa-skull','sci-fi':'fa-rocket','sports':'fa-basketball-ball',
         'mecha':'fa-robot','psychological':'fa-brain','mystery':'fa-search'
@@ -2088,7 +2088,7 @@
     // INIT
     // ============================================================
     async function init() {
-      console.log('🚀 Manga App Starting... (18+ =', showMature ? 'ON' : '', ')');
+      console.log('🚀 Manga App Starting... (18+ =', showMature ? 'ON' : 'OFF', ')');
       renderSkeleton('trendingGrid', 12);
       renderSkeleton('mangaOriginGrid', 8);
       renderSkeleton('manhwaOriginGrid', 8);
@@ -2100,7 +2100,7 @@
       try {
         const initialParams = {
           limit: 24,
-          set: 0,
+          offset: 0,
           'availableTranslatedLanguage[]': ['id'],
           'includes[]': ['cover_art', 'artist', 'author'],
           order: { latestUploadedChapter: 'desc' },
@@ -2114,7 +2114,7 @@
         const allItems = initialData.data || [];
         state.total = initialData.total || 0;
         state.mangaList = allItems;
-        state.set = allItems.length;
+        state.offset = allItems.length;
         state.hasMore = allItems.length < state.total;
 
         const shuffled = [...allItems].sort(() => Math.random() - 0.5);
@@ -2210,7 +2210,7 @@
     matureToggleLabel.textContent = '18+ ';
 
     init();
-    console.log('📚 Manga App Ready with 18+ Toggle (default )');
+    console.log('📚 Manga App Ready with 18+ Toggle (default OFF)');
   </script>
 </body>
 </html>
