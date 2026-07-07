@@ -2,15 +2,13 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
   <title>Baca Chapter – Akino Store</title>
   <meta name="description" content="Baca chapter manga dengan nyaman." />
 
-  <!-- Preconnect ke worker proxy untuk mempercepat koneksi -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://manga-scrapper.akinostore.workers.dev" />
   <link rel="dns-prefetch" href="https://manga-scrapper.akinostore.workers.dev" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
@@ -219,20 +217,69 @@
       background:var(--accent); color:#fff;
     }
 
-    /* ===== READER IMAGES ===== */
+    /* ===== READER IMAGES - SCROLL ===== */
     .reader-images.scroll {
       display:flex; flex-direction:column; align-items:center; gap:0.4rem;
       padding-bottom:1rem;
     }
+    .reader-images.scroll .scroll-footer {
+      width:100%; max-width:800px;
+      display:flex; justify-content:flex-end;
+      padding:0.6rem 0.2rem 0;
+      margin-top:0.4rem;
+      border-top:1px solid var(--border-color);
+    }
+    .reader-images.scroll .scroll-footer .next-chapter-btn {
+      padding:0.4rem 1.2rem; border-radius:var(--radius-sm);
+      background:var(--accent); color:#fff; font-size:0.8rem; font-weight:600;
+      transition:all var(--transition); border:none; cursor:pointer;
+      display:inline-flex; align-items:center; gap:0.4rem;
+    }
+    .reader-images.scroll .scroll-footer .next-chapter-btn:hover {
+      background:var(--accent-hover); transform:scale(1.02);
+    }
+    .reader-images.scroll .scroll-footer .next-chapter-btn:disabled {
+      opacity:0.4; cursor:not-allowed; transform:none;
+    }
+
+    .reader-images.scroll .img-placeholder {
+      width:100%; max-width:800px;
+      aspect-ratio:3/4.5;
+      background:var(--bg-secondary);
+      border-radius:var(--radius-sm);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--fg-muted);
+      font-size:0.8rem;
+      position:relative;
+      overflow:hidden;
+    }
+    .reader-images.scroll .img-placeholder .spinner-mini {
+      width:28px;
+      height:28px;
+      border:3px solid var(--border-color);
+      border-top-color:var(--accent);
+      border-radius:50%;
+      animation:spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform:rotate(360deg); }
+    }
     .reader-images.scroll img {
-      max-width:100%; height:auto; border-radius:var(--radius-sm);
-      background:var(--bg-secondary); border:1px solid var(--border-color);
+      width:100%;
+      height:auto;
+      border-radius:var(--radius-sm);
+      background:var(--bg-secondary);
+      border:1px solid var(--border-color);
       box-shadow:var(--shadow);
     }
 
+    /* ===== READER IMAGES - PAGE ===== */
     .reader-images.page {
       display:flex; flex-direction:column; align-items:center; gap:0.4rem;
       padding-bottom:2rem;
+      position:relative;
     }
     .reader-images.page .page-wrapper {
       position:relative; width:100%; max-width:800px; margin:0 auto;
@@ -247,17 +294,17 @@
       position:relative;
       z-index:2;
     }
-    .reader-images.page .page-wrapper .img-spinner {
+    .reader-images.page .img-spinner {
       position:absolute;
       inset:0;
       display:flex;
       align-items:center;
       justify-content:center;
       background:var(--bg-secondary);
-      border-radius:var(--radius-sm);
       z-index:1;
+      border-radius:var(--radius-sm);
     }
-    .reader-images.page .page-wrapper .img-spinner .spinner {
+    .reader-images.page .img-spinner .spinner {
       width:32px;
       height:32px;
       border:3px solid var(--border-color);
@@ -265,21 +312,19 @@
       border-radius:50%;
       animation:spin 0.8s linear infinite;
     }
-    @keyframes spin {
-      to { transform:rotate(360deg); }
-    }
 
     .reader-images.page .click-area {
-      display:flex; position:absolute; inset:0; z-index:3;
+      display:flex; position:relative; width:100%; max-width:800px; margin:0 auto;
       border-radius:var(--radius-sm);
       overflow:hidden;
     }
     .reader-images.page .click-area .half {
-      flex:1; min-height:100%; cursor:pointer;
+      flex:1; height:100%; min-height:300px; cursor:pointer;
       display:flex; align-items:center; justify-content:center;
       color:var(--fg-muted); font-size:1.5rem; transition:all var(--transition);
       user-select:none;
       -webkit-user-select:none;
+      position:relative;
     }
     .reader-images.page .click-area .half:hover {
       background:var(--accent-dim);
@@ -312,26 +357,6 @@
       background:var(--accent-hover); transform:scale(1.02);
     }
     .reader-images.page .page-footer .next-chapter-btn:disabled {
-      opacity:0.4; cursor:not-allowed; transform:none;
-    }
-
-    .scroll-footer {
-      width:100%; max-width:800px;
-      display:flex; justify-content:flex-end;
-      padding:0.6rem 0.2rem 0;
-      margin-top:0.4rem;
-      border-top:1px solid var(--border-color);
-    }
-    .scroll-footer .next-chapter-btn {
-      padding:0.4rem 1.2rem; border-radius:var(--radius-sm);
-      background:var(--accent); color:#fff; font-size:0.8rem; font-weight:600;
-      transition:all var(--transition); border:none; cursor:pointer;
-      display:inline-flex; align-items:center; gap:0.4rem;
-    }
-    .scroll-footer .next-chapter-btn:hover {
-      background:var(--accent-hover); transform:scale(1.02);
-    }
-    .scroll-footer .next-chapter-btn:disabled {
       opacity:0.4; cursor:not-allowed; transform:none;
     }
 
@@ -429,7 +454,7 @@
     }
     .full-view~.full-toggle-btn { display:none; }
 
-    /* ===== LOADING SPINNER ===== */
+    /* ===== LOADING ===== */
     .loading-spinner {
       text-align:center; padding:4rem 0; color:var(--fg-secondary);
     }
@@ -1035,7 +1060,6 @@
     let preloadedImage = null;
     let preloadController = null;
     let preloadTimeout = null;
-    let scrollObserver = null;
 
     // ================================================================
     // UTILITY
@@ -1070,7 +1094,7 @@
     }
 
     // ================================================================
-    // 🔥 KOMENTAR – FIRESTORE (dengan chapterId)
+    // 🔥 KOMENTAR – FIRESTORE
     // ================================================================
     const COMMENTS_COLLECTION = 'comments';
 
@@ -1423,12 +1447,13 @@
     }
 
     // ================================================================
-    // FUNGSI NAVIGASI CHAPTER
+    // ⭐ NAVIGASI CHAPTER
     // ================================================================
     function findNextChapter(currentId, lang) {
       const current = allChapters.find(c => c.id === currentId);
       if (!current) return null;
       const currentNum = parseFloat(current.chapter) || 0;
+
       let candidates = allChapters.filter(c => c.lang === lang && (parseFloat(c.chapter) || 0) > currentNum);
       if (candidates.length === 0) {
         candidates = allChapters.filter(c => (parseFloat(c.chapter) || 0) > currentNum);
@@ -1452,7 +1477,7 @@
     }
 
     // ================================================================
-    // PRELOAD GAMBAR BERIKUTNYA
+    // ⭐ PRELOAD GAMBAR (dengan cache)
     // ================================================================
     function preloadNextImage() {
       const nextIndex = currentPageIndex + 1;
@@ -1471,10 +1496,11 @@
       preloadTimeout = setTimeout(() => {
         preloadController = new AbortController();
         const url = pageUrls[nextIndex];
+
         fetch(url, {
           signal: preloadController.signal,
           priority: 'low',
-          cache: 'force-cache'
+          cache: 'force-cache',
         })
         .then(res => {
           if (!res.ok) throw new Error('Gagal preload');
@@ -1519,20 +1545,12 @@
       readerImages.innerHTML = '';
 
       const nextChapter = findNextChapter(currentChapterId, currentLang);
-      preloadedImage = null;
-      if (preloadController) {
-        preloadController.abort();
-        preloadController = null;
-      }
-      if (scrollObserver) {
-        scrollObserver.disconnect();
-        scrollObserver = null;
-      }
 
       if (isPage) {
         readerImages.className = 'reader-images page';
         const wrapper = document.createElement('div');
         wrapper.className = 'page-wrapper';
+        wrapper.style.position = 'relative';
 
         // Spinner
         const spinner = document.createElement('div');
@@ -1557,7 +1575,7 @@
           this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22%3E%3Crect width=%22400%22 height=%22600%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2220%22%3EGagal%20load%3C/text%3E%3C/svg%3E';
         };
 
-        // Click area (prev/next)
+        // Click area
         const clickArea = document.createElement('div');
         clickArea.className = 'click-area';
         const leftHalf = document.createElement('div');
@@ -1603,7 +1621,6 @@
         readerImages._nextBtn = nextBtn;
         readerImages._spinner = spinner;
 
-        // Preload halaman berikutnya
         if (currentPageIndex + 1 < pageUrls.length) {
           preloadNextImage();
         }
@@ -1611,6 +1628,8 @@
       } else {
         // SCROLL MODE
         readerImages.className = 'reader-images scroll';
+
+        // Container
         const container = document.createElement('div');
         container.style.width = '100%';
         container.style.display = 'flex';
@@ -1621,33 +1640,25 @@
         const imgElements = [];
         pageUrls.forEach((url, idx) => {
           const placeholder = document.createElement('div');
-          placeholder.style.width = '100%';
-          placeholder.style.maxWidth = '800px';
-          placeholder.style.aspectRatio = '3/4.5';
-          placeholder.style.background = 'var(--bg-secondary)';
-          placeholder.style.borderRadius = 'var(--radius-sm)';
-          placeholder.style.display = 'flex';
-          placeholder.style.alignItems = 'center';
-          placeholder.style.justifyContent = 'center';
-          placeholder.style.color = 'var(--fg-muted)';
-          placeholder.style.fontSize = '0.8rem';
-          placeholder.textContent = 'Memuat...';
+          placeholder.className = 'img-placeholder';
+          const spinnerMini = document.createElement('div');
+          spinnerMini.className = 'spinner-mini';
+          placeholder.appendChild(spinnerMini);
 
           const img = document.createElement('img');
           img.dataset.src = url;
           img.alt = `Halaman ${idx + 1}`;
           img.loading = 'lazy';
           img.decoding = 'async';
-          img.style.width = '100%';
-          img.style.height = 'auto';
           img.style.display = 'none';
-          img.style.borderRadius = 'var(--radius-sm)';
-          img.onerror = function() {
-            this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22%3E%3Crect width=%22400%22 height=%22600%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2220%22%3EGagal%20load%3C/text%3E%3C/svg%3E';
-            placeholder.remove();
-          };
+
           img.onload = function() {
             placeholder.remove();
+            this.style.display = 'block';
+          };
+          img.onerror = function() {
+            placeholder.remove();
+            this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22%3E%3Crect width=%22400%22 height=%22600%22 fill=%22%23222%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2220%22%3EGagal%20load%3C/text%3E%3C/svg%3E';
             this.style.display = 'block';
           };
 
@@ -1656,8 +1667,8 @@
           imgElements.push({ placeholder, img, url, loaded: false });
         });
 
-        // Intersection Observer dengan rootMargin 200px
-        scrollObserver = new IntersectionObserver((entries) => {
+        // Intersection Observer
+        const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
               const placeholder = entry.target;
@@ -1671,13 +1682,13 @@
         }, { rootMargin: '200px 0px' });
 
         imgElements.forEach(({ placeholder }) => {
-          scrollObserver.observe(placeholder);
+          observer.observe(placeholder);
         });
 
+        readerImages._scrollObserver = observer;
         readerImages.appendChild(container);
-        readerImages._scrollObserver = scrollObserver;
 
-        // Footer next chapter
+        // Footer
         const scrollFooter = document.createElement('div');
         scrollFooter.className = 'scroll-footer';
         const nextBtn = document.createElement('button');
@@ -1698,9 +1709,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ================================================================
-    // UPDATE PAGE FOOTER & NAVIGASI
-    // ================================================================
     function updatePageFooter() {
       if (currentMode !== 'page') return;
       const footer = readerImages.querySelector('.page-footer');
@@ -1711,14 +1719,16 @@
       const isLast = (currentPageIndex === pageUrls.length - 1);
       if (nextBtn) {
         const nextChapter = findNextChapter(currentChapterId, currentLang);
-        if (nextChapter) {
+        if (nextChapter && isLast) {
+          nextBtn.style.display = 'inline-flex';
           nextBtn.disabled = false;
           nextBtn.innerHTML = 'Chapter Selanjutnya <i class="fas fa-arrow-right"></i>';
-          nextBtn.style.display = isLast ? 'inline-flex' : 'none';
         } else {
-          nextBtn.disabled = true;
-          nextBtn.innerHTML = 'Tidak ada chapter selanjutnya';
           nextBtn.style.display = isLast ? 'inline-flex' : 'none';
+          if (isLast && !nextChapter) {
+            nextBtn.disabled = true;
+            nextBtn.innerHTML = 'Tidak ada chapter selanjutnya';
+          }
         }
       }
     }
@@ -1732,6 +1742,7 @@
         preloadController.abort();
         preloadController = null;
       }
+
       if (currentMode === 'page') {
         const wrapper = readerImages.querySelector('.page-wrapper');
         if (!wrapper) return;
@@ -2091,12 +2102,14 @@
         currentMangaId = null;
       }
 
+      // Urutkan chapter ascending
       allChapters.sort((a, b) => {
         const numA = parseFloat(a.chapter) || 0;
         const numB = parseFloat(b.chapter) || 0;
         return numA - numB;
       });
 
+      // Isi dropdown
       chapterSelect.innerHTML = '';
       allChapters.forEach((ch, idx) => {
         const opt = document.createElement('option');
