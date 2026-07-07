@@ -1030,7 +1030,7 @@
         <button class="theme-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
         <!-- 🔥 TOMBOL TOGGLE 18+ -->
         <button class="mature-toggle-btn" id="matureToggleBtn" onclick="toggleMature()" disabled>
-          <i class="fas fa-lock"></i> <span id="matureToggleLabel">18+ Disembunyikan</span>
+          <i class="fas fa-lock"></i> <span id="matureToggleLabel">18+ Off</span>
         </button>
         <a href="login.html" class="auth-btn" id="authBtn">
           <i class="fas fa-user"></i> <span id="authText">Login</span>
@@ -1278,7 +1278,7 @@
     let heroIndex = 0;
     let pendingMangaId = null;
 
-    // 🔥 18+ STATE - DEFAULT OFF (disembunyikan)
+    // 🔥 18+ STATE - DEFAULT OFF (Off)
     let showMature = false;
 
     const $ = id => document.getElementById(id);
@@ -1337,7 +1337,7 @@
         matureToggleBtn.title = 'Klik untuk menampilkan atau menyembunyikan konten 18+';
         if (!showMature) {
           matureToggleBtn.classList.remove('active');
-          matureToggleLabel.textContent = '18+ Disembunyikan';
+          matureToggleLabel.textContent = '18+ Off';
         }
         // Reload data jika perlu
         if (state.mangaList.length === 0) {
@@ -1354,7 +1354,7 @@
         showMature = false;
         matureToggleBtn.disabled = true;
         matureToggleBtn.classList.remove('active');
-        matureToggleLabel.textContent = '18+ Disembunyikan';
+        matureToggleLabel.textContent = '18+ Off';
         // Reload data (sembunyikan 18+)
         state.mangaList = [];
         state.offset = 0;
@@ -1514,10 +1514,10 @@
       // Update UI toggle
       if (showMature) {
         matureToggleBtn.classList.add('active');
-        matureToggleLabel.textContent = '18+ Ditampilkan';
+        matureToggleLabel.textContent = '18+ On';
       } else {
         matureToggleBtn.classList.remove('active');
-        matureToggleLabel.textContent = '18+ Disembunyikan';
+        matureToggleLabel.textContent = '18+ Off';
       }
       // Reset dan reload data
       state.mangaList = [];
@@ -2207,7 +2207,7 @@
 
     // 🔥 Inisialisasi toggle button (default disabled)
     matureToggleBtn.disabled = true;
-    matureToggleLabel.textContent = '18+ Disembunyikan';
+    matureToggleLabel.textContent = '18+ Off';
 
     init();
     console.log('📚 Manga App Ready with 18+ Toggle (default OFF)');
